@@ -1,4 +1,4 @@
-import { Alert, Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, Image, Pressable, ScrollView, Share, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -203,7 +203,12 @@ export default function AuthStatus() {
               />
               <Button
                 title="Share Listing"
-                onPress={() => Alert.alert('Share Listing', 'Sharing comes next.')}
+                onPress={() =>
+                  Share.share({
+                    title: product.title || 'Veribee listing',
+                    message: `${product.title || 'This listing'} is Veribee verified with auth score ${product.authScore}.`,
+                  })
+                }
               />
             </>
           ) : (

@@ -34,17 +34,25 @@ export const LOCAL_TEST_ACCOUNTS: LocalTestAccount[] = [
   },
 ];
 
+export function toLocalPhoneDigits(value: string) {
+  let digits = value.replace(/\D/g, '');
+  if (digits.startsWith('63')) digits = digits.slice(2);
+  if (digits.startsWith('0')) digits = digits.slice(1);
+  return digits.slice(0, 10);
+}
+
 export function toLocalPhone(value: string) {
-  const digits = value.replace(/\D/g, '');
-  if (digits.startsWith('63')) return `+${digits.slice(0, 12)}`;
-  return `+63${digits.slice(0, 10)}`;
+  return `+63${toLocalPhoneDigits(value)}`;
+}
+
+export function findLocalAccountByPhone(phoneDigits: string) {
+  const phone = toLocalPhone(phoneDigits);
+  return LOCAL_TEST_ACCOUNTS.find((account) => account.phone === phone);
 }
 
 export function findLocalAccount(phoneDigits: string, password: string) {
-  const phone = toLocalPhone(phoneDigits);
-  return LOCAL_TEST_ACCOUNTS.find(
-    (account) => account.phone === phone && account.password === password,
-  );
+  const account = findLocalAccountByPhone(phoneDigits);
+  return account?.password === password ? account : undefined;
 }
 
 export function makeLocalUserId(phone: string) {

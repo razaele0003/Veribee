@@ -1,4 +1,4 @@
-import { Alert, Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -8,11 +8,13 @@ import { Colors, Shadow } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
 import { Spacing } from '@/constants/spacing';
 import { Radii } from '@/constants/radii';
+import { useState } from 'react';
 
 export default function PickupConfirm() {
   const router = useRouter();
   const activeDelivery = useRiderStore((s) => s.activeDelivery);
   const updateActiveStatus = useRiderStore((s) => s.updateActiveStatus);
+  const [checked, setChecked] = useState([false, false, false]);
 
   if (!activeDelivery) {
     router.replace('/(rider)/job-feed');
@@ -21,10 +23,10 @@ export default function PickupConfirm() {
 
   const onConfirm = () => {
     updateActiveStatus('heading_to_buyer');
-    Alert.alert('Pickup confirmed', 'Package custody is now assigned to you.', [
-      { text: 'Navigate to Buyer', onPress: () => router.replace('/(rider)/navigation-delivery') },
-    ]);
+    router.replace('/(rider)/navigation-delivery');
   };
+
+  const allChecked = checked.every(Boolean);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -54,24 +56,50 @@ export default function PickupConfirm() {
           </View>
         </View>
 
-        <ChecklistItem label="Package matches order details" />
-        <ChecklistItem label="Veribee seal is intact" />
-        <ChecklistItem label="Seller confirms rider identity" />
+        {[
+          'Package matches order details',
+          'Veribee seal is intact',
+          'Seller confirms rider identity',
+        ].map((label, index) => (
+          <ChecklistItem
+            key={label}
+            label={label}
+            checked={checked[index]}
+            onPress={() =>
+              setChecked((current) =>
+                current.map((value, itemIndex) => (itemIndex === index ? !value : value)),
+              )
+            }
+          />
+        ))}
 
-        <Button title="Confirm Pickup" onPress={onConfirm} />
+        <Button title="Confirm Pickup" onPress={onConfirm} disabled={!allChecked} />
       </ScrollView>
     </SafeAreaView>
   );
 }
 
-function ChecklistItem({ label }: { label: string }) {
+function ChecklistItem({
+  label,
+  checked,
+  onPress,
+}: {
+  label: string;
+  checked: boolean;
+  onPress: () => void;
+}) {
   return (
-    <View style={styles.checkRow}>
-      <View style={styles.checkIcon}>
-        <MaterialIcons name="check" size={18} color={Colors.onTertiary} />
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => [styles.checkRow, pressed && styles.pressed]}
+      accessibilityRole="checkbox"
+      accessibilityState={{ checked }}
+    >
+      <View style={[styles.checkIcon, !checked && styles.checkIconEmpty]}>
+        {checked && <MaterialIcons name="check" size={18} color={Colors.onTertiary} />}
       </View>
       <Text style={styles.checkText}>{label}</Text>
-    </View>
+    </Pressable>
   );
 }
 
@@ -151,10 +179,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  checkIconEmpty: {
+    backgroundColor: Colors.surfaceContainerLowest,
+  },
   checkText: {
     flex: 1,
     fontFamily: Fonts.manropeBold,
     fontSize: 15,
     color: Colors.onSurface,
   },
+  pressed: { opacity: 0.72 },
 });

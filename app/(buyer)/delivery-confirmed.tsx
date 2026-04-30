@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -7,9 +7,11 @@ import { Colors, Shadow } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
 import { Spacing } from '@/constants/spacing';
 import { Radii } from '@/constants/radii';
+import { useState } from 'react';
 
 export default function DeliveryConfirmed() {
   const router = useRouter();
+  const [receiptOpen, setReceiptOpen] = useState(false);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -44,13 +46,49 @@ export default function DeliveryConfirmed() {
           <Text style={styles.detailText}>April 20, 2026</Text>
         </View>
 
-        <Button title="View Receipt" variant="outlined" onPress={() => router.replace('/(buyer)/orders')} />
+        <Button title="View Receipt" variant="outlined" onPress={() => setReceiptOpen(true)} />
         <Button
           title="Rate Your Experience"
           onPress={() => router.push('/(buyer)/rate-experience')}
         />
       </View>
+
+      <Modal
+        transparent
+        animationType="fade"
+        visible={receiptOpen}
+        onRequestClose={() => setReceiptOpen(false)}
+      >
+        <View style={styles.modalScrim}>
+          <View style={styles.receiptModal}>
+            <Pressable
+              onPress={() => setReceiptOpen(false)}
+              hitSlop={12}
+              style={styles.modalClose}
+              accessibilityRole="button"
+              accessibilityLabel="Close receipt"
+            >
+              <MaterialIcons name="close" size={24} color={Colors.onSurfaceVariant} />
+            </Pressable>
+            <Text style={styles.receiptTitle}>Receipt</Text>
+            <ReceiptRow label="Order" value="VB-9982" />
+            <ReceiptRow label="Item" value="Classic Artisan Leather Tote" />
+            <ReceiptRow label="Rider" value="Juan dela Cruz" />
+            <ReceiptRow label="Verification" value="OTP Confirmed" />
+            <Button title="Done" onPress={() => setReceiptOpen(false)} />
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
+  );
+}
+
+function ReceiptRow({ label, value }: { label: string; value: string }) {
+  return (
+    <View style={styles.receiptRow}>
+      <Text style={styles.receiptLabel}>{label}</Text>
+      <Text style={styles.receiptValue}>{value}</Text>
+    </View>
   );
 }
 
@@ -122,5 +160,38 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.manropeRegular,
     fontSize: 12,
     color: Colors.onSurfaceVariant,
+  },
+  modalScrim: {
+    flex: 1,
+    backgroundColor: Colors.inverseSurface,
+    justifyContent: 'center',
+    padding: Spacing.containerMargin,
+  },
+  receiptModal: {
+    borderRadius: Radii.xl,
+    backgroundColor: Colors.surfaceContainerLowest,
+    padding: Spacing.lg,
+    gap: Spacing.md,
+    ...Shadow.card,
+  },
+  modalClose: {
+    alignSelf: 'flex-end',
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  receiptTitle: { ...Type.h3, color: Colors.onSurface },
+  receiptRow: {
+    borderRadius: Radii.DEFAULT,
+    backgroundColor: Colors.surfaceContainerLow,
+    padding: Spacing.md,
+    gap: Spacing.xs,
+  },
+  receiptLabel: { ...Type.labelCaps, color: Colors.onSurfaceVariant },
+  receiptValue: {
+    fontFamily: Fonts.manropeBold,
+    fontSize: 15,
+    color: Colors.onSurface,
   },
 });

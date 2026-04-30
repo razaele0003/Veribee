@@ -17,7 +17,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/Button';
 import { Input, PasswordInput } from '@/components/ui/Input';
-import { makeLocalUserId, toLocalPhone } from '@/lib/localAuth';
+import { makeLocalUserId, toLocalPhone, toLocalPhoneDigits } from '@/lib/localAuth';
 import { useAuthStore } from '@/store/authStore';
 import { Colors } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
@@ -74,8 +74,7 @@ export default function Register() {
     router.push({ pathname: '/(auth)/otp-verify', params: { phone: fullPhone } });
   };
 
-  const onlyPhoneDigits = (value: string) =>
-    value.replace(/\D/g, '').slice(0, 10);
+  const onlyPhoneDigits = (value: string) => toLocalPhoneDigits(value);
 
   return (
     <SafeAreaView style={styles.container}>

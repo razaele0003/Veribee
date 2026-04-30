@@ -42,6 +42,7 @@ type RiderState = {
   todayEarnings: number;
   setOnline: (isOnline: boolean) => void;
   acceptJob: (jobId: string) => ActiveDelivery | null;
+  declineJob: (jobId: string) => void;
   updateActiveStatus: (status: RiderJobStatus) => void;
   completeActiveDelivery: () => ActiveDelivery | null;
   clearActiveDelivery: () => void;
@@ -130,6 +131,10 @@ export const useRiderStore = create<RiderState>((set, get) => ({
 
     return activeDelivery;
   },
+  declineJob: (jobId) =>
+    set((state) => ({
+      jobs: state.jobs.filter((item) => item.id !== jobId),
+    })),
   updateActiveStatus: (status) =>
     set((state) => ({
       activeDelivery: state.activeDelivery

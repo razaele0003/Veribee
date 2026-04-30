@@ -1,4 +1,4 @@
-import { Alert, Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, Image, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -9,12 +9,14 @@ import { Colors, Shadow } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
 import { Spacing } from '@/constants/spacing';
 import { Radii } from '@/constants/radii';
+import { useState } from 'react';
 
 export default function ProductDetail() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id?: string }>();
   const product = findBuyerProduct(id);
   const addItem = useCartStore((s) => s.addItem);
+  const [authReportOpen, setAuthReportOpen] = useState(false);
 
   const addToCart = () => {
     addItem({
@@ -83,12 +85,18 @@ export default function ProductDetail() {
           <Text style={styles.price}>{formatPHP(product.price)}</Text>
         </View>
 
-        <View style={styles.verifiedBanner}>
+        <Pressable
+          onPress={() => setAuthReportOpen(true)}
+          style={({ pressed }) => [styles.verifiedBanner, pressed && styles.pressed]}
+          accessibilityRole="button"
+          accessibilityLabel="Open authentication report"
+        >
           <MaterialIcons name="verified" size={22} color={Colors.onSecondaryContainer} />
           <Text style={styles.verifiedText}>
             Veribee Verified - Authenticated April 20, 2026
           </Text>
-        </View>
+          <MaterialIcons name="info-outline" size={20} color={Colors.onSecondaryContainer} />
+        </Pressable>
 
         <View style={styles.sellerCard}>
           <View style={styles.sellerAvatar}>
@@ -127,6 +135,42 @@ export default function ProductDetail() {
         <Button title="Add to Cart" variant="outlined" onPress={addToCart} style={styles.action} />
         <Button title="Buy Now" onPress={buyNow} style={styles.action} />
       </View>
+
+      <Modal
+        transparent
+        animationType="fade"
+        visible={authReportOpen}
+        onRequestClose={() => setAuthReportOpen(false)}
+      >
+        <View style={styles.modalScrim}>
+          <View style={styles.authModal}>
+            <Pressable
+              onPress={() => setAuthReportOpen(false)}
+              hitSlop={12}
+              style={styles.modalClose}
+              accessibilityRole="button"
+              accessibilityLabel="Close authentication report"
+            >
+              <MaterialIcons name="close" size={24} color={Colors.onSurfaceVariant} />
+            </Pressable>
+            <MaterialIcons name="verified" size={42} color={Colors.primary} />
+            <Text style={styles.modalTitle}>Authentication Report</Text>
+            <Text style={styles.modalBody}>
+              Serial review, seller history, product imagery, and transaction signals were checked
+              before this item was marked verified.
+            </Text>
+            <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>Seller VSI</Text>
+              <Text style={styles.reportValue}>{product.sellerVsi}</Text>
+            </View>
+            <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>Result</Text>
+              <Text style={styles.reportValue}>Verified</Text>
+            </View>
+            <Button title="Close Report" onPress={() => setAuthReportOpen(false)} />
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -284,4 +328,42 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
   },
   action: { flex: 1 },
+  modalScrim: {
+    flex: 1,
+    backgroundColor: Colors.inverseSurface,
+    justifyContent: 'center',
+    padding: Spacing.containerMargin,
+  },
+  authModal: {
+    borderRadius: Radii.xl,
+    backgroundColor: Colors.surfaceContainerLowest,
+    padding: Spacing.lg,
+    gap: Spacing.md,
+    ...Shadow.card,
+  },
+  modalClose: {
+    alignSelf: 'flex-end',
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalTitle: { ...Type.h3, color: Colors.onSurface },
+  modalBody: { ...Type.bodyMd, color: Colors.onSurfaceVariant },
+  reportRow: {
+    minHeight: 44,
+    borderRadius: Radii.DEFAULT,
+    backgroundColor: Colors.surfaceContainerLow,
+    paddingHorizontal: Spacing.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: Spacing.md,
+  },
+  reportLabel: { ...Type.labelCaps, color: Colors.onSurfaceVariant },
+  reportValue: {
+    fontFamily: Fonts.manropeBold,
+    fontSize: 15,
+    color: Colors.primary,
+  },
 });

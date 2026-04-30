@@ -16,6 +16,7 @@ export default function RiderJobFeed() {
   const isOnline = useRiderStore((s) => s.isOnline);
   const setOnline = useRiderStore((s) => s.setOnline);
   const acceptJob = useRiderStore((s) => s.acceptJob);
+  const declineJob = useRiderStore((s) => s.declineJob);
 
   const onAccept = (jobId: string) => {
     const delivery = acceptJob(jobId);
@@ -70,7 +71,7 @@ export default function RiderJobFeed() {
               key={job.id}
               job={job}
               onAccept={() => onAccept(job.id)}
-              onDecline={() => Alert.alert('Declined', `${job.orderId} hidden for this session.`)}
+              onDecline={() => declineJob(job.id)}
             />
           ))
         ) : (

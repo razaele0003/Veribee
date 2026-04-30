@@ -16,6 +16,8 @@ export default function RiderOtpEntry() {
   const activeDelivery = useRiderStore((s) => s.activeDelivery);
   const completeActiveDelivery = useRiderStore((s) => s.completeActiveDelivery);
   const [otp, setOtp] = useState('');
+  const [error, setError] = useState('');
+  const [attempts, setAttempts] = useState(0);
 
   if (!activeDelivery) {
     router.replace('/(rider)/job-feed');
@@ -24,7 +26,9 @@ export default function RiderOtpEntry() {
 
   const onConfirm = () => {
     if (otp !== activeDelivery.otpCode) {
-      Alert.alert('Invalid OTP', `For local testing, enter ${activeDelivery.otpCode}.`);
+      setOtp('');
+      setAttempts((current) => current + 1);
+      setError('Incorrect code. Ask the buyer to read the OTP again.');
       return;
     }
 
@@ -55,8 +59,22 @@ export default function RiderOtpEntry() {
         </Text>
 
         <View style={styles.otpWrap}>
-          <OTPInput value={otp} onChange={setOtp} />
+          <OTPInput
+            value={otp}
+            onChange={(next) => {
+              setOtp(next);
+              setError('');
+            }}
+          />
         </View>
+        {!!error && <Text style={styles.errorText}>{error}</Text>}
+        {attempts >= 3 && (
+          <Button
+            title="Contact Support"
+            variant="outlined"
+            onPress={() => Alert.alert('Support', 'Call Veribee support at 02-8000-VERI.')}
+          />
+        )}
 
         <View style={styles.localHint}>
           <Text style={styles.localHintLabel}>Local Test Code</Text>
@@ -129,5 +147,11 @@ const styles = StyleSheet.create({
     fontSize: 28,
     color: Colors.primary,
     marginTop: Spacing.xs,
+  },
+  errorText: {
+    fontFamily: Fonts.manropeBold,
+    fontSize: 13,
+    color: Colors.error,
+    textAlign: 'center',
   },
 });

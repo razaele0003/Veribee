@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import {
-  Alert,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -13,7 +12,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Button } from '@/components/ui/Button';
 import { Input, PasswordInput } from '@/components/ui/Input';
-import { findLocalAccount } from '@/lib/localAuth';
+import {
+  findLocalAccount,
+  findLocalAccountByPhone,
+  toLocalPhoneDigits,
+} from '@/lib/localAuth';
 import { useAuthStore } from '@/store/authStore';
 import { Colors } from '@/constants/colors';
 import { Type, Fonts } from '@/constants/typography';
@@ -28,10 +31,13 @@ export default function Login() {
 
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
+  const [phoneError, setPhoneError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
   const [loading, setLoading] = useState(false);
 
   const setPhoneDigits = (value: string) => {
-    setPhone(value.replace(/\D/g, '').slice(0, 10));
+    setPhone(toLocalPhoneDigits(value));
+    setPhoneError('');
   };
 
   const onDevSellerLogin = () => {
@@ -56,17 +62,30 @@ export default function Login() {
   };
 
   const onLogin = async () => {
-    if (!phone || !password) {
-      Alert.alert('Missing info', 'Enter your phone and password.');
+    setPhoneError('');
+    setPasswordError('');
+
+    if (!phone) {
+      setPhoneError('Phone number is required');
+    } else if (phone.length !== 10) {
+      setPhoneError('Phone must be 10 digits');
+    }
+
+    if (!password) {
+      setPasswordError('Password is required');
+    }
+
+    if (!phone || phone.length !== 10 || !password) {
       return;
     }
-    const account =
-      findLocalAccount(phone, password) ?? {
-        id: 'local-seller',
-        role: 'seller' as const,
-        phone: `+63${phone}`,
-        fullName: 'Local Seller',
-      };
+
+    const knownAccount = findLocalAccountByPhone(phone);
+    const account = findLocalAccount(phone, password);
+    if (!knownAccount || !account) {
+      setPasswordError('Invalid credentials');
+      return;
+    }
+
     setLoading(true);
     setUser(account.id);
     setRoles([account.role]);
@@ -107,14 +126,23 @@ export default function Login() {
               onChangeText={setPhoneDigits}
               placeholder="9171234567"
               maxLength={10}
+              error={phoneError}
             />
             <PasswordInput
               label="Password"
               value={password}
-              onChangeText={setPassword}
+              onChangeText={(value) => {
+                setPassword(value);
+                setPasswordError('');
+              }}
               placeholder="********"
+              error={passwordError}
             />
-            <Pressable style={styles.forgot} hitSlop={8}>
+            <Pressable
+              style={styles.forgot}
+              hitSlop={8}
+              onPress={() => router.push('/(auth)/forgot-password')}
+            >
               <Text style={styles.forgotText}>Forgot Password?</Text>
             </Pressable>
 
