@@ -1,4 +1,4 @@
-import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -67,7 +67,15 @@ export default function ProductDetail() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.heroImage}>
-          <MaterialIcons name="inventory-2" size={72} color={Colors.primary} />
+          {product.imageUrl ? (
+            <Image
+              source={{ uri: product.imageUrl }}
+              style={styles.productImage}
+              resizeMode="cover"
+            />
+          ) : (
+            <MaterialIcons name="inventory-2" size={72} color={Colors.primary} />
+          )}
         </View>
 
         <View style={styles.titleBlock}>
@@ -153,6 +161,10 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surfaceContainerHigh,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  productImage: {
+    width: '100%',
+    height: '100%',
   },
   titleBlock: {
     padding: Spacing.containerMargin,

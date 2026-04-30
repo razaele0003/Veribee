@@ -1,3 +1,5 @@
+import { ProductImages } from '@/constants/productImages';
+
 export type BuyerProduct = {
   id: string;
   title: string;
@@ -30,6 +32,7 @@ export const BUYER_PRODUCTS: BuyerProduct[] = [
     sellerId: 'seller-techhaven',
     sellerName: 'TechHaven PH',
     sellerVsi: 98,
+    imageUrl: ProductImages.watch,
     authStatus: 'verified',
     description:
       'A premium smartwatch with verified serial details, clean casing, and a leather band ready for daily wear.',
@@ -42,6 +45,7 @@ export const BUYER_PRODUCTS: BuyerProduct[] = [
     sellerId: 'seller-luxegoods',
     sellerName: 'LuxeGoods Manila',
     sellerVsi: 95,
+    imageUrl: ProductImages.tote,
     authStatus: 'verified',
     description:
       'A structured artisan leather tote with warm tone, careful stitching, and Veribee authentication evidence.',
@@ -54,6 +58,7 @@ export const BUYER_PRODUCTS: BuyerProduct[] = [
     sellerId: 'seller-sole',
     sellerName: 'SoleAuthentic',
     sellerVsi: 92,
+    imageUrl: ProductImages.sneakers,
     authStatus: 'verified',
     description:
       'Rare designer sneakers in excellent condition, verified through photos, labels, and seller history.',
@@ -66,6 +71,7 @@ export const BUYER_PRODUCTS: BuyerProduct[] = [
     sellerId: 'seller-heirloom',
     sellerName: 'Heirloom Jewels',
     sellerVsi: 99,
+    imageUrl: ProductImages.pendant,
     authStatus: 'verified',
     description:
       'A vintage-inspired gold pendant with provenance notes and strong authentication confidence.',

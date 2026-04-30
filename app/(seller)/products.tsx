@@ -5,6 +5,7 @@ import { useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { ProductListItem } from '@/components/seller/ProductListItem';
 import { LocalProduct, useSellerStore } from '@/store/sellerStore';
+import { ProductImages } from '@/constants/productImages';
 import { Colors, Shadow } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
 import { Spacing } from '@/constants/spacing';
@@ -15,7 +16,7 @@ type ProductTab = 'verified' | 'pending' | 'failed';
 const previewProducts: LocalProduct[] = [
   {
     id: 'preview-watch',
-    photos: [],
+    photos: [ProductImages.watch],
     title: 'Series 9 Chronograph',
     category: 'Electronics',
     price: '18500',
@@ -30,7 +31,7 @@ const previewProducts: LocalProduct[] = [
   },
   {
     id: 'preview-tote',
-    photos: [],
+    photos: [ProductImages.tote],
     title: 'Classic Artisan Tote',
     category: 'Bags',
     price: '12990',
@@ -45,7 +46,7 @@ const previewProducts: LocalProduct[] = [
   },
   {
     id: 'preview-sneakers',
-    photos: [],
+    photos: [ProductImages.sneakers],
     title: 'Urban Kicks',
     category: 'Shoes',
     price: '8450',
@@ -60,7 +61,7 @@ const previewProducts: LocalProduct[] = [
   },
   {
     id: 'preview-rejected',
-    photos: [],
+    photos: [ProductImages.pendant],
     title: 'Logo Label Wallet',
     category: 'Bags',
     price: '3900',

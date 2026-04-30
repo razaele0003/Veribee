@@ -1,4 +1,4 @@
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -66,7 +66,11 @@ function CartRow({ item }: { item: CartItem }) {
   return (
     <View style={styles.cartRow}>
       <View style={styles.thumb}>
-        <MaterialIcons name="inventory-2" size={30} color={Colors.primary} />
+        {item.imageUrl ? (
+          <Image source={{ uri: item.imageUrl }} style={styles.thumbImage} resizeMode="cover" />
+        ) : (
+          <MaterialIcons name="inventory-2" size={30} color={Colors.primary} />
+        )}
       </View>
       <View style={styles.cartCopy}>
         <Text style={styles.seller}>{item.sellerName}</Text>
@@ -138,7 +142,9 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surfaceContainerHigh,
     alignItems: 'center',
     justifyContent: 'center',
+    overflow: 'hidden',
   },
+  thumbImage: { width: '100%', height: '100%' },
   cartCopy: { flex: 1, gap: 2 },
   seller: { ...Type.labelCaps, fontSize: 10, color: Colors.onSurfaceVariant },
   itemTitle: {

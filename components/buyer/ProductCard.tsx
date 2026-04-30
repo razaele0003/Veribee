@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { BuyerProduct, formatPHP } from '@/lib/buyerData';
 import { Colors, Shadow } from '@/constants/colors';
@@ -22,7 +22,15 @@ export function ProductCard({ product, onPress }: Props) {
       accessibilityLabel={`${product.title}, ${formatPHP(product.price)}`}
     >
       <View style={styles.imageBlock}>
-        <MaterialIcons name="inventory-2" size={42} color={Colors.primary} />
+        {product.imageUrl ? (
+          <Image
+            source={{ uri: product.imageUrl }}
+            style={styles.productImage}
+            resizeMode="cover"
+          />
+        ) : (
+          <MaterialIcons name="inventory-2" size={42} color={Colors.primary} />
+        )}
         <View
           style={[
             styles.badge,
@@ -79,6 +87,11 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surfaceContainerLow,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  productImage: {
+    ...StyleSheet.absoluteFillObject,
+    width: '100%',
+    height: '100%',
   },
   badge: {
     position: 'absolute',
