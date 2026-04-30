@@ -1,0 +1,35 @@
+{
+  "expo": {
+    "name": "Veribee Delivery",
+    "slug": "veribee",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "veribee",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "icon": "./assets/images/veribee-logo.png",
+    "splash": {
+      "image": "./assets/images/veribee-logo.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#fcf9f8"
+    },
+    "ios": {
+      "supportsTablet": false
+    },
+    "android": {
+      "package": "com.veribee.delivery",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/veribee-logo.png",
+        "backgroundColor": "#fcf9f8"
+      }
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      "expo-asset"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

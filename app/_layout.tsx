@@ -1,0 +1,37 @@
+import { Stack } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
+import {
+  useFonts,
+  Epilogue_600SemiBold,
+  Epilogue_700Bold,
+} from '@expo-google-fonts/epilogue';
+import {
+  Manrope_400Regular,
+  Manrope_500Medium,
+  Manrope_700Bold,
+} from '@expo-google-fonts/manrope';
+import { Colors } from '@/constants/colors';
+
+export default function RootLayout() {
+  const [loaded] = useFonts({
+    Epilogue_600SemiBold,
+    Epilogue_700Bold,
+    Manrope_400Regular,
+    Manrope_500Medium,
+    Manrope_700Bold,
+  });
+
+  void loaded;
+
+  return (
+    <>
+      <StatusBar style="dark" />
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          contentStyle: { backgroundColor: Colors.surface },
+        }}
+      />
+    </>
+  );
+}
