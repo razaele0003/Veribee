@@ -6,6 +6,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  useWindowDimensions,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -85,9 +86,11 @@ function normalizeOrder(row: Record<string, any>): OrderItemData {
 
 export default function SellerDashboard() {
   const router = useRouter();
+  const { width } = useWindowDimensions();
   const storeUserId = useAuthStore((s) => s.userId);
   const [data, setData] = useState<DashboardState>(fallbackDashboard);
   const [refreshing, setRefreshing] = useState(false);
+  const isCompact = width < 380;
 
   const progressWidth = useMemo(
     () => `${Math.min(Math.max(data.vsiScore, 0), 100)}%` as `${number}%`,
@@ -216,7 +219,12 @@ export default function SellerDashboard() {
           </Text>
         </View>
 
-        <View style={styles.vsiCard}>
+        <Pressable
+          onPress={() => router.push('/(seller)/vsi-score')}
+          style={({ pressed }) => [styles.vsiCard, pressed && styles.pressed]}
+          accessibilityRole="button"
+          accessibilityLabel="Open VSI score breakdown"
+        >
           <View style={styles.vsiHeader}>
             <View>
               <Text style={styles.vsiLabel}>VSI Score</Text>
@@ -232,19 +240,26 @@ export default function SellerDashboard() {
                 </View>
               </View>
             </View>
-            <View style={styles.trustedPill}>
+            <View style={[styles.trustedPill, isCompact && styles.trustedPillCompact]}>
               <MaterialIcons
                 name="verified"
-                size={18}
+                size={isCompact ? 16 : 18}
                 color={Colors.onSecondaryContainer}
               />
-              <Text style={styles.trustedText}>Trusted Seller</Text>
+              <Text
+                style={styles.trustedText}
+                numberOfLines={1}
+                adjustsFontSizeToFit
+                minimumFontScale={0.86}
+              >
+                Trusted Seller
+              </Text>
             </View>
           </View>
           <View style={styles.progressTrack}>
             <View style={[styles.progressFill, { width: progressWidth }]} />
           </View>
-        </View>
+        </Pressable>
 
         <View style={styles.statsRow}>
           <StatCard value={String(data.ordersToday)} label="Orders Today" />
@@ -254,10 +269,8 @@ export default function SellerDashboard() {
 
         <View style={styles.actions}>
           <Button
-            title="+ Add Product"
-            onPress={() =>
-              Alert.alert('Add Product', 'The add product wizard is next.')
-            }
+            title={isCompact ? "+ Add\nProduct" : '+ Add Product'}
+            onPress={() => router.push('/(seller)/add-product/step1-basic')}
             style={styles.actionButton}
           />
           <Button
@@ -337,7 +350,7 @@ const styles = StyleSheet.create({
   content: {
     paddingHorizontal: Spacing.containerMargin,
     paddingTop: Spacing.xl,
-    paddingBottom: Spacing.xl,
+    paddingBottom: 112,
     gap: Spacing.xl,
   },
   greetingBlock: { gap: Spacing.base },
@@ -346,12 +359,13 @@ const styles = StyleSheet.create({
   vsiCard: {
     backgroundColor: Colors.primaryContainer,
     borderRadius: Radii.lg,
-    padding: Spacing.lg,
+    padding: Spacing.md,
     gap: Spacing.xl,
     ...Shadow.card,
   },
   vsiHeader: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     gap: Spacing.md,
@@ -390,13 +404,18 @@ const styles = StyleSheet.create({
     gap: Spacing.xs,
     backgroundColor: Colors.secondaryContainer,
     borderRadius: Radii.full,
-    paddingHorizontal: Spacing.md,
+    maxWidth: '100%',
+    paddingHorizontal: Spacing.sm,
     paddingVertical: Spacing.sm,
+  },
+  trustedPillCompact: {
+    alignSelf: 'flex-start',
   },
   trustedText: {
     fontFamily: Fonts.manropeBold,
     fontSize: 13,
     color: Colors.onSecondaryContainer,
+    flexShrink: 1,
   },
   progressTrack: {
     height: 8,
@@ -442,9 +461,9 @@ const styles = StyleSheet.create({
   },
   actions: {
     flexDirection: 'row',
-    gap: Spacing.md,
+    gap: Spacing.sm,
   },
-  actionButton: { flex: 1 },
+  actionButton: { flex: 1, minWidth: 0 },
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'flex-end',

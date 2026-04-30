@@ -32,7 +32,7 @@ const roles: RoleOption[] = [
     label: 'Buyer',
     description: 'Purchase premium artisan goods.',
     icon: 'shopping-bag',
-    available: false,
+    available: true,
   },
   {
     id: 'seller',
@@ -55,14 +55,14 @@ const heroImage = require('@/assets/images/role-select-hero.png');
 export default function RoleSelect() {
   const router = useRouter();
   const setActiveRole = useAuthStore((s) => s.setActiveRole);
-  const [selected, setSelected] = useState<Role | null>('seller');
+  const [selected, setSelected] = useState<Role | null>('buyer');
   const [saving, setSaving] = useState(false);
 
   const onTapRole = (r: RoleOption) => {
     if (!r.available) {
       Alert.alert(
         `${r.id[0].toUpperCase() + r.id.slice(1)} coming soon`,
-        'This role is not available yet. Please continue as a Seller for now.',
+        'Rider is not available yet. Buyer and Seller are active for now.',
       );
       return;
     }
@@ -74,7 +74,7 @@ export default function RoleSelect() {
     setSaving(true);
     setActiveRole(selected);
     setSaving(false);
-    router.replace('/(seller)/dashboard');
+    router.replace(selected === 'buyer' ? '/(buyer)/home' : '/(seller)/dashboard');
   };
 
   return (

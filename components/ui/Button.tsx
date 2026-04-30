@@ -88,6 +88,8 @@ const styles = StyleSheet.create({
   text: {
     fontFamily: Fonts.manropeBold,
     fontSize: 16,
+    lineHeight: 20,
     letterSpacing: 0.2,
+    textAlign: 'center',
   },
 });

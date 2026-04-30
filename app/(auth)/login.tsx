@@ -41,6 +41,13 @@ export default function Login() {
     router.replace('/(seller)/dashboard');
   };
 
+  const onDevBuyerLogin = () => {
+    setUser('local-buyer');
+    setActiveRole('buyer');
+    setRoles(['buyer']);
+    router.replace('/(buyer)/home');
+  };
+
   const onLogin = async () => {
     if (!phone || !password) {
       Alert.alert('Missing info', 'Enter your phone and password.');
@@ -61,10 +68,12 @@ export default function Login() {
 
     if (account.role === 'seller') {
       router.replace('/(seller)/dashboard');
+    } else if (account.role === 'buyer') {
+      router.replace('/(buyer)/home');
     } else {
       Alert.alert(
-        `${account.role[0].toUpperCase() + account.role.slice(1)} coming soon`,
-        'Phase 1 supports Seller only. You can continue by selecting Seller.',
+        'Rider coming soon',
+        'Phase 2 supports Buyer and Seller. Rider comes in Phase 3.',
       );
       router.replace('/(auth)/role-select');
     }
@@ -100,7 +109,7 @@ export default function Login() {
               label="Password"
               value={password}
               onChangeText={setPassword}
-              placeholder="••••••••"
+              placeholder="********"
             />
             <Pressable style={styles.forgot} hitSlop={8}>
               <Text style={styles.forgotText}>Forgot Password?</Text>
@@ -108,11 +117,18 @@ export default function Login() {
 
             <Button title="Login" onPress={onLogin} loading={loading} />
             {__DEV__ && (
-              <Button
-                title="Use Test Seller"
-                variant="outlined"
-                onPress={onDevSellerLogin}
-              />
+              <>
+                <Button
+                  title="Use Test Buyer"
+                  variant="outlined"
+                  onPress={onDevBuyerLogin}
+                />
+                <Button
+                  title="Use Test Seller"
+                  variant="outlined"
+                  onPress={onDevSellerLogin}
+                />
+              </>
             )}
           </View>
 

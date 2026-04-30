@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import { MaterialIcons } from '@expo/vector-icons';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -83,8 +84,14 @@ export default function Register() {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-          <Pressable onPress={() => router.back()} hitSlop={10} style={styles.back}>
-            <Text style={styles.backArrow}>←</Text>
+          <Pressable
+            onPress={() => router.back()}
+            hitSlop={10}
+            style={styles.back}
+            accessibilityRole="button"
+            accessibilityLabel="Go back"
+          >
+            <MaterialIcons name="arrow-back" size={24} color={Colors.onSurface} />
           </Pressable>
           <Text style={styles.title}>Create Account</Text>
           <Text style={styles.subtitle}>Join Veribee for a boutique delivery experience.</Text>
@@ -151,7 +158,7 @@ export default function Register() {
               onPress={() => setValue('terms', (!terms) as unknown as true, { shouldValidate: true })}
             >
               <View style={[styles.checkbox, terms && styles.checkboxChecked]}>
-                {terms && <Text style={styles.check}>✓</Text>}
+                {terms && <MaterialIcons name="check" size={14} color={Colors.onPrimary} />}
               </View>
               <Text style={styles.termsText}>
                 I agree to the <Text style={styles.link}>Terms</Text> and{' '}
@@ -180,7 +187,6 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.surface },
   content: { padding: Spacing.lg, paddingBottom: Spacing.xl },
   back: { paddingVertical: Spacing.base, marginBottom: 4 },
-  backArrow: { fontSize: 24, color: Colors.onSurface },
   title: {
     ...Type.h3,
     color: Colors.primary,
@@ -212,7 +218,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primary,
     borderColor: Colors.primary,
   },
-  check: { color: Colors.onPrimary, fontSize: 13, fontWeight: '700' },
   termsText: {
     fontFamily: Fonts.manropeRegular,
     fontSize: 13,

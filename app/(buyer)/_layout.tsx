@@ -12,7 +12,7 @@ const tabIcon = (name: TabIcon) =>
     return <MaterialIcons name={name} size={size} color={color} />;
   };
 
-export default function SellerLayout() {
+export default function BuyerLayout() {
   return (
     <Tabs
       screenOptions={{
@@ -42,49 +42,29 @@ export default function SellerLayout() {
       }}
     >
       <Tabs.Screen
-        name="dashboard"
-        options={{ title: 'Dashboard', tabBarIcon: tabIcon('dashboard') }}
+        name="home"
+        options={{ title: 'Home', tabBarIcon: tabIcon('home') }}
+      />
+      <Tabs.Screen
+        name="search"
+        options={{ title: 'Search', tabBarIcon: tabIcon('search') }}
       />
       <Tabs.Screen
         name="orders"
         options={{ title: 'Orders', tabBarIcon: tabIcon('receipt-long') }}
       />
       <Tabs.Screen
-        name="products"
-        options={{ title: 'Products', tabBarIcon: tabIcon('inventory') }}
-      />
-      <Tabs.Screen
         name="profile"
         options={{ title: 'Profile', tabBarIcon: tabIcon('person') }}
       />
-      <Tabs.Screen
-        name="add-product/step1-basic"
-        options={{ href: null }}
-      />
-      <Tabs.Screen
-        name="add-product/step2-auth"
-        options={{ href: null }}
-      />
-      <Tabs.Screen
-        name="add-product/step3-review"
-        options={{ href: null }}
-      />
-      <Tabs.Screen
-        name="auth-status/[id]"
-        options={{ href: null }}
-      />
-      <Tabs.Screen
-        name="vsi-score"
-        options={{ href: null }}
-      />
-      <Tabs.Screen
-        name="kyc"
-        options={{ href: null }}
-      />
-      <Tabs.Screen
-        name="earnings"
-        options={{ href: null }}
-      />
+      <Tabs.Screen name="product/[id]" options={{ href: null }} />
+      <Tabs.Screen name="cart" options={{ href: null }} />
+      <Tabs.Screen name="checkout" options={{ href: null }} />
+      <Tabs.Screen name="order-tracking/[id]" options={{ href: null }} />
+      <Tabs.Screen name="otp-handover" options={{ href: null }} />
+      <Tabs.Screen name="delivery-confirmed" options={{ href: null }} />
+      <Tabs.Screen name="rate-experience" options={{ href: null }} />
+      <Tabs.Screen name="dispute" options={{ href: null }} />
     </Tabs>
   );
 }

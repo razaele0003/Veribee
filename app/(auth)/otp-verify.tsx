@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { MaterialIcons } from '@expo/vector-icons';
 import { Button } from '@/components/ui/Button';
 import { OTPInput } from '@/components/ui/OTPInput';
 import { LOCAL_OTP_CODE } from '@/lib/localAuth';
@@ -14,7 +15,7 @@ function maskPhone(p?: string) {
   if (!p) return '';
   return p.replace(
     /(\+\d{2})(\d+)(\d{2})/,
-    (_m, a, mid, c) => `${a} ${'•'.repeat(mid.length)}${c}`,
+    (_m, a, mid, c) => `${a} ${'*'.repeat(mid.length)}${c}`,
   );
 }
 
@@ -54,7 +55,7 @@ export default function OtpVerify() {
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
         <View style={styles.icon}>
-          <Text style={{ fontSize: 32 }}>🔒</Text>
+          <MaterialIcons name="lock" size={32} color={Colors.primary} />
         </View>
         <Text style={styles.title}>Verify Your Number</Text>
         <Text style={styles.subtitle}>
