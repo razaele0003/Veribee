@@ -7,7 +7,7 @@ type AuthState = {
   activeRole: Role | null;
   roles: Role[];
   setUser: (userId: string | null) => void;
-  setActiveRole: (role: Role) => void;
+  setActiveRole: (role: Role | null) => void;
   setRoles: (roles: Role[]) => void;
   reset: () => void;
 };

@@ -12,7 +12,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Button } from '@/components/ui/Button';
-import { supabase } from '@/lib/supabase';
 import { useAuthStore, Role } from '@/store/authStore';
 import { Colors, Shadow } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
@@ -56,7 +55,6 @@ const heroImage = require('@/assets/images/role-select-hero.png');
 export default function RoleSelect() {
   const router = useRouter();
   const setActiveRole = useAuthStore((s) => s.setActiveRole);
-  const userId = useAuthStore((s) => s.userId);
   const [selected, setSelected] = useState<Role | null>('seller');
   const [saving, setSaving] = useState(false);
 
@@ -74,17 +72,6 @@ export default function RoleSelect() {
   const onContinue = async () => {
     if (!selected) return;
     setSaving(true);
-    if (userId) {
-      const { error } = await supabase
-        .from('users')
-        .update({ active_role: selected })
-        .eq('id', userId);
-      if (error) {
-        setSaving(false);
-        Alert.alert('Could not save role', error.message);
-        return;
-      }
-    }
     setActiveRole(selected);
     setSaving(false);
     router.replace('/(seller)/dashboard');

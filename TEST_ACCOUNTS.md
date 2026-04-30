@@ -9,3 +9,5 @@ These are local QA account identities for testing screen flows only. Do not crea
 | Rider | +639171234503 | VeribeeTest123! | Role is visible but blocked with a coming soon alert. |
 
 Phase 1 only supports the Seller route. Buyer and Rider identities are for gating checks once auth seeding is approved later.
+
+Local OTP code for registration testing: `123456`.

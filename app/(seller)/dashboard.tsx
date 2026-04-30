@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/Button';
 import { Logo } from '@/components/ui/Logo';
 import { OrderItem, OrderItemData } from '@/components/seller/OrderItem';
 import { supabase } from '@/lib/supabase';
+import { isLocalUserId } from '@/lib/localAuth';
 import { useAuthStore } from '@/store/authStore';
 import { Colors, Shadow } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
@@ -95,11 +96,20 @@ export default function SellerDashboard() {
 
   const loadDashboard = useCallback(async () => {
     setRefreshing(true);
+    let userId = storeUserId;
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    const userId = storeUserId ?? user?.id;
+    if (isLocalUserId(userId)) {
+      setData(fallbackDashboard);
+      setRefreshing(false);
+      return;
+    }
+
+    if (!userId) {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      userId = user?.id ?? null;
+    }
 
     if (!userId) {
       setData(fallbackDashboard);

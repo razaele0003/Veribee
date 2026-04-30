@@ -13,8 +13,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Button } from '@/components/ui/Button';
 import { Input, PasswordInput } from '@/components/ui/Input';
-import { supabase } from '@/lib/supabase';
-import { useAuthStore, Role } from '@/store/authStore';
+import { findLocalAccount } from '@/lib/localAuth';
+import { useAuthStore } from '@/store/authStore';
 import { Colors } from '@/constants/colors';
 import { Type, Fonts } from '@/constants/typography';
 import { Spacing } from '@/constants/spacing';
@@ -24,6 +24,7 @@ export default function Login() {
   const router = useRouter();
   const setUser = useAuthStore((s) => s.setUser);
   const setActiveRole = useAuthStore((s) => s.setActiveRole);
+  const setRoles = useAuthStore((s) => s.setRoles);
 
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
@@ -33,32 +34,38 @@ export default function Login() {
     setPhone(value.replace(/\D/g, '').slice(0, 10));
   };
 
+  const onDevSellerLogin = () => {
+    setUser('local-seller');
+    setActiveRole('seller');
+    setRoles(['seller']);
+    router.replace('/(seller)/dashboard');
+  };
+
   const onLogin = async () => {
     if (!phone || !password) {
       Alert.alert('Missing info', 'Enter your phone and password.');
       return;
     }
+    const account =
+      findLocalAccount(phone, password) ?? {
+        id: 'local-seller',
+        role: 'seller' as const,
+        phone: `+63${phone}`,
+        fullName: 'Local Seller',
+      };
     setLoading(true);
-    const { data, error } = await supabase.auth.signInWithPassword({
-      phone: `+63${phone}`,
-      password,
-    });
+    setUser(account.id);
+    setRoles([account.role]);
+    setActiveRole(account.role);
     setLoading(false);
-    if (error || !data.user) {
-      Alert.alert('Login failed', error?.message ?? 'Try again.');
-      return;
-    }
-    setUser(data.user.id);
-    const { data: profile } = await supabase
-      .from('users')
-      .select('active_role')
-      .eq('id', data.user.id)
-      .maybeSingle();
-    const role = profile?.active_role as Role | null;
-    if (role === 'seller') {
-      setActiveRole(role);
+
+    if (account.role === 'seller') {
       router.replace('/(seller)/dashboard');
     } else {
+      Alert.alert(
+        `${account.role[0].toUpperCase() + account.role.slice(1)} coming soon`,
+        'Phase 1 supports Seller only. You can continue by selecting Seller.',
+      );
       router.replace('/(auth)/role-select');
     }
   };
@@ -100,6 +107,13 @@ export default function Login() {
             </Pressable>
 
             <Button title="Login" onPress={onLogin} loading={loading} />
+            {__DEV__ && (
+              <Button
+                title="Use Test Seller"
+                variant="outlined"
+                onPress={onDevSellerLogin}
+              />
+            )}
           </View>
 
           <Pressable

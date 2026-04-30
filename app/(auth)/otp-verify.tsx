@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Button } from '@/components/ui/Button';
 import { OTPInput } from '@/components/ui/OTPInput';
-import { supabase } from '@/lib/supabase';
+import { LOCAL_OTP_CODE } from '@/lib/localAuth';
 import { Colors } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
 import { Spacing } from '@/constants/spacing';
@@ -34,14 +34,9 @@ export default function OtpVerify() {
   const verify = async () => {
     if (code.length !== 6 || !phone) return;
     setLoading(true);
-    const { error } = await supabase.auth.verifyOtp({
-      phone,
-      token: code,
-      type: 'sms',
-    });
     setLoading(false);
-    if (error) {
-      Alert.alert('Verification failed', error.message);
+    if (code !== LOCAL_OTP_CODE) {
+      Alert.alert('Verification failed', `Use ${LOCAL_OTP_CODE} for local testing.`);
       return;
     }
     router.replace('/(auth)/role-select');
@@ -49,7 +44,6 @@ export default function OtpVerify() {
 
   const resend = async () => {
     if (secs > 0 || !phone) return;
-    await supabase.auth.signInWithOtp({ phone });
     setSecs(45);
   };
 

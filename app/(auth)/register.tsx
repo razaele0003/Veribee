@@ -16,7 +16,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/Button';
 import { Input, PasswordInput } from '@/components/ui/Input';
-import { supabase } from '@/lib/supabase';
+import { makeLocalUserId, toLocalPhone } from '@/lib/localAuth';
+import { useAuthStore } from '@/store/authStore';
 import { Colors } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
 import { Spacing } from '@/constants/spacing';
@@ -39,6 +40,9 @@ type FormValues = z.infer<typeof schema>;
 
 export default function Register() {
   const router = useRouter();
+  const setUser = useAuthStore((s) => s.setUser);
+  const setActiveRole = useAuthStore((s) => s.setActiveRole);
+  const setRoles = useAuthStore((s) => s.setRoles);
   const [loading, setLoading] = useState(false);
   const {
     control,
@@ -61,17 +65,11 @@ export default function Register() {
 
   const onSubmit = async (values: FormValues) => {
     setLoading(true);
-    const fullPhone = `+63${values.phone}`;
-    const { error } = await supabase.auth.signUp({
-      phone: fullPhone,
-      password: values.password,
-      options: { data: { full_name: values.fullName } },
-    });
+    const fullPhone = toLocalPhone(values.phone);
+    setUser(makeLocalUserId(fullPhone));
+    setActiveRole(null);
+    setRoles([]);
     setLoading(false);
-    if (error) {
-      Alert.alert('Sign up failed', error.message);
-      return;
-    }
     router.push({ pathname: '/(auth)/otp-verify', params: { phone: fullPhone } });
   };
 
