@@ -5,9 +5,11 @@ import {
   Text,
   TextInput,
   TextInputProps,
+  TextStyle,
   View,
   ViewStyle,
 } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
 import { Colors } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
 import { Radii } from '@/constants/radii';
@@ -69,7 +71,11 @@ export function PasswordInput(props: Props) {
       secureTextEntry={hidden}
       rightAccessory={
         <Pressable onPress={() => setHidden((h) => !h)} hitSlop={10}>
-          <Text style={styles.eye}>{hidden ? '👁' : '🙈'}</Text>
+          <MaterialIcons
+            name={hidden ? 'visibility' : 'visibility-off'}
+            size={22}
+            color={Colors.onSurfaceVariant}
+          />
         </Pressable>
       }
     />
@@ -106,8 +112,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: Colors.onSurface,
     paddingVertical: 12,
-  },
-  eye: { fontSize: 18 },
+    outlineStyle: 'none',
+  } as TextStyle & { outlineStyle: string },
   errorText: {
     fontFamily: Fonts.manropeMedium,
     fontSize: 12,

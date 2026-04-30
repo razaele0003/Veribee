@@ -25,7 +25,6 @@ import { Radii } from '@/constants/radii';
 const schema = z
   .object({
     fullName: z.string().min(2, 'Enter your full name'),
-    email: z.string().email('Enter a valid email'),
     phone: z.string().regex(/^\d{10}$/, 'Phone must be 10 digits'),
     password: z.string().min(8, 'Password must be at least 8 characters'),
     confirmPassword: z.string(),
@@ -51,7 +50,6 @@ export default function Register() {
     resolver: zodResolver(schema),
     defaultValues: {
       fullName: '',
-      email: '',
       phone: '',
       password: '',
       confirmPassword: '',
@@ -65,7 +63,6 @@ export default function Register() {
     setLoading(true);
     const fullPhone = `+63${values.phone}`;
     const { error } = await supabase.auth.signUp({
-      email: values.email,
       phone: fullPhone,
       password: values.password,
       options: { data: { full_name: values.fullName } },
@@ -77,6 +74,9 @@ export default function Register() {
     }
     router.push({ pathname: '/(auth)/otp-verify', params: { phone: fullPhone } });
   };
+
+  const onlyPhoneDigits = (value: string) =>
+    value.replace(/\D/g, '').slice(0, 10);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -107,30 +107,16 @@ export default function Register() {
             />
             <Controller
               control={control}
-              name="email"
-              render={({ field: { value, onChange } }) => (
-                <Input
-                  label="Email"
-                  value={value}
-                  onChangeText={onChange}
-                  placeholder="you@example.com"
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  error={errors.email?.message}
-                />
-              )}
-            />
-            <Controller
-              control={control}
               name="phone"
               render={({ field: { value, onChange } }) => (
                 <Input
                   label="Phone Number"
                   prefix="+63"
                   value={value}
-                  onChangeText={onChange}
+                  onChangeText={(text) => onChange(onlyPhoneDigits(text))}
                   placeholder="9171234567"
                   keyboardType="phone-pad"
+                  maxLength={10}
                   error={errors.phone?.message}
                 />
               )}

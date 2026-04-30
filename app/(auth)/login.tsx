@@ -29,6 +29,10 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const setPhoneDigits = (value: string) => {
+    setPhone(value.replace(/\D/g, '').slice(0, 10));
+  };
+
   const onLogin = async () => {
     if (!phone || !password) {
       Alert.alert('Missing info', 'Enter your phone and password.');
@@ -81,8 +85,9 @@ export default function Login() {
               prefix="+63"
               keyboardType="phone-pad"
               value={phone}
-              onChangeText={setPhone}
+              onChangeText={setPhoneDigits}
               placeholder="9171234567"
+              maxLength={10}
             />
             <PasswordInput
               label="Password"
@@ -95,18 +100,6 @@ export default function Login() {
             </Pressable>
 
             <Button title="Login" onPress={onLogin} loading={loading} />
-
-            <View style={styles.divider}>
-              <View style={styles.line} />
-              <Text style={styles.or}>or</Text>
-              <View style={styles.line} />
-            </View>
-
-            <Button
-              title="Continue with Google"
-              variant="outlined"
-              onPress={() => Alert.alert('Coming soon', 'Google sign-in is not wired up yet.')}
-            />
           </View>
 
           <Pressable
@@ -146,16 +139,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.primary,
   },
-  divider: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.md,
-    marginVertical: Spacing.sm,
-  },
-  line: { flex: 1, height: 1, backgroundColor: Colors.outlineVariant },
-  or: { fontFamily: Fonts.manropeRegular, color: Colors.onSurfaceVariant, fontSize: 12 },
   footer: { marginTop: Spacing.lg, alignItems: 'center' },
   footerText: { fontFamily: Fonts.manropeRegular, fontSize: 14, color: Colors.onSurfaceVariant },
   footerLink: { fontFamily: Fonts.manropeBold, color: Colors.primary },
 });
-
