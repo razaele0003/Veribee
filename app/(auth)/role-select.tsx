@@ -46,7 +46,7 @@ const roles: RoleOption[] = [
     label: 'Rider',
     description: 'Deliver products to customers.',
     icon: 'delivery-dining',
-    available: false,
+    available: true,
   },
 ];
 
@@ -74,7 +74,13 @@ export default function RoleSelect() {
     setSaving(true);
     setActiveRole(selected);
     setSaving(false);
-    router.replace(selected === 'buyer' ? '/(buyer)/home' : '/(seller)/dashboard');
+    if (selected === 'buyer') {
+      router.replace('/(buyer)/home');
+    } else if (selected === 'seller') {
+      router.replace('/(seller)/dashboard');
+    } else {
+      router.replace('/(rider)/job-feed');
+    }
   };
 
   return (

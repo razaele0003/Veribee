@@ -75,7 +75,7 @@ export default function BuyerProfile() {
             </Pressable>
           ))}
           <Pressable
-            onPress={() => Alert.alert('Switch Role', 'Seller is available; Rider comes in Phase 3.')}
+            onPress={() => router.push('/(auth)/role-select')}
             style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
           >
             <MaterialIcons name="swap-horiz" size={20} color={Colors.primary} />

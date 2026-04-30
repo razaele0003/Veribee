@@ -48,7 +48,7 @@ export default function Profile() {
   };
 
   const switchRole = () => {
-    Alert.alert('Switch Role', 'Other roles are coming soon for Phase 1.');
+    router.push('/(auth)/role-select');
   };
 
   const logOut = () => {

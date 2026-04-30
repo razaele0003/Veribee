@@ -48,6 +48,13 @@ export default function Login() {
     router.replace('/(buyer)/home');
   };
 
+  const onDevRiderLogin = () => {
+    setUser('local-rider');
+    setActiveRole('rider');
+    setRoles(['rider']);
+    router.replace('/(rider)/job-feed');
+  };
+
   const onLogin = async () => {
     if (!phone || !password) {
       Alert.alert('Missing info', 'Enter your phone and password.');
@@ -70,12 +77,8 @@ export default function Login() {
       router.replace('/(seller)/dashboard');
     } else if (account.role === 'buyer') {
       router.replace('/(buyer)/home');
-    } else {
-      Alert.alert(
-        'Rider coming soon',
-        'Phase 2 supports Buyer and Seller. Rider comes in Phase 3.',
-      );
-      router.replace('/(auth)/role-select');
+    } else if (account.role === 'rider') {
+      router.replace('/(rider)/job-feed');
     }
   };
 
@@ -127,6 +130,11 @@ export default function Login() {
                   title="Use Test Seller"
                   variant="outlined"
                   onPress={onDevSellerLogin}
+                />
+                <Button
+                  title="Use Test Rider"
+                  variant="outlined"
+                  onPress={onDevRiderLogin}
                 />
               </>
             )}
