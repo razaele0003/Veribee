@@ -49,7 +49,7 @@ export default function RiderJobFeed() {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <LinearGradient
-        colors={[Colors.primaryContainer, Colors.primary]}
+        colors={[Colors.primaryContainer, Colors.primary, '#d22517']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.hero}
@@ -153,8 +153,8 @@ const styles = StyleSheet.create({
   hero: {
     paddingHorizontal: Spacing.containerMargin,
     paddingVertical: Spacing.lg,
-    borderBottomLeftRadius: Radii.xl,
-    borderBottomRightRadius: Radii.xl,
+    borderBottomLeftRadius: Radii.DEFAULT,
+    borderBottomRightRadius: Radii.DEFAULT,
   },
   heroRow: {
     flexDirection: 'column',
@@ -174,12 +174,14 @@ const styles = StyleSheet.create({
   },
   heroTitle: {
     fontFamily: Fonts.epilogueBold,
-    fontSize: 30,
-    lineHeight: 36,
+    fontSize: 32,
+    lineHeight: 38,
     color: Colors.onPrimary,
   },
   heroBody: {
-    ...Type.bodyMd,
+    fontFamily: Fonts.manropeMedium,
+    fontSize: 16,
+    lineHeight: 24,
     color: Colors.onPrimaryContainer,
   },
   onlineBadge: {
@@ -212,12 +214,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: 'rgba(255,255,255,0.12)',
+    backgroundColor: 'rgba(255,255,255,0.14)',
     borderRadius: Radii.DEFAULT,
     paddingHorizontal: Spacing.md,
     paddingVertical: 8,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.18)',
+    borderColor: 'rgba(255,255,255,0.24)',
     marginTop: Spacing.sm,
   },
   statusLabel: {
@@ -240,9 +242,9 @@ const styles = StyleSheet.create({
     minHeight: 68,
     marginTop: Spacing.xs,
     borderRadius: Radii.DEFAULT,
-    backgroundColor: 'rgba(255,255,255,0.12)',
+    backgroundColor: 'rgba(255,255,255,0.14)',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.18)',
+    borderColor: 'rgba(255,255,255,0.24)',
     flexDirection: 'row',
     alignItems: 'center',
   },
@@ -253,11 +255,12 @@ const styles = StyleSheet.create({
   },
   heroStatValue: {
     fontFamily: Fonts.epilogueBold,
-    fontSize: 18,
+    fontSize: 20,
+    lineHeight: 24,
     color: Colors.onPrimary,
   },
   heroStatLabel: {
-    fontFamily: Fonts.manropeMedium,
+    fontFamily: Fonts.manropeBold,
     fontSize: 11,
     color: Colors.onPrimaryContainer,
   },

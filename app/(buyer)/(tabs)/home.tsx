@@ -142,7 +142,7 @@ export default function BuyerHome() {
         ListHeaderComponent={
           <>
             <LinearGradient
-              colors={[Colors.primaryContainer, Colors.primary]}
+              colors={[Colors.primaryContainer, Colors.primary, '#d22517']}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={styles.heroCard}
@@ -377,9 +377,11 @@ const styles = StyleSheet.create({
     gap: Spacing.md,
   },
   heroCard: {
-    borderRadius: Radii.card,
-    padding: Spacing.lg,
-    gap: Spacing.md,
+    borderRadius: Radii.DEFAULT,
+    paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.lg,
+    paddingBottom: Spacing.lg,
+    gap: 18,
     marginBottom: Spacing.md,
     overflow: 'hidden',
     ...Shadow.fab,
@@ -394,10 +396,10 @@ const styles = StyleSheet.create({
     minHeight: 30,
     borderRadius: Radii.full,
     backgroundColor: Colors.secondaryContainer,
-    paddingHorizontal: Spacing.sm,
+    paddingHorizontal: 14,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: Spacing.xs,
+    gap: 6,
   },
   heroBadgeText: {
     ...Type.labelCaps,
@@ -405,25 +407,29 @@ const styles = StyleSheet.create({
     color: Colors.onSecondaryContainer,
   },
   heroLocation: {
-    ...Type.labelMd,
+    fontFamily: Fonts.manropeBold,
+    fontSize: 14,
+    lineHeight: 18,
     color: Colors.onPrimary,
   },
   heroTitle: {
     fontFamily: Fonts.epilogueBold,
-    fontSize: 28,
-    lineHeight: 34,
+    fontSize: 30,
+    lineHeight: 36,
     color: Colors.onPrimary,
   },
   heroCopy: {
-    ...Type.bodyMd,
+    fontFamily: Fonts.manropeMedium,
+    fontSize: 16,
+    lineHeight: 24,
     color: Colors.onPrimaryContainer,
   },
   heroStats: {
-    minHeight: 70,
+    minHeight: 68,
     borderRadius: Radii.DEFAULT,
-    backgroundColor: 'rgba(255,255,255,0.12)',
+    backgroundColor: 'rgba(255,255,255,0.14)',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.18)',
+    borderColor: 'rgba(255,255,255,0.24)',
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: Spacing.sm,
@@ -435,11 +441,12 @@ const styles = StyleSheet.create({
   },
   heroStatValue: {
     fontFamily: Fonts.epilogueBold,
-    fontSize: 19,
+    fontSize: 21,
+    lineHeight: 25,
     color: Colors.onPrimary,
   },
   heroStatLabel: {
-    fontFamily: Fonts.manropeMedium,
+    fontFamily: Fonts.manropeBold,
     fontSize: 11,
     color: Colors.onPrimaryContainer,
     textAlign: 'center',
