@@ -147,7 +147,9 @@ export default function Login() {
           {/* ── Hero banner ── */}
           <View style={styles.hero}>
             <View style={styles.heroGlow} />
-            <Logo size={72} />
+            <View style={styles.logoBadge}>
+              <Logo size={58} />
+            </View>
             <Text style={styles.heroTitle}>Welcome back</Text>
             <Text style={styles.heroSub}>Sign in to your Veribee account</Text>
           </View>
@@ -255,6 +257,22 @@ const styles = StyleSheet.create({
     opacity: 0.15,
     top: -60,
     right: -60,
+  },
+  logoBadge: {
+    width: 88,
+    height: 88,
+    borderRadius: Radii.full,
+    backgroundColor: Colors.surfaceContainerLowest,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: 'rgba(255,255,255,0.42)',
+    shadowColor: Colors.onSurface,
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.18,
+    shadowRadius: 18,
+    elevation: 6,
+    marginBottom: Spacing.xs,
   },
   heroTitle: {
     fontFamily: Fonts.epilogueBold,

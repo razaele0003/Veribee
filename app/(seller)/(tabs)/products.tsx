@@ -180,7 +180,7 @@ export default function Products() {
           accessibilityRole="button"
           accessibilityLabel="Notifications"
         >
-          <MaterialIcons name="notifications" size={24} color={Colors.primary} />
+          <MaterialIcons name="notifications" size={24} color={Colors.onPrimary} />
         </Pressable>
       </View>
 
@@ -189,8 +189,14 @@ export default function Products() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.titleSection}>
+          <Text style={styles.pageKicker}>SELLER INVENTORY</Text>
           <Text style={styles.pageTitle}>Inventory</Text>
-          <Text style={styles.pageSubtitle}>Manage and track your products.</Text>
+          <Text style={styles.pageSubtitle}>Manage authenticated products, review queues, and live marketplace listings.</Text>
+          <View style={styles.inventoryStats}>
+            <MiniStat value={String(counts.verified)} label="Active" tone="yellow" />
+            <MiniStat value={String(counts.pending)} label="Pending" tone="blue" />
+            <MiniStat value={String(counts.failed)} label="Rejected" tone="pink" />
+          </View>
         </View>
 
         <View style={styles.controlsArea}>
@@ -329,14 +335,34 @@ export default function Products() {
   );
 }
 
+function MiniStat({ value, label, tone }: { value: string; label: string; tone: 'yellow' | 'blue' | 'pink' }) {
+  const style =
+    tone === 'yellow'
+      ? styles.miniStatYellow
+      : tone === 'blue'
+        ? styles.miniStatBlue
+        : styles.miniStatPink;
+  const textStyle =
+    tone === 'yellow'
+      ? styles.miniStatTextYellow
+      : tone === 'blue'
+        ? styles.miniStatTextBlue
+        : styles.miniStatTextPink;
+
+  return (
+    <View style={[styles.miniStat, style]}>
+      <Text style={[styles.miniStatValue, textStyle]}>{value}</Text>
+      <Text style={[styles.miniStatLabel, textStyle]}>{label}</Text>
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },
   header: {
     height: 64,
     paddingHorizontal: Spacing.containerMargin,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: Colors.surfaceContainerHigh,
-    backgroundColor: Colors.surfaceContainerLowest,
+    backgroundColor: Colors.primaryContainer,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -351,13 +377,13 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: Colors.surfaceVariant,
+    backgroundColor: Colors.surfaceContainerLowest,
     ...Shadow.input,
   },
   headerTitle: {
     fontFamily: Fonts.epilogueBold,
     fontSize: 18,
-    color: Colors.primary,
+    color: Colors.onPrimary,
     letterSpacing: -0.5,
   },
   iconButton: {
@@ -385,6 +411,10 @@ const styles = StyleSheet.create({
     letterSpacing: -0.8,
     color: Colors.onBackground,
   },
+  pageKicker: {
+    ...Type.labelCaps,
+    color: Colors.primary,
+  },
   pageSubtitle: {
     fontFamily: Fonts.manropeRegular,
     fontSize: 16,
@@ -393,10 +423,49 @@ const styles = StyleSheet.create({
   controlsArea: {
     gap: Spacing.sm,
   },
+  inventoryStats: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+    marginTop: Spacing.sm,
+  },
+  miniStat: {
+    flex: 1,
+    minHeight: 64,
+    borderRadius: Radii.DEFAULT,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 2,
+    borderWidth: 1,
+  },
+  miniStatYellow: {
+    backgroundColor: Colors.secondaryContainer,
+    borderColor: Colors.secondaryFixedDim,
+  },
+  miniStatBlue: {
+    backgroundColor: Colors.accentBlueContainer,
+    borderColor: Colors.accentBlue,
+  },
+  miniStatPink: {
+    backgroundColor: Colors.accentPinkContainer,
+    borderColor: Colors.accentPink,
+  },
+  miniStatValue: {
+    fontFamily: Fonts.epilogueBold,
+    fontSize: 22,
+  },
+  miniStatLabel: {
+    fontFamily: Fonts.manropeBold,
+    fontSize: 11,
+  },
+  miniStatTextYellow: { color: Colors.onSecondaryContainer },
+  miniStatTextBlue: { color: Colors.onAccentBlueContainer },
+  miniStatTextPink: { color: Colors.onAccentPinkContainer },
   searchBar: {
     height: 48,
     borderRadius: Radii.lg,
-    backgroundColor: Colors.surfaceContainer,
+    backgroundColor: Colors.surfaceContainerLowest,
+    borderWidth: 1,
+    borderColor: Colors.outlineVariant,
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: Spacing.sm,
@@ -418,7 +487,9 @@ const styles = StyleSheet.create({
     height: 48,
     paddingHorizontal: Spacing.sm,
     borderRadius: Radii.lg,
-    backgroundColor: Colors.surfaceContainer,
+    backgroundColor: Colors.dealContainer,
+    borderWidth: 1,
+    borderColor: Colors.outlineVariant,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,

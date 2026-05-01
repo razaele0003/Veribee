@@ -20,7 +20,10 @@ export default function RiderActive() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Active Delivery</Text>
+          <View>
+            <Text style={styles.headerKicker}>RIDER ROUTE</Text>
+            <Text style={styles.headerTitle}>Active Delivery</Text>
+          </View>
         </View>
         <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
           <View style={styles.emptyState}>
@@ -119,14 +122,17 @@ export default function RiderActive() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Delivery in Progress</Text>
+        <View>
+          <Text style={styles.headerKicker}>RIDER ROUTE</Text>
+          <Text style={styles.headerTitle}>Delivery in Progress</Text>
+        </View>
         <Pressable
           onPress={() => router.push(nextRoute)}
           hitSlop={10}
           accessibilityRole="button"
           accessibilityLabel="Open active delivery"
         >
-          <MaterialIcons name="open-in-new" size={24} color={Colors.primary} />
+          <MaterialIcons name="open-in-new" size={24} color={Colors.onPrimary} />
         </Pressable>
       </View>
       <View style={styles.mapContainer}>
@@ -218,19 +224,22 @@ export default function RiderActive() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },
   header: {
-    height: 64,
+    minHeight: 72,
     paddingHorizontal: Spacing.containerMargin,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: Colors.outlineVariant,
-    backgroundColor: Colors.surface,
+    backgroundColor: Colors.primaryContainer,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
   headerTitle: {
     fontFamily: Fonts.epilogueBold,
-    fontSize: 28,
-    color: Colors.onSurface,
+    fontSize: 24,
+    color: Colors.onPrimary,
+  },
+  headerKicker: {
+    ...Type.labelCaps,
+    color: Colors.secondaryContainer,
+    marginBottom: 3,
   },
   content: {
     padding: Spacing.containerMargin,
@@ -242,7 +251,7 @@ const styles = StyleSheet.create({
     borderRadius: Radii.card,
     borderWidth: 1,
     borderColor: Colors.surfaceContainerHigh,
-    backgroundColor: Colors.surfaceContainerLowest,
+    backgroundColor: Colors.dealContainer,
     alignItems: 'center',
     justifyContent: 'center',
     padding: Spacing.xl,

@@ -63,20 +63,20 @@ export default function BuyerProfile() {
           <View style={styles.profileGlow} pointerEvents="none" />
           <View style={styles.avatarContainer}>
             <View style={styles.avatar}>
-              <Text style={styles.avatarText}>C</Text>
+              <Text style={styles.avatarText}>DK</Text>
             </View>
             <View style={styles.verifiedBadge}>
               <MaterialIcons name="verified" size={16} color={Colors.primary} />
             </View>
           </View>
-          <Text style={styles.name}>Customer Test</Text>
+          <Text style={styles.name}>David Kim</Text>
           <View style={styles.badgeRow}>
             <View style={styles.statusPill}>
               <View style={styles.statusDot} />
               <Text style={styles.statusText}>ACTIVE CUSTOMER</Text>
             </View>
           </View>
-          <Text style={styles.joinDate}>Joined Feb 2024 • Metro Manila</Text>
+          <Text style={styles.joinDate}>Joined Feb 2024 - Metro Manila</Text>
         </View>
 
         <View style={styles.statsRow}>
@@ -197,19 +197,17 @@ function Stat({ value, label }: { value: string; label: string }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.surface },
+  container: { flex: 1, backgroundColor: Colors.background },
   header: {
     height: 64,
     paddingHorizontal: Spacing.containerMargin,
-    backgroundColor: Colors.surface,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: Colors.outlineVariant,
+    backgroundColor: Colors.primaryContainer,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
   headerSpacer: { width: 40 },
-  headerTitle: { ...Type.h3, color: Colors.primary },
+  headerTitle: { ...Type.h3, color: Colors.onPrimary },
   iconButton: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
   pressed: { opacity: 0.72 },
   content: {
@@ -218,18 +216,14 @@ const styles = StyleSheet.create({
     gap: Spacing.lg,
   },
   profileBlock: {
-    backgroundColor: Colors.surfaceContainerLowest,
-    borderRadius: Radii.card,
+    backgroundColor: Colors.primaryContainer,
+    borderRadius: Radii.xl,
     padding: Spacing.xl,
     alignItems: 'center',
     gap: Spacing.sm,
     borderWidth: 1,
-    borderColor: 'rgba(211, 218, 234, 0.3)',
-    shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.02,
-    shadowRadius: 8,
-    elevation: 2,
+    borderColor: 'rgba(255,255,255,0.24)',
+    ...Shadow.fab,
     overflow: 'hidden',
   },
   profileGlow: {
@@ -239,8 +233,8 @@ const styles = StyleSheet.create({
     width: 128,
     height: 128,
     borderRadius: Radii.full,
-    backgroundColor: Colors.primaryFixedDim,
-    opacity: 0.2,
+    backgroundColor: 'rgba(255,255,255,0.14)',
+    opacity: 1,
   },
   avatarContainer: {
     position: 'relative',
@@ -250,8 +244,8 @@ const styles = StyleSheet.create({
     width: 96,
     height: 96,
     borderRadius: Radii.full,
-    backgroundColor: Colors.surfaceContainerHigh,
-    borderWidth: 4,
+    backgroundColor: Colors.secondaryContainer,
+    borderWidth: 3,
     borderColor: Colors.surfaceContainerLowest,
     alignItems: 'center',
     justifyContent: 'center',
@@ -263,8 +257,8 @@ const styles = StyleSheet.create({
   },
   avatarText: {
     fontFamily: Fonts.epilogueBold,
-    fontSize: 28,
-    color: Colors.onSurfaceVariant,
+    fontSize: 24,
+    color: Colors.onSecondaryContainer,
   },
   verifiedBadge: {
     position: 'absolute',
@@ -285,7 +279,7 @@ const styles = StyleSheet.create({
   name: {
     fontFamily: Fonts.epilogueBold,
     fontSize: 28,
-    color: Colors.onSurface,
+    color: Colors.onPrimary,
   },
   badgeRow: {
     flexDirection: 'row',
@@ -294,7 +288,9 @@ const styles = StyleSheet.create({
   },
   statusPill: {
     borderRadius: Radii.full,
-    backgroundColor: Colors.surfaceContainerHigh,
+    backgroundColor: 'rgba(255,255,255,0.14)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.24)',
     paddingHorizontal: 12,
     paddingVertical: 4,
     flexDirection: 'row',
@@ -305,17 +301,17 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: Radii.full,
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.secondaryContainer,
   },
   statusText: {
     fontFamily: Fonts.epilogueBold,
     fontSize: 10,
     letterSpacing: 0.5,
-    color: Colors.primary,
+    color: Colors.onPrimary,
   },
   joinDate: {
     ...Type.bodyMd,
-    color: Colors.onSurfaceVariant,
+    color: Colors.onPrimaryContainer,
     marginTop: Spacing.xs,
   },
   statsRow: { flexDirection: 'row', gap: Spacing.md },
@@ -325,7 +321,7 @@ const styles = StyleSheet.create({
     borderRadius: Radii.card,
     borderWidth: 1,
     borderColor: 'rgba(211, 218, 234, 0.3)',
-    backgroundColor: Colors.surfaceContainerLowest,
+    backgroundColor: Colors.dealContainer,
     padding: Spacing.sm,
     justifyContent: 'center',
     alignItems: 'center',
@@ -338,7 +334,7 @@ const styles = StyleSheet.create({
   statValue: {
     fontFamily: Fonts.epilogueBold,
     fontSize: 20,
-    color: Colors.onSurface,
+    color: Colors.primary,
     lineHeight: 28,
   },
   statLabel: {

@@ -223,20 +223,23 @@ export default function SellerOrders() {
     <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
         <View style={styles.headerTitleRow}>
-          <Text style={styles.title}>Recent Orders</Text>
+          <View>
+            <Text style={styles.headerKicker}>SELLER ORDER DESK</Text>
+            <Text style={styles.title}>Recent Orders</Text>
+          </View>
           <View style={styles.headerActions}>
             <Pressable
               onPress={() => setSearchOpen((open) => !open)}
               hitSlop={12}
               style={({ pressed }) => [styles.iconButton, pressed && styles.pressed]}
             >
-              <MaterialIcons name="search" size={24} color={Colors.onSurfaceVariant} />
+              <MaterialIcons name="search" size={24} color={Colors.onPrimary} />
             </Pressable>
             <Pressable
               hitSlop={12}
               style={({ pressed }) => [styles.iconButton, pressed && styles.pressed]}
             >
-              <MaterialIcons name="filter-list" size={24} color={Colors.onSurfaceVariant} />
+              <MaterialIcons name="filter-list" size={24} color={Colors.onPrimary} />
             </Pressable>
           </View>
         </View>
@@ -259,6 +262,32 @@ export default function SellerOrders() {
             )}
           </View>
         )}
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.statusTabs}>
+          <Pressable
+            onPress={() => setActiveTab('all')}
+            style={[styles.statusTab, activeTab === 'all' && styles.statusTabActive]}
+          >
+            <Text style={[styles.statusTabValue, activeTab === 'all' && styles.statusTabValueActive]}>
+              {orders.length}
+            </Text>
+            <Text style={[styles.statusTabLabel, activeTab === 'all' && styles.statusTabLabelActive]}>All</Text>
+          </Pressable>
+          {tabs.map((tab) => {
+            const active = activeTab === tab.key;
+            return (
+              <Pressable
+                key={tab.key}
+                onPress={() => setActiveTab(tab.key)}
+                style={[styles.statusTab, active && styles.statusTabActive]}
+              >
+                <Text style={[styles.statusTabValue, active && styles.statusTabValueActive]}>
+                  {counts[tab.key]}
+                </Text>
+                <Text style={[styles.statusTabLabel, active && styles.statusTabLabelActive]}>{tab.label}</Text>
+              </Pressable>
+            );
+          })}
+        </ScrollView>
       </View>
 
       <ScrollView
@@ -384,7 +413,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.containerMargin,
     paddingTop: Spacing.xl,
     paddingBottom: Spacing.md,
-    backgroundColor: Colors.background,
+    backgroundColor: Colors.primaryContainer,
     gap: Spacing.md,
   },
   headerTitleRow: {
@@ -395,7 +424,12 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: Fonts.epilogueBold,
     fontSize: 28,
-    color: Colors.onSurface,
+    color: Colors.onPrimary,
+  },
+  headerKicker: {
+    ...Type.labelCaps,
+    color: Colors.secondaryContainer,
+    marginBottom: 4,
   },
   headerActions: {
     flexDirection: 'row',
@@ -407,14 +441,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: Radii.full,
-    backgroundColor: Colors.surfaceVariant,
+    backgroundColor: 'rgba(255,255,255,0.14)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.24)',
     opacity: 0.8,
   },
   pressed: { opacity: 0.6 },
   searchBar: {
     height: 48,
     borderRadius: Radii.full,
-    backgroundColor: Colors.surfaceVariant,
+    backgroundColor: Colors.surfaceContainerLowest,
     opacity: 0.7,
     flexDirection: 'row',
     alignItems: 'center',
@@ -427,6 +463,37 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.onSurface,
   },
+  statusTabs: {
+    gap: Spacing.sm,
+    paddingRight: Spacing.containerMargin,
+  },
+  statusTab: {
+    minWidth: 92,
+    minHeight: 58,
+    borderRadius: Radii.DEFAULT,
+    backgroundColor: 'rgba(255,255,255,0.14)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.24)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: Spacing.sm,
+  },
+  statusTabActive: {
+    backgroundColor: Colors.secondaryContainer,
+    borderColor: Colors.secondaryContainer,
+  },
+  statusTabValue: {
+    fontFamily: Fonts.epilogueBold,
+    fontSize: 18,
+    color: Colors.onPrimary,
+  },
+  statusTabValueActive: { color: Colors.onSecondaryContainer },
+  statusTabLabel: {
+    fontFamily: Fonts.manropeBold,
+    fontSize: 11,
+    color: Colors.onPrimaryContainer,
+  },
+  statusTabLabelActive: { color: Colors.onSecondaryContainer },
   content: {
     paddingHorizontal: Spacing.containerMargin,
     paddingBottom: 112,

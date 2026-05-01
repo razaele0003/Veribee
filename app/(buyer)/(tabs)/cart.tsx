@@ -37,6 +37,33 @@ export default function BuyerCart() {
       </View>
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        <View style={styles.cartHero}>
+          <View>
+            <Text style={styles.heroKicker}>VERIFIED CHECKOUT</Text>
+            <Text style={styles.heroTitle}>Cart ready for Veribee checks</Text>
+          </View>
+          <View style={styles.heroStats}>
+            <View style={styles.heroStat}>
+              <Text style={styles.heroStatValue}>{selectedItems.length}</Text>
+              <Text style={styles.heroStatLabel}>Selected</Text>
+            </View>
+            <View style={styles.heroDivider} />
+            <View style={styles.heroStat}>
+              <Text style={styles.heroStatValue}>{formatPHP(authFee)}</Text>
+              <Text style={styles.heroStatLabel}>Auth fee</Text>
+            </View>
+            <View style={styles.heroDivider} />
+            <View style={styles.heroStat}>
+              <Text style={styles.heroStatValue}>{formatPHP(deliveryFee)}</Text>
+              <Text style={styles.heroStatLabel}>Delivery</Text>
+            </View>
+          </View>
+          <View style={styles.voucherStrip}>
+            <MaterialIcons name="local-offer" size={18} color={Colors.onSecondaryContainer} />
+            <Text style={styles.voucherText}>Free demo voucher applied to verified Metro Manila routes</Text>
+          </View>
+        </View>
+
         {items.length > 0 ? (
           Object.entries(groupedItems).map(([sellerName, sellerItems]) => (
             <View key={sellerName} style={styles.storeGroup}>
@@ -69,6 +96,7 @@ export default function BuyerCart() {
             <View style={styles.totalBlock}>
               <Text style={styles.totalLabel}>Total</Text>
               <Text style={styles.totalValue}>{formatPHP(grandTotal)}</Text>
+              <Text style={styles.totalSub}>{formatPHP(totalPrice)} items</Text>
             </View>
             <Pressable
               style={[
@@ -146,9 +174,7 @@ const styles = StyleSheet.create({
   header: {
     height: 64,
     paddingHorizontal: Spacing.containerMargin,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: Colors.outlineVariant,
-    backgroundColor: Colors.surfaceContainerLowest,
+    backgroundColor: Colors.primaryContainer,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -157,12 +183,76 @@ const styles = StyleSheet.create({
   headerTitle: { 
     fontFamily: Fonts.epilogueBold,
     fontSize: 18,
-    color: Colors.onSurface 
+    color: Colors.onPrimary 
   },
   content: {
     padding: Spacing.containerMargin,
     paddingBottom: 120,
     gap: Spacing.sm,
+  },
+  cartHero: {
+    backgroundColor: Colors.primaryContainer,
+    borderRadius: Radii.xl,
+    padding: Spacing.md,
+    gap: Spacing.md,
+    marginBottom: Spacing.sm,
+    ...Shadow.fab,
+  },
+  heroKicker: {
+    ...Type.labelCaps,
+    color: Colors.secondaryContainer,
+    marginBottom: 6,
+  },
+  heroTitle: {
+    fontFamily: Fonts.epilogueBold,
+    fontSize: 24,
+    lineHeight: 30,
+    color: Colors.onPrimary,
+  },
+  heroStats: {
+    minHeight: 66,
+    borderRadius: Radii.DEFAULT,
+    backgroundColor: 'rgba(255,255,255,0.14)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.24)',
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  heroStat: {
+    flex: 1,
+    alignItems: 'center',
+    gap: 2,
+    paddingHorizontal: 4,
+  },
+  heroStatValue: {
+    fontFamily: Fonts.epilogueBold,
+    fontSize: 16,
+    color: Colors.onPrimary,
+  },
+  heroStatLabel: {
+    fontFamily: Fonts.manropeBold,
+    fontSize: 11,
+    color: Colors.onPrimaryContainer,
+  },
+  heroDivider: {
+    width: StyleSheet.hairlineWidth,
+    height: 34,
+    backgroundColor: 'rgba(255,255,255,0.24)',
+  },
+  voucherStrip: {
+    minHeight: 44,
+    borderRadius: Radii.DEFAULT,
+    backgroundColor: Colors.secondaryContainer,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+    paddingHorizontal: Spacing.sm,
+  },
+  voucherText: {
+    flex: 1,
+    fontFamily: Fonts.manropeBold,
+    fontSize: 12,
+    color: Colors.onSecondaryContainer,
   },
   storeGroup: {
     backgroundColor: Colors.surfaceContainerLowest,
@@ -176,8 +266,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: Spacing.sm,
     borderBottomWidth: 1,
-    borderBottomColor: Colors.surfaceContainer,
+    borderBottomColor: Colors.outlineVariant,
     gap: Spacing.sm,
+    backgroundColor: Colors.dealContainer,
   },
   storeName: {
     fontFamily: Fonts.epilogueBold,
@@ -285,7 +376,8 @@ const styles = StyleSheet.create({
   totalBlock: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: Spacing.xs,
+    flexWrap: 'wrap',
+    gap: 4,
   },
   totalLabel: {
     fontFamily: Fonts.manropeRegular,
@@ -296,6 +388,12 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.epilogueSemiBold,
     fontSize: 20,
     color: Colors.primary,
+  },
+  totalSub: {
+    width: '100%',
+    fontFamily: Fonts.manropeBold,
+    fontSize: 11,
+    color: Colors.onSurfaceVariant,
   },
   checkoutButton: {
     backgroundColor: Colors.primary,

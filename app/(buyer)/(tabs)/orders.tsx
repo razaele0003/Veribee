@@ -90,9 +90,37 @@ export default function BuyerOrders() {
     [activeTab, allOrders],
   );
 
+  const orderCounts = useMemo(
+    () => ({
+      all: allOrders.length,
+      shipping: allOrders.filter((order) => order.status === 'in_transit').length,
+      secured: allOrders.filter((order) => order.status === 'delivered').length,
+    }),
+    [allOrders],
+  );
+
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>My Orders</Text>
+      <View style={styles.hero}>
+        <Text style={styles.heroKicker}>ORDER CONTROL CENTER</Text>
+        <Text style={styles.title}>Track every verified order</Text>
+        <View style={styles.heroStats}>
+          <View style={styles.heroStat}>
+            <Text style={styles.heroStatValue}>{orderCounts.all}</Text>
+            <Text style={styles.heroStatLabel}>Orders</Text>
+          </View>
+          <View style={styles.heroDivider} />
+          <View style={styles.heroStat}>
+            <Text style={styles.heroStatValue}>{orderCounts.shipping}</Text>
+            <Text style={styles.heroStatLabel}>Shipping</Text>
+          </View>
+          <View style={styles.heroDivider} />
+          <View style={styles.heroStat}>
+            <Text style={styles.heroStatValue}>{orderCounts.secured}</Text>
+            <Text style={styles.heroStatLabel}>Secured</Text>
+          </View>
+        </View>
+      </View>
       
       <View style={styles.tabsWrapper}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabs}>
@@ -160,10 +188,12 @@ function OrderCard({ order, onPress }: { order: BuyerOrder; onPress: () => void 
     >
       <View style={styles.cardHeader}>
         <View style={styles.sellerInfo}>
-          <MaterialIcons name="person" size={16} color={Colors.onSurfaceVariant} />
+          <MaterialIcons name="storefront" size={16} color={Colors.primary} />
           <Text style={styles.sellerName}>{order.sellerName}</Text>
         </View>
-        <Text style={styles.statusLabel}>{getStatusLabel(order.status)}</Text>
+        <View style={styles.statusPill}>
+          <Text style={styles.statusLabel}>{getStatusLabel(order.status)}</Text>
+        </View>
       </View>
 
       <View style={styles.divider} />
@@ -197,7 +227,10 @@ function OrderCard({ order, onPress }: { order: BuyerOrder; onPress: () => void 
       <View style={styles.divider} />
 
       <View style={styles.actionRow}>
-        <Text style={styles.orderIdText}>Order ID {order.id}</Text>
+        <View style={styles.orderTrustRow}>
+          <MaterialIcons name="verified-user" size={15} color={Colors.tertiary} />
+          <Text style={styles.orderIdText}>Order ID {order.id}</Text>
+        </View>
         <Pressable style={styles.actionButton} onPress={onPress}>
           <Text style={styles.actionButtonText}>View Details</Text>
         </Pressable>
@@ -207,16 +240,53 @@ function OrderCard({ order, onPress }: { order: BuyerOrder; onPress: () => void 
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.surfaceContainerLowest },
-  title: {
-    ...Type.h2,
-    color: Colors.onSurface,
+  container: { flex: 1, backgroundColor: Colors.background },
+  hero: {
+    backgroundColor: Colors.primaryContainer,
     paddingHorizontal: Spacing.containerMargin,
     paddingTop: Spacing.lg,
+    paddingBottom: Spacing.md,
+    gap: Spacing.md,
+  },
+  heroKicker: {
+    ...Type.labelCaps,
+    color: Colors.secondaryContainer,
+  },
+  title: {
+    fontFamily: Fonts.epilogueBold,
+    fontSize: 30,
+    lineHeight: 36,
+    color: Colors.onPrimary,
+  },
+  heroStats: {
+    minHeight: 62,
+    borderRadius: Radii.DEFAULT,
+    backgroundColor: 'rgba(255,255,255,0.14)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.24)',
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  heroStat: { flex: 1, alignItems: 'center', gap: 2 },
+  heroStatValue: {
+    fontFamily: Fonts.epilogueBold,
+    fontSize: 18,
+    color: Colors.onPrimary,
+  },
+  heroStatLabel: {
+    fontFamily: Fonts.manropeBold,
+    fontSize: 11,
+    color: Colors.onPrimaryContainer,
+  },
+  heroDivider: {
+    width: StyleSheet.hairlineWidth,
+    height: 32,
+    backgroundColor: 'rgba(255,255,255,0.24)',
   },
   tabsWrapper: {
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: Colors.outlineVariant,
+    backgroundColor: Colors.surfaceContainerLowest,
   },
   tabs: {
     paddingHorizontal: Spacing.containerMargin,
@@ -241,14 +311,17 @@ const styles = StyleSheet.create({
     padding: Spacing.containerMargin,
     paddingBottom: 112,
     gap: Spacing.md,
-    backgroundColor: Colors.surfaceContainer,
+    backgroundColor: Colors.background,
   },
   orderCard: {
     backgroundColor: Colors.surfaceContainerLowest,
     borderWidth: 1,
-    borderColor: Colors.surfaceVariant,
+    borderColor: Colors.outlineVariant,
+    borderRadius: Radii.lg,
     paddingTop: Spacing.sm,
     paddingHorizontal: Spacing.sm,
+    overflow: 'hidden',
+    ...Shadow.card,
   },
   pressed: { opacity: 0.8 },
   cardHeader: {
@@ -267,9 +340,15 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: Colors.onSurface,
   },
+  statusPill: {
+    borderRadius: Radii.full,
+    backgroundColor: Colors.dealContainer,
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: 5,
+  },
   statusLabel: {
-    fontFamily: Fonts.manropeRegular,
-    fontSize: 13,
+    fontFamily: Fonts.manropeBold,
+    fontSize: 12,
     color: Colors.primary,
   },
   divider: {
@@ -285,6 +364,7 @@ const styles = StyleSheet.create({
   thumb: {
     width: 80,
     height: 80,
+    borderRadius: Radii.DEFAULT,
     backgroundColor: Colors.surfaceContainerHighest,
     alignItems: 'center',
     justifyContent: 'center',
@@ -345,6 +425,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingVertical: Spacing.sm,
+  },
+  orderTrustRow: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
   },
   orderIdText: {
     fontFamily: Fonts.manropeRegular,

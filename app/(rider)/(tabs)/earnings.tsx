@@ -44,7 +44,10 @@ export default function RiderEarnings() {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <View style={styles.iconButton} />
-        <Text style={styles.headerTitle}>My Earnings</Text>
+        <View style={styles.headerCenter}>
+          <Text style={styles.headerKicker}>RIDER PAYOUTS</Text>
+          <Text style={styles.headerTitle}>My Earnings</Text>
+        </View>
         <View style={styles.iconButton} />
       </View>
 
@@ -77,6 +80,10 @@ export default function RiderEarnings() {
           <View style={styles.primaryValueRow}>
             <Text style={styles.currencyLabel}>PHP</Text>
             <Text style={styles.primaryValue}>{periodTotal.toFixed(2)}</Text>
+          </View>
+          <View style={styles.payoutBadge}>
+            <MaterialIcons name="verified" size={16} color={Colors.onSecondaryContainer} />
+            <Text style={styles.payoutBadgeText}>Verified delivery fees ready for weekly payout</Text>
           </View>
         </View>
 
@@ -168,20 +175,24 @@ function EarningRow({
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },
   header: {
-    height: 64,
+    minHeight: 76,
     paddingHorizontal: Spacing.containerMargin,
-    backgroundColor: Colors.surface,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: Colors.outlineVariant,
+    backgroundColor: Colors.primaryContainer,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
   iconButton: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
+  headerCenter: { alignItems: 'center' },
+  headerKicker: {
+    ...Type.labelCaps,
+    color: Colors.secondaryContainer,
+    marginBottom: 2,
+  },
   headerTitle: {
     fontFamily: Fonts.epilogueBold,
-    fontSize: 28,
-    color: Colors.onSurface,
+    fontSize: 24,
+    color: Colors.onPrimary,
   },
   content: {
     padding: Spacing.containerMargin,
@@ -222,14 +233,14 @@ const styles = StyleSheet.create({
     color: Colors.onPrimary,
   },
   primaryCard: {
-    backgroundColor: Colors.surfaceContainerLowest,
+    backgroundColor: Colors.primaryContainer,
     borderRadius: 24,
     padding: Spacing.xl,
     paddingVertical: 32,
     gap: Spacing.sm,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: 'rgba(211, 218, 234, 0.3)',
+    borderColor: 'rgba(255,255,255,0.24)',
     shadowColor: Colors.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.06,
@@ -249,7 +260,7 @@ const styles = StyleSheet.create({
   },
   primaryLabel: {
     ...Type.bodyLg,
-    color: Colors.onSurfaceVariant,
+    color: Colors.onPrimaryContainer,
   },
   primaryValueRow: {
     flexDirection: 'row',
@@ -259,14 +270,32 @@ const styles = StyleSheet.create({
   currencyLabel: {
     fontFamily: Fonts.epilogueBold,
     fontSize: 20,
-    color: Colors.primary,
+    color: Colors.secondaryContainer,
   },
   primaryValue: {
     fontFamily: Fonts.epilogueBold,
     fontSize: 56,
     letterSpacing: -1,
     lineHeight: 56,
-    color: Colors.onSurface,
+    color: Colors.onPrimary,
+  },
+  payoutBadge: {
+    alignSelf: 'flex-start',
+    maxWidth: '100%',
+    minHeight: 36,
+    borderRadius: Radii.full,
+    backgroundColor: Colors.secondaryContainer,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+    paddingHorizontal: Spacing.sm,
+    marginTop: Spacing.xs,
+  },
+  payoutBadgeText: {
+    flexShrink: 1,
+    fontFamily: Fonts.manropeBold,
+    fontSize: 12,
+    color: Colors.onSecondaryContainer,
   },
   trendBadge: {
     alignSelf: 'flex-start',

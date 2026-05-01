@@ -104,6 +104,7 @@ export default function Profile() {
       >
         {/* ── Profile Header ── */}
         <View style={styles.profileSection}>
+          <Text style={styles.profileKicker}>SELLER PROFILE</Text>
           {/* Avatar with gold verified badge */}
           <View style={styles.avatarWrap}>
             <View style={styles.avatar}>
@@ -321,9 +322,7 @@ const styles = StyleSheet.create({
   header: {
     height: 64,
     paddingHorizontal: Spacing.containerMargin,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: Colors.outlineVariant,
-    backgroundColor: Colors.surface,
+    backgroundColor: Colors.primaryContainer,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -331,7 +330,7 @@ const styles = StyleSheet.create({
   headerSpacer: { width: 40 },
   iconButton: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
   pressed: { opacity: 0.72 },
-  headerTitle: { ...Type.h3, color: Colors.primary },
+  headerTitle: { ...Type.h3, color: Colors.onPrimary },
 
   // Scroll
   content: {
@@ -341,13 +340,26 @@ const styles = StyleSheet.create({
   },
 
   // Profile section
-  profileSection: { alignItems: 'center', gap: Spacing.sm },
+  profileSection: {
+    alignItems: 'center',
+    gap: Spacing.sm,
+    backgroundColor: Colors.primaryContainer,
+    borderRadius: Radii.xl,
+    padding: Spacing.xl,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.24)',
+    ...Shadow.fab,
+  },
+  profileKicker: {
+    ...Type.labelCaps,
+    color: Colors.secondaryContainer,
+  },
   avatarWrap: { position: 'relative', marginBottom: Spacing.xs },
   avatar: {
     width: 112,
     height: 112,
     borderRadius: Radii.full,
-    backgroundColor: Colors.primaryContainer,
+    backgroundColor: Colors.secondaryContainer,
     borderWidth: 4,
     borderColor: Colors.surface,
     alignItems: 'center',
@@ -361,7 +373,7 @@ const styles = StyleSheet.create({
   avatarText: {
     fontFamily: Fonts.epilogueBold,
     fontSize: 44,
-    color: Colors.onPrimary,
+    color: Colors.onSecondaryContainer,
   },
   verifiedBadgeOverlay: {
     position: 'absolute',
@@ -379,7 +391,7 @@ const styles = StyleSheet.create({
   storeName: {
     fontFamily: Fonts.epilogueBold,
     fontSize: 22,
-    color: Colors.onSurface,
+    color: Colors.onPrimary,
     textAlign: 'center',
   },
   verifiedPills: { flexDirection: 'row', gap: Spacing.sm },
@@ -389,10 +401,10 @@ const styles = StyleSheet.create({
     gap: 4,
     paddingHorizontal: 10,
     paddingVertical: 5,
-    backgroundColor: Colors.surfaceContainer,
+    backgroundColor: 'rgba(255,255,255,0.14)',
     borderRadius: Radii.full,
     borderWidth: 1,
-    borderColor: Colors.outlineVariant,
+    borderColor: 'rgba(255,255,255,0.24)',
   },
   pillText: {
     fontFamily: Fonts.manropeMedium,
@@ -403,7 +415,7 @@ const styles = StyleSheet.create({
     marginTop: Spacing.xs,
     paddingHorizontal: 14,
     paddingVertical: 6,
-    backgroundColor: Colors.primaryFixed,
+    backgroundColor: Colors.secondaryContainer,
     borderRadius: Radii.lg,
     borderWidth: 1,
     borderColor: Colors.primaryFixedDim,
@@ -412,7 +424,7 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.manropeBold,
     fontSize: 11,
     letterSpacing: 1,
-    color: Colors.onPrimaryFixedVariant,
+    color: Colors.onSecondaryContainer,
   },
 
   // VSI bento card

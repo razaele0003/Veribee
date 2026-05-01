@@ -225,7 +225,9 @@ export default function SellerDashboard() {
     <SafeAreaView style={styles.container}>
       <View style={styles.appBar}>
         <View style={styles.brandRow}>
-          <Logo size={36} />
+          <View style={styles.logoBubble}>
+            <Logo size={30} />
+          </View>
           <Text style={styles.brand}>Veribee</Text>
         </View>
         <Pressable
@@ -238,7 +240,7 @@ export default function SellerDashboard() {
           <MaterialIcons
             name="notifications-none"
             size={28}
-            color={Colors.onSurfaceVariant}
+            color={Colors.onPrimary}
           />
           <View style={styles.notificationDot} />
         </Pressable>
@@ -256,10 +258,22 @@ export default function SellerDashboard() {
         }
       >
         <View style={styles.greetingBlock}>
+          <Text style={styles.greetingKicker}>SELLER OPERATIONS</Text>
           <Text style={styles.greeting}>Good morning, {data.displayName}</Text>
           <Text style={styles.subtitle}>
             Here's your store overview for today.
           </Text>
+        </View>
+
+        <View style={styles.marketStrip}>
+          <View style={styles.marketPill}>
+            <MaterialIcons name="local-offer" size={18} color={Colors.onSecondaryContainer} />
+            <Text style={styles.marketPillText}>Campaign-ready</Text>
+          </View>
+          <View style={styles.marketPillBlue}>
+            <MaterialIcons name="bolt" size={18} color={Colors.onAccentBlueContainer} />
+            <Text style={styles.marketPillBlueText}>24h auth queue</Text>
+          </View>
         </View>
 
         <Pressable
@@ -404,13 +418,11 @@ function StatCard({
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.surface },
+  container: { flex: 1, backgroundColor: Colors.background },
   appBar: {
     height: 64,
     paddingHorizontal: Spacing.containerMargin,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: Colors.outlineVariant,
-    backgroundColor: Colors.surface,
+    backgroundColor: Colors.primaryContainer,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -420,11 +432,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: Spacing.sm,
   },
+  logoBubble: {
+    width: 38,
+    height: 38,
+    borderRadius: Radii.full,
+    backgroundColor: Colors.surfaceContainerLowest,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   brand: {
     fontFamily: Fonts.epilogueBold,
     fontSize: 26,
     lineHeight: 32,
-    color: Colors.primary,
+    color: Colors.onPrimary,
   },
   iconButton: {
     width: 40,
@@ -439,7 +459,7 @@ const styles = StyleSheet.create({
     width: 7,
     height: 7,
     borderRadius: Radii.full,
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.secondaryContainer,
   },
   pressed: { opacity: 0.72 },
   content: {
@@ -449,8 +469,45 @@ const styles = StyleSheet.create({
     gap: Spacing.xl,
   },
   greetingBlock: { gap: Spacing.base },
+  greetingKicker: {
+    ...Type.labelCaps,
+    color: Colors.primary,
+  },
   greeting: { ...Type.h1, color: Colors.onSurface },
   subtitle: { ...Type.bodyMd, color: Colors.onSurfaceVariant },
+  marketStrip: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+    flexWrap: 'wrap',
+  },
+  marketPill: {
+    minHeight: 44,
+    borderRadius: Radii.DEFAULT,
+    backgroundColor: Colors.secondaryContainer,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+    paddingHorizontal: Spacing.sm,
+  },
+  marketPillText: {
+    fontFamily: Fonts.manropeBold,
+    fontSize: 13,
+    color: Colors.onSecondaryContainer,
+  },
+  marketPillBlue: {
+    minHeight: 44,
+    borderRadius: Radii.DEFAULT,
+    backgroundColor: Colors.accentBlueContainer,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+    paddingHorizontal: Spacing.sm,
+  },
+  marketPillBlueText: {
+    fontFamily: Fonts.manropeBold,
+    fontSize: 13,
+    color: Colors.onAccentBlueContainer,
+  },
   vsiCard: {
     backgroundColor: Colors.primaryContainer,
     borderRadius: Radii.card,
@@ -531,7 +588,9 @@ const styles = StyleSheet.create({
   statCard: {
     flex: 1,
     minHeight: 106,
-    backgroundColor: Colors.surfaceContainerLow,
+    backgroundColor: Colors.surfaceContainerLowest,
+    borderWidth: 1,
+    borderColor: Colors.outlineVariant,
     borderRadius: Radii.card,
     alignItems: 'center',
     justifyContent: 'center',

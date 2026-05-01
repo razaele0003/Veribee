@@ -45,7 +45,10 @@ export default function RiderAccount() {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <View style={styles.iconButton} />
-        <Text style={styles.headerTitle}>Account</Text>
+        <View style={styles.headerCenter}>
+          <Text style={styles.headerKicker}>RIDER ACCOUNT</Text>
+          <Text style={styles.headerTitle}>Account</Text>
+        </View>
         <View style={styles.iconButton} />
       </View>
 
@@ -81,7 +84,7 @@ export default function RiderAccount() {
             </View>
           </View>
           
-          <Text style={styles.joinDate}>Joined Jan 2023 • Metro Manila</Text>
+          <Text style={styles.joinDate}>Joined Jan 2023 - Metro Manila</Text>
         </View>
 
         <View style={styles.statsRow}>
@@ -312,33 +315,35 @@ export default function RiderAccount() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },
   header: {
-    height: 64,
+    minHeight: 76,
     paddingHorizontal: Spacing.containerMargin,
-    backgroundColor: Colors.surface,
+    backgroundColor: Colors.primaryContainer,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
   iconButton: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
-  headerTitle: { ...Type.h3, color: Colors.primary },
+  headerCenter: { alignItems: 'center' },
+  headerKicker: {
+    ...Type.labelCaps,
+    color: Colors.secondaryContainer,
+    marginBottom: 2,
+  },
+  headerTitle: { ...Type.h3, color: Colors.onPrimary },
   content: {
     padding: Spacing.containerMargin,
     paddingBottom: 112,
     gap: Spacing.lg,
   },
   profileBlock: {
-    backgroundColor: Colors.surfaceContainerLowest,
-    borderRadius: Radii.card,
+    backgroundColor: Colors.primaryContainer,
+    borderRadius: Radii.xl,
     padding: Spacing.xl,
     alignItems: 'center',
     gap: Spacing.sm,
     borderWidth: 1,
-    borderColor: 'rgba(211, 218, 234, 0.3)',
-    shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.02,
-    shadowRadius: 8,
-    elevation: 2,
+    borderColor: 'rgba(255,255,255,0.24)',
+    ...Shadow.fab,
     overflow: 'hidden',
   },
   profileGlow: {
@@ -348,8 +353,8 @@ const styles = StyleSheet.create({
     width: 128,
     height: 128,
     borderRadius: Radii.full,
-    backgroundColor: Colors.primaryFixedDim,
-    opacity: 0.2,
+    backgroundColor: 'rgba(255,255,255,0.14)',
+    opacity: 1,
   },
   avatarContainer: {
     position: 'relative',
@@ -359,7 +364,7 @@ const styles = StyleSheet.create({
     width: 96,
     height: 96,
     borderRadius: Radii.full,
-    backgroundColor: Colors.surfaceContainerHigh,
+    backgroundColor: Colors.secondaryContainer,
     borderWidth: 4,
     borderColor: Colors.surfaceContainerLowest,
     alignItems: 'center',
@@ -373,7 +378,7 @@ const styles = StyleSheet.create({
   avatarText: {
     fontFamily: Fonts.epilogueBold,
     fontSize: 28,
-    color: Colors.onSurfaceVariant,
+    color: Colors.onSecondaryContainer,
   },
   verifiedBadge: {
     position: 'absolute',
@@ -394,7 +399,7 @@ const styles = StyleSheet.create({
   name: {
     fontFamily: Fonts.epilogueBold,
     fontSize: 28,
-    color: Colors.onSurface,
+    color: Colors.onPrimary,
   },
   badgeRow: {
     flexDirection: 'row',
@@ -403,7 +408,9 @@ const styles = StyleSheet.create({
   },
   statusPill: {
     borderRadius: Radii.full,
-    backgroundColor: Colors.surfaceContainerHigh,
+    backgroundColor: 'rgba(255,255,255,0.14)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.24)',
     paddingHorizontal: 12,
     paddingVertical: 4,
     flexDirection: 'row',
@@ -414,13 +421,13 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: Radii.full,
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.secondaryContainer,
   },
   statusText: {
     fontFamily: Fonts.epilogueBold,
     fontSize: 10,
     letterSpacing: 0.5,
-    color: Colors.primary,
+    color: Colors.onPrimary,
   },
   ratingPill: {
     flexDirection: 'row',
@@ -438,7 +445,7 @@ const styles = StyleSheet.create({
   },
   joinDate: {
     ...Type.bodyMd,
-    color: Colors.onSurfaceVariant,
+    color: Colors.onPrimaryContainer,
     marginTop: Spacing.xs,
   },
   vehicleCard: {
