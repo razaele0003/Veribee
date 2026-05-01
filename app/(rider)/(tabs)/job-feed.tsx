@@ -65,7 +65,7 @@ export default function RiderJobFeed() {
               <Text style={styles.onlineBadgeText}>{isOnline ? 'Online' : 'Offline'}</Text>
             </View>
           </View>
-          <Text style={styles.heroBody}>Accept nearby verified deliveries and track your route from pickup to handoff.</Text>
+          <Text style={styles.heroBody}>Verified pickups near Makati and BGC.</Text>
           
           <View style={styles.statusPill}>
             <Text style={styles.statusLabel}>STATUS</Text>
@@ -106,10 +106,17 @@ export default function RiderJobFeed() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <MapCard />
+        <MapCard label="Live route zone" height={120} />
 
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Nearby Requests</Text>
+          <View>
+            <Text style={styles.sectionEyebrow}>QUEUE</Text>
+            <Text style={styles.sectionTitle}>Nearby Requests</Text>
+          </View>
+          <View style={styles.sectionActions}>
+            <View style={styles.countChip}>
+              <Text style={styles.countChipText}>{jobs.length} jobs</Text>
+            </View>
           <Pressable
             onPress={() => setRefreshTick((value) => value + 1)}
             hitSlop={10}
@@ -118,6 +125,7 @@ export default function RiderJobFeed() {
           >
             <MaterialIcons name="refresh" size={24} color={Colors.primary} />
           </Pressable>
+          </View>
         </View>
         {refreshTick > 0 && (
           <Text style={styles.refreshNote}>Local jobs are up to date.</Text>
@@ -152,9 +160,10 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },
   hero: {
     paddingHorizontal: Spacing.containerMargin,
-    paddingVertical: Spacing.lg,
-    borderBottomLeftRadius: Radii.DEFAULT,
-    borderBottomRightRadius: Radii.DEFAULT,
+    paddingTop: Spacing.md,
+    paddingBottom: Spacing.md,
+    borderBottomLeftRadius: Radii.xl,
+    borderBottomRightRadius: Radii.xl,
   },
   heroRow: {
     flexDirection: 'column',
@@ -174,14 +183,14 @@ const styles = StyleSheet.create({
   },
   heroTitle: {
     fontFamily: Fonts.epilogueBold,
-    fontSize: 32,
-    lineHeight: 38,
+    fontSize: 28,
+    lineHeight: 34,
     color: Colors.onPrimary,
   },
   heroBody: {
     fontFamily: Fonts.manropeMedium,
-    fontSize: 16,
-    lineHeight: 24,
+    fontSize: 14,
+    lineHeight: 20,
     color: Colors.onPrimaryContainer,
   },
   onlineBadge: {
@@ -239,24 +248,27 @@ const styles = StyleSheet.create({
     color: Colors.onPrimary,
   },
   heroStats: {
-    minHeight: 68,
+    minHeight: 56,
     marginTop: Spacing.xs,
-    borderRadius: Radii.DEFAULT,
-    backgroundColor: 'rgba(255,255,255,0.14)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.24)',
+    gap: Spacing.sm,
     flexDirection: 'row',
     alignItems: 'center',
   },
   heroStat: {
     flex: 1,
+    minHeight: 56,
+    borderRadius: Radii.DEFAULT,
+    backgroundColor: 'rgba(255,255,255,0.14)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.24)',
     alignItems: 'center',
+    justifyContent: 'center',
     gap: 2,
   },
   heroStatValue: {
     fontFamily: Fonts.epilogueBold,
-    fontSize: 20,
-    lineHeight: 24,
+    fontSize: 18,
+    lineHeight: 22,
     color: Colors.onPrimary,
   },
   heroStatLabel: {
@@ -265,25 +277,47 @@ const styles = StyleSheet.create({
     color: Colors.onPrimaryContainer,
   },
   heroStatDivider: {
-    height: 34,
-    width: StyleSheet.hairlineWidth,
-    backgroundColor: 'rgba(255,255,255,0.24)',
+    display: 'none',
   },
   content: {
-    padding: Spacing.containerMargin,
+    padding: Spacing.md,
     paddingBottom: 112,
     gap: Spacing.md,
   },
   sectionHeader: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-end',
     justifyContent: 'space-between',
     marginTop: Spacing.sm,
+    gap: Spacing.md,
+  },
+  sectionEyebrow: {
+    ...Type.labelCaps,
+    color: Colors.primary,
+    marginBottom: 3,
   },
   sectionTitle: {
     fontFamily: Fonts.epilogueBold,
-    fontSize: 24,
+    fontSize: 22,
     color: Colors.onSurface,
+  },
+  sectionActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+  },
+  countChip: {
+    minHeight: 32,
+    borderRadius: Radii.full,
+    backgroundColor: Colors.secondaryContainer,
+    paddingHorizontal: Spacing.sm,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  countChipText: {
+    fontFamily: Fonts.manropeBold,
+    fontSize: 12,
+    color: Colors.onSecondaryContainer,
   },
   refreshNote: {
     ...Type.bodyMd,

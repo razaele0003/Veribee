@@ -20,8 +20,8 @@ export function JobCard({ job, onAccept, onDecline }: Props) {
           <View style={styles.iconBox}>
             <MaterialIcons name="inventory-2" size={24} color={Colors.primary} />
           </View>
-          <View>
-            <Text style={styles.categoryText}>{job.category} Verified</Text>
+          <View style={styles.headerCopy}>
+            <Text style={styles.categoryText} numberOfLines={1}>{job.category} Verified</Text>
             <View style={styles.distanceRow}>
               <MaterialIcons name="directions-walk" size={14} color={Colors.onSurfaceVariant} />
               <Text style={styles.distanceText}>{job.distanceKm.toFixed(1)} km away</Text>
@@ -39,20 +39,23 @@ export function JobCard({ job, onAccept, onDecline }: Props) {
       </View>
 
       <View style={styles.routeContainer}>
-        <View style={styles.routeTimeline}>
-          <View style={styles.routeLine} />
-          <View style={styles.routeStep}>
-            <View style={styles.pickupDotOuter}>
-              <View style={styles.pickupDotInner} />
-            </View>
+        <View style={styles.routeConnector} />
+        <View style={styles.routeRow}>
+          <View style={styles.markerColumn}>
+            <View style={styles.pickupDotOuter} />
+          </View>
+          <View style={styles.routeCopy}>
             <Text style={styles.stepLabel}>PICKUP</Text>
             <Text style={styles.stepValue}>{job.pickupAddress}</Text>
           </View>
-          
-          <View style={[styles.routeStep, { marginTop: Spacing.md }]}>
+        </View>
+        <View style={styles.routeRow}>
+          <View style={styles.markerColumn}>
             <View style={styles.deliveryDotOuter}>
               <MaterialIcons name="location-on" size={12} color={Colors.onPrimary} />
             </View>
+          </View>
+          <View style={styles.routeCopy}>
             <Text style={styles.stepLabel}>DELIVERY</Text>
             <Text style={styles.stepValue}>{job.deliveryAddress}</Text>
           </View>
@@ -87,29 +90,25 @@ export function JobCard({ job, onAccept, onDecline }: Props) {
 
 const styles = StyleSheet.create({
   card: {
-    borderRadius: Radii.card,
+    borderRadius: Radii.xl,
     borderWidth: 1,
-    borderColor: 'rgba(211, 218, 234, 0.4)',
+    borderColor: Colors.outlineVariant,
     backgroundColor: Colors.surfaceContainerLowest,
-    padding: Spacing.lg,
+    padding: 14,
     overflow: 'hidden',
-    shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.04,
-    shadowRadius: 8,
-    elevation: 2,
+    ...Shadow.card,
     marginBottom: Spacing.sm,
   },
   cardHeader: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     justifyContent: 'space-between',
-    paddingBottom: Spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.surfaceContainerHighest,
-    marginBottom: Spacing.md,
+    paddingBottom: Spacing.sm,
+    gap: Spacing.sm,
   },
   headerLeft: {
+    flex: 1,
+    minWidth: 0,
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.sm,
@@ -121,6 +120,10 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surfaceContainerHigh,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  headerCopy: {
+    flex: 1,
+    minWidth: 0,
   },
   categoryText: {
     fontFamily: Fonts.epilogueBold,
@@ -139,6 +142,7 @@ const styles = StyleSheet.create({
     color: Colors.onSurfaceVariant,
   },
   headerRight: {
+    minWidth: 92,
     alignItems: 'flex-end',
   },
   feeText: {
@@ -160,41 +164,48 @@ const styles = StyleSheet.create({
     letterSpacing: 0,
   },
   routeContainer: {
-    paddingLeft: Spacing.lg,
-    marginBottom: Spacing.lg,
-  },
-  routeTimeline: {
     position: 'relative',
-    borderLeftWidth: 2,
-    borderLeftColor: Colors.surfaceContainerHighest,
-    paddingLeft: Spacing.lg,
+    borderRadius: Radii.lg,
+    borderWidth: 1,
+    borderColor: Colors.outlineVariant,
+    backgroundColor: Colors.background,
+    padding: Spacing.sm,
+    gap: Spacing.sm,
+    marginBottom: Spacing.sm,
   },
-  routeLine: {
-    display: 'none',
+  routeConnector: {
+    position: 'absolute',
+    left: Spacing.md + 13,
+    top: 32,
+    bottom: 32,
+    width: 2,
+    backgroundColor: Colors.surfaceContainerHighest,
   },
-  routeStep: {
-    position: 'relative',
+  routeRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: Spacing.sm,
+  },
+  markerColumn: {
+    width: 28,
+    alignItems: 'center',
+    paddingTop: 2,
+  },
+  routeCopy: {
+    flex: 1,
+    minWidth: 0,
   },
   pickupDotOuter: {
-    position: 'absolute',
-    left: -43,
-    top: 4,
-    width: 14,
-    height: 14,
+    width: 16,
+    height: 16,
     borderRadius: Radii.full,
     borderWidth: 2,
     borderColor: Colors.primary,
     backgroundColor: Colors.surfaceContainerLowest,
   },
-  pickupDotInner: {
-    display: 'none',
-  },
   deliveryDotOuter: {
-    position: 'absolute',
-    left: -43,
-    top: 4,
-    width: 14,
-    height: 14,
+    width: 18,
+    height: 18,
     borderRadius: Radii.full,
     backgroundColor: Colors.primary,
     alignItems: 'center',
@@ -210,7 +221,9 @@ const styles = StyleSheet.create({
   stepValue: {
     ...Type.bodyMd,
     fontFamily: Fonts.manropeMedium,
+    fontSize: 15,
     color: Colors.onSurface,
+    lineHeight: 21,
   },
   actionsGrid: {
     flexDirection: 'row',
@@ -219,8 +232,8 @@ const styles = StyleSheet.create({
   },
   declineButton: {
     flex: 1,
-    height: 48,
-    borderRadius: Radii.lg,
+    height: 44,
+    borderRadius: Radii.DEFAULT,
     borderWidth: 1,
     borderColor: Colors.outlineVariant,
     backgroundColor: Colors.surfaceContainerLowest,
@@ -236,8 +249,8 @@ const styles = StyleSheet.create({
   },
   acceptButton: {
     flex: 1,
-    height: 48,
-    borderRadius: Radii.lg,
+    height: 44,
+    borderRadius: Radii.DEFAULT,
     backgroundColor: Colors.primary,
     flexDirection: 'row',
     alignItems: 'center',
