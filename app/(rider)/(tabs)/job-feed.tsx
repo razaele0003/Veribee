@@ -7,6 +7,8 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { JobCard } from '@/components/rider/JobCard';
 import { MapCard } from '@/components/rider/MapCard';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { DEMO_ROUTE } from '@/lib/demoProfiles';
+import { estimateRouteSummary } from '@/lib/maps';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/authStore';
 import { useRiderStore } from '@/store/riderStore';
@@ -106,7 +108,13 @@ export default function RiderJobFeed() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <MapCard label="Live route zone" height={120} />
+        <MapCard
+          label="Live route zone"
+          height={120}
+          origin={DEMO_ROUTE.riderStart}
+          destination={DEMO_ROUTE.pickup}
+          routeSummary={estimateRouteSummary(DEMO_ROUTE.riderStart, DEMO_ROUTE.pickup)}
+        />
 
         <View style={styles.sectionHeader}>
           <View>

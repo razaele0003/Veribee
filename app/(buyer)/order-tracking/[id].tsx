@@ -5,6 +5,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Button } from '@/components/ui/Button';
 import { DEMO_ACCOUNTS, DEMO_ROUTE, makeGoogleMapsDirectionsUrl } from '@/lib/demoProfiles';
+import type { Coordinate } from '@/lib/maps';
 import { supabase } from '@/lib/supabase';
 import { Colors, Shadow } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
@@ -18,9 +19,10 @@ export default function OrderTracking() {
   const { id } = useLocalSearchParams<{ id?: string }>();
   const [deliveryStatus, setDeliveryStatus] = useState('heading_to_buyer');
   const [otpReady, setOtpReady] = useState(false);
+  const [riderCoordinate, setRiderCoordinate] = useState<Coordinate>(DEMO_ROUTE.riderStart);
   const mapsUrl = useMemo(
-    () => makeGoogleMapsDirectionsUrl(DEMO_ROUTE.pickup, DEMO_ROUTE.dropoff),
-    [],
+    () => makeGoogleMapsDirectionsUrl(riderCoordinate, DEMO_ROUTE.dropoff),
+    [riderCoordinate],
   );
   const activeStep = useMemo(() => {
     if (deliveryStatus === 'delivered') return 3;
@@ -49,6 +51,13 @@ export default function OrderTracking() {
           const next = payload.new ?? {};
           if (next.status) setDeliveryStatus(String(next.status));
           if (next.otp_code) setOtpReady(true);
+          if (next.rider_current_lat && next.rider_current_lng) {
+            setRiderCoordinate({
+              label: 'Angelo Reyes live location',
+              latitude: Number(next.rider_current_lat),
+              longitude: Number(next.rider_current_lng),
+            });
+          }
           if (next.status === 'delivered') router.replace('/(buyer)/delivery-confirmed');
         },
       )
@@ -73,6 +82,12 @@ export default function OrderTracking() {
           <MaterialIcons name="arrow-back" size={24} color={Colors.primary} />
         </Pressable>
         <View style={styles.routeLine} />
+        <View style={styles.liveBadge}>
+          <View style={styles.liveDot} />
+          <Text style={styles.liveBadgeText}>
+            Live rider GPS {riderCoordinate.latitude.toFixed(4)}, {riderCoordinate.longitude.toFixed(4)}
+          </Text>
+        </View>
         <View style={styles.riderMarker}>
           <MaterialIcons name="delivery-dining" size={28} color={Colors.onPrimary} />
         </View>
@@ -191,6 +206,34 @@ const styles = StyleSheet.create({
     height: 4,
     borderRadius: Radii.full,
     backgroundColor: Colors.tertiaryContainer,
+  },
+  liveBadge: {
+    position: 'absolute',
+    top: Spacing.xl + 54,
+    left: Spacing.containerMargin,
+    right: Spacing.containerMargin,
+    minHeight: 42,
+    borderRadius: Radii.full,
+    backgroundColor: 'rgba(255,255,255,0.92)',
+    borderWidth: 1,
+    borderColor: Colors.outlineVariant,
+    paddingHorizontal: Spacing.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+    ...Shadow.card,
+  },
+  liveDot: {
+    width: 8,
+    height: 8,
+    borderRadius: Radii.full,
+    backgroundColor: Colors.success,
+  },
+  liveBadgeText: {
+    flex: 1,
+    fontFamily: Fonts.manropeBold,
+    fontSize: 12,
+    color: Colors.onSurface,
   },
   riderMarker: {
     position: 'absolute',

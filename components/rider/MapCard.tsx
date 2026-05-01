@@ -4,14 +4,32 @@ import { Colors, Shadow } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
 import { Radii } from '@/constants/radii';
 import { Spacing } from '@/constants/spacing';
+import type { Coordinate, RouteSummary } from '@/lib/maps';
 
 type Props = {
   label?: string;
   height?: number;
+  origin?: Coordinate;
+  destination?: Coordinate;
+  current?: Coordinate;
+  routeSummary?: RouteSummary | null;
+  isLive?: boolean;
   onOpenMaps?: () => void;
 };
 
-export function MapCard({ label = 'Makati CBD', height = 176, onOpenMaps }: Props) {
+export function MapCard({
+  label = 'Makati CBD',
+  height = 176,
+  origin,
+  destination,
+  current,
+  routeSummary,
+  isLive,
+  onOpenMaps,
+}: Props) {
+  const originLabel = current?.label ?? origin?.label ?? 'Rider';
+  const destinationLabel = destination?.label ?? 'Destination';
+
   return (
     <View style={[styles.map, { height }]}>
       <View style={styles.gridLayer}>
@@ -29,9 +47,32 @@ export function MapCard({ label = 'Makati CBD', height = 176, onOpenMaps }: Prop
       </View>
       
       <View style={styles.topLabel}>
-        <View style={styles.pulseDot} />
+        <View style={[styles.pulseDot, isLive && styles.pulseDotLive]} />
         <Text style={styles.topLabelText}>{label}</Text>
       </View>
+
+      {(origin || current || destination) && (
+        <View style={styles.routePanel}>
+          <View style={styles.routeLineText}>
+            <MaterialIcons name="near-me" size={14} color={Colors.primary} />
+            <Text style={styles.routePointText} numberOfLines={1}>
+              {originLabel}
+            </Text>
+          </View>
+          <View style={styles.routePanelDivider} />
+          <View style={styles.routeLineText}>
+            <MaterialIcons name="place" size={14} color={Colors.primary} />
+            <Text style={styles.routePointText} numberOfLines={1}>
+              {destinationLabel}
+            </Text>
+          </View>
+          {!!routeSummary && (
+            <Text style={styles.routeMeta}>
+              {routeSummary.distanceKm.toFixed(1)} km - {routeSummary.etaMinutes} min
+            </Text>
+          )}
+        </View>
+      )}
 
       <Pressable
         onPress={onOpenMaps}
@@ -74,6 +115,38 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.02,
     shadowRadius: 8,
     elevation: 2,
+  },
+  routePanel: {
+    position: 'absolute',
+    left: Spacing.sm,
+    top: Spacing.sm,
+    width: '58%',
+    borderRadius: Radii.DEFAULT,
+    backgroundColor: 'rgba(255, 255, 255, 0.94)',
+    borderWidth: 1,
+    borderColor: 'rgba(211, 218, 234, 0.5)',
+    padding: Spacing.sm,
+    gap: 4,
+  },
+  routeLineText: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+  },
+  routePointText: {
+    flex: 1,
+    fontFamily: Fonts.manropeBold,
+    fontSize: 11,
+    color: Colors.onSurface,
+  },
+  routePanelDivider: {
+    height: 1,
+    backgroundColor: Colors.surfaceVariant,
+  },
+  routeMeta: {
+    fontFamily: Fonts.manropeBold,
+    fontSize: 11,
+    color: Colors.primary,
   },
   gridLayer: {
     flex: 1,
@@ -168,6 +241,9 @@ const styles = StyleSheet.create({
     height: 8,
     borderRadius: Radii.full,
     backgroundColor: Colors.primary,
+  },
+  pulseDotLive: {
+    backgroundColor: Colors.success,
   },
   topLabelText: {
     fontFamily: Fonts.manropeMedium,

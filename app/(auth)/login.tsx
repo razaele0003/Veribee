@@ -25,6 +25,7 @@ import { Spacing } from '@/constants/spacing';
 import { Radii } from '@/constants/radii';
 import { Logo } from '@/components/ui/Logo';
 import { supabase } from '@/lib/supabase';
+import { signInWithGoogle } from '@/lib/authOAuth';
 import type { Role } from '@/store/authStore';
 
 export default function Login() {
@@ -133,6 +134,18 @@ export default function Login() {
     setLoading(false);
   };
 
+  const handleGoogleLogin = async () => {
+    setLoading(true);
+    setPhoneError('');
+    setPasswordError('');
+    try {
+      await signInWithGoogle();
+    } catch (error: any) {
+      setPhoneError(error?.message ?? 'Google sign in is not configured yet.');
+      setLoading(false);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
@@ -195,6 +208,16 @@ export default function Login() {
               loading={loading}
               style={styles.signInBtn}
             />
+
+            <Pressable
+              onPress={handleGoogleLogin}
+              style={({ pressed }) => [styles.googleButton, pressed && styles.pressed]}
+              accessibilityRole="button"
+              accessibilityLabel="Continue with Google"
+            >
+              <MaterialIcons name="account-circle" size={20} color={Colors.primary} />
+              <Text style={styles.googleButtonText}>Continue with Google</Text>
+            </Pressable>
 
             {/* Dev shortcuts */}
             <View style={styles.devDivider}>
@@ -324,6 +347,23 @@ const styles = StyleSheet.create({
   },
 
   signInBtn: { marginTop: Spacing.xs },
+  googleButton: {
+    minHeight: 48,
+    borderRadius: Radii.lg,
+    borderWidth: 1,
+    borderColor: Colors.outlineVariant,
+    backgroundColor: Colors.surfaceContainerLowest,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.xs,
+  },
+  googleButtonText: {
+    fontFamily: Fonts.manropeBold,
+    fontSize: 14,
+    color: Colors.onSurface,
+  },
+  pressed: { opacity: 0.72 },
 
   /* Dev shortcuts */
   devDivider: {

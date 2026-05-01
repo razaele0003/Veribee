@@ -13,6 +13,11 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 
 import { Button } from '@/components/ui/Button';
+import {
+  captureIdImage,
+  evaluateIdImages,
+  type CapturedIdImage,
+} from '@/lib/idVerification';
 import { useAuthStore, Role } from '@/store/authStore';
 import { Colors, Shadow } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
@@ -31,10 +36,11 @@ export default function AddRole() {
   const setRoles = useAuthStore((s) => s.setRoles);
   
   const [selectedIdType, setSelectedIdType] = useState<string>(ID_TYPES[0]);
-  const [frontUploaded, setFrontUploaded] = useState(false);
-  const [backUploaded, setBackUploaded] = useState(false);
+  const [frontImage, setFrontImage] = useState<CapturedIdImage | null>(null);
+  const [backImage, setBackImage] = useState<CapturedIdImage | null>(null);
   
   const [loading, setLoading] = useState(false);
+  const idCheck = evaluateIdImages(selectedIdType, frontImage, backImage);
 
   const onComplete = async () => {
     setLoading(true);
@@ -97,39 +103,51 @@ export default function AddRole() {
             </ScrollView>
 
             <View style={styles.uploadRow}>
-              <Pressable 
-                style={[styles.uploadBoxHalf, frontUploaded && styles.uploadBoxSuccess]} 
-                onPress={() => setFrontUploaded(true)}
-              >
-                <MaterialIcons 
-                  name={frontUploaded ? "check-circle" : "add-photo-alternate"} 
-                  size={28} 
-                  color={frontUploaded ? Colors.primary : Colors.onSurfaceVariant} 
-                />
-                <Text style={[styles.uploadBoxText, frontUploaded && styles.uploadBoxTextSuccess]}>
-                  {frontUploaded ? "Front Uploaded" : "Upload Front"}
-                </Text>
-              </Pressable>
+                  <Pressable 
+                    style={[styles.uploadBoxHalf, frontImage && styles.uploadBoxSuccess]} 
+                    onPress={async () => setFrontImage(await captureIdImage())}
+                  >
+                    <MaterialIcons 
+                      name={frontImage ? "check-circle" : "add-photo-alternate"} 
+                      size={28} 
+                      color={frontImage ? Colors.primary : Colors.onSurfaceVariant} 
+                    />
+                    <Text style={[styles.uploadBoxText, frontImage && styles.uploadBoxTextSuccess]}>
+                      {frontImage ? "Front Captured" : "Upload Front"}
+                    </Text>
+                  </Pressable>
 
-              <Pressable 
-                style={[styles.uploadBoxHalf, backUploaded && styles.uploadBoxSuccess]} 
-                onPress={() => setBackUploaded(true)}
-              >
-                <MaterialIcons 
-                  name={backUploaded ? "check-circle" : "add-photo-alternate"} 
-                  size={28} 
-                  color={backUploaded ? Colors.primary : Colors.onSurfaceVariant} 
-                />
-                <Text style={[styles.uploadBoxText, backUploaded && styles.uploadBoxTextSuccess]}>
-                  {backUploaded ? "Back Uploaded" : "Upload Back"}
-                </Text>
-              </Pressable>
-            </View>
+                  <Pressable 
+                    style={[styles.uploadBoxHalf, backImage && styles.uploadBoxSuccess]} 
+                    onPress={async () => setBackImage(await captureIdImage())}
+                  >
+                    <MaterialIcons 
+                      name={backImage ? "check-circle" : "add-photo-alternate"} 
+                      size={28} 
+                      color={backImage ? Colors.primary : Colors.onSurfaceVariant} 
+                    />
+                    <Text style={[styles.uploadBoxText, backImage && styles.uploadBoxTextSuccess]}>
+                      {backImage ? "Back Captured" : "Upload Back"}
+                    </Text>
+                  </Pressable>
+                </View>
 
-            <Button
-              title="Complete Verification"
-              onPress={onComplete}
-              disabled={!frontUploaded || !backUploaded}
+                <View style={styles.localCheckCard}>
+                  <MaterialIcons name="manage-search" size={18} color={Colors.primary} />
+                  <View style={styles.localCheckCopy}>
+                    <Text style={styles.localCheckTitle}>Free local ID pre-check: {idCheck.score}/100</Text>
+                    <Text style={styles.localCheckBody}>
+                      {idCheck.status === 'ready_for_review'
+                        ? 'Images are ready for manual KYC review.'
+                        : 'Capture both ID sides before review.'}
+                    </Text>
+                  </View>
+                </View>
+
+                <Button
+                  title="Complete Verification"
+                  onPress={onComplete}
+                  disabled={idCheck.status !== 'ready_for_review'}
               loading={loading}
               style={{marginTop: Spacing.xl}}
             />
@@ -257,5 +275,26 @@ const styles = StyleSheet.create({
   },
   uploadBoxTextSuccess: {
     color: Colors.primary,
+  },
+  localCheckCard: {
+    borderRadius: Radii.lg,
+    borderWidth: 1,
+    borderColor: Colors.outlineVariant,
+    backgroundColor: Colors.surfaceContainerLowest,
+    padding: Spacing.md,
+    flexDirection: 'row',
+    gap: Spacing.sm,
+  },
+  localCheckCopy: { flex: 1 },
+  localCheckTitle: {
+    fontFamily: Fonts.manropeBold,
+    fontSize: 13,
+    color: Colors.onSurface,
+  },
+  localCheckBody: {
+    fontFamily: Fonts.manropeRegular,
+    fontSize: 12,
+    color: Colors.onSurfaceVariant,
+    marginTop: 2,
   },
 });

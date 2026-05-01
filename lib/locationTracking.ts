@@ -1,5 +1,7 @@
 import * as Location from 'expo-location';
 import { supabase } from '@/lib/supabase';
+import { DEMO_ROUTE } from '@/lib/demoProfiles';
+import type { Coordinate } from '@/lib/maps';
 
 type LocationSubscription = {
   remove: () => void;
@@ -10,19 +12,45 @@ async function requestTrackingPermission() {
   return status === 'granted';
 }
 
+export function getDemoRiderCoordinate(): Coordinate {
+  return DEMO_ROUTE.riderStart;
+}
+
+export async function getCurrentRiderCoordinate(fallback: Coordinate = DEMO_ROUTE.riderStart) {
+  try {
+    const hasPermission = await requestTrackingPermission();
+    if (!hasPermission) return { coordinate: fallback, live: false };
+
+    const lastKnown = await Location.getLastKnownPositionAsync({
+      maxAge: 60_000,
+      requiredAccuracy: 250,
+    });
+
+    const position =
+      lastKnown ??
+      (await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Balanced,
+      }));
+
+    return {
+      coordinate: {
+        label: 'Current rider location',
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+      },
+      live: true,
+    };
+  } catch {
+    return { coordinate: fallback, live: false };
+  }
+}
+
 export async function publishCurrentRiderLocation(deliveryId: string) {
   try {
     const hasPermission = await requestTrackingPermission();
     if (!hasPermission) return null;
 
-    const position = await Location.getCurrentPositionAsync({
-      accuracy: Location.Accuracy.Balanced,
-    });
-
-    const coords = {
-      latitude: position.coords.latitude,
-      longitude: position.coords.longitude,
-    };
+    const { coordinate: coords } = await getCurrentRiderCoordinate();
 
     await supabase
       .from('deliveries')

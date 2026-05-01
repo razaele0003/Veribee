@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Redirect, useRouter } from 'expo-router';
@@ -6,7 +6,12 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { ActiveDeliveryCard } from '@/components/rider/ActiveDeliveryCard';
 import { MapCard } from '@/components/rider/MapCard';
 import { DEMO_ROUTE, makeGoogleMapsDirectionsUrl } from '@/lib/demoProfiles';
-import { publishCurrentRiderLocation, startRiderLocationTracking } from '@/lib/locationTracking';
+import {
+  getCurrentRiderCoordinate,
+  publishCurrentRiderLocation,
+  startRiderLocationTracking,
+} from '@/lib/locationTracking';
+import { getFreeRouteSummary, type Coordinate, type RouteSummary } from '@/lib/maps';
 import { supabase } from '@/lib/supabase';
 import { useRiderStore } from '@/store/riderStore';
 import { Colors } from '@/constants/colors';
@@ -17,10 +22,13 @@ export default function NavigationDelivery() {
   const router = useRouter();
   const activeDelivery = useRiderStore((s) => s.activeDelivery);
   const updateActiveStatus = useRiderStore((s) => s.updateActiveStatus);
+  const [riderCoordinate, setRiderCoordinate] = useState<Coordinate>(DEMO_ROUTE.pickup);
+  const [isLiveLocation, setIsLiveLocation] = useState(false);
+  const [routeSummary, setRouteSummary] = useState<RouteSummary | null>(null);
 
   const mapsUrl = useMemo(
-    () => makeGoogleMapsDirectionsUrl(DEMO_ROUTE.pickup, DEMO_ROUTE.dropoff),
-    [],
+    () => makeGoogleMapsDirectionsUrl(riderCoordinate, DEMO_ROUTE.dropoff),
+    [riderCoordinate],
   );
 
   useEffect(() => {
@@ -33,6 +41,14 @@ export default function NavigationDelivery() {
         return;
       }
       subscription = next;
+    });
+    getCurrentRiderCoordinate(DEMO_ROUTE.pickup).then(({ coordinate, live }) => {
+      if (cancelled) return;
+      setRiderCoordinate(coordinate);
+      setIsLiveLocation(live);
+      getFreeRouteSummary(coordinate, DEMO_ROUTE.dropoff).then((summary) => {
+        if (!cancelled) setRouteSummary(summary);
+      });
     });
 
     return () => {
@@ -79,6 +95,11 @@ export default function NavigationDelivery() {
         <MapCard
           label={activeDelivery.deliveryAddress}
           height={360}
+          origin={DEMO_ROUTE.pickup}
+          current={riderCoordinate}
+          destination={DEMO_ROUTE.dropoff}
+          routeSummary={routeSummary}
+          isLive={isLiveLocation}
           onOpenMaps={() => Linking.openURL(mapsUrl)}
         />
       </View>

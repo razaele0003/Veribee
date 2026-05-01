@@ -5,6 +5,8 @@ export type DemoCoordinate = {
   longitude: number;
 };
 
+export { makeGoogleMapsDirectionsUrl } from '@/lib/maps';
+
 export const DEMO_PASSWORD = 'VeribeeTest123!';
 export const DEMO_OTP = '123456';
 
@@ -78,9 +80,3 @@ export const DEMO_ROUTE = {
   jobFee: 85,
   otpCode: DEMO_OTP,
 } as const;
-
-export function makeGoogleMapsDirectionsUrl(origin: DemoCoordinate, destination: DemoCoordinate) {
-  const originCoord = `${origin.latitude},${origin.longitude}`;
-  const destinationCoord = `${destination.latitude},${destination.longitude}`;
-  return `https://www.google.com/maps/dir/?api=1&origin=${originCoord}&destination=${destinationCoord}&travelmode=driving`;
-}
