@@ -18,6 +18,54 @@ import { Radii } from '@/constants/radii';
 
 const categories = ['All', 'Electronics', 'Bags', 'Shoes', 'Jewelry'];
 
+const commerceShortcuts: Array<{
+  id: string;
+  label: string;
+  icon: keyof typeof MaterialIcons.glyphMap;
+  color: string;
+  bg: string;
+}> = [
+  {
+    id: 'deals',
+    label: 'Flash Deals',
+    icon: 'flash-on',
+    color: Colors.deal,
+    bg: Colors.dealContainer,
+  },
+  {
+    id: 'verified',
+    label: 'VSI 95+',
+    icon: 'verified',
+    color: Colors.tertiary,
+    bg: Colors.tertiaryContainer,
+  },
+  {
+    id: 'handover',
+    label: 'OTP Safe',
+    icon: 'pin',
+    color: Colors.accentBlue,
+    bg: Colors.accentBlueContainer,
+  },
+  {
+    id: 'local',
+    label: 'Nearby',
+    icon: 'storefront',
+    color: Colors.accentPink,
+    bg: Colors.accentPinkContainer,
+  },
+];
+
+const marketplacePerks: Array<{
+  id: string;
+  icon: keyof typeof MaterialIcons.glyphMap;
+  label: string;
+  value: string;
+}> = [
+  { id: 'voucher', icon: 'confirmation-number', label: 'Buyer perk', value: 'PHP 100 voucher' },
+  { id: 'guard', icon: 'shield', label: 'Protected', value: 'OTP handover' },
+  { id: 'route', icon: 'near-me', label: 'Metro Manila', value: 'Live rider route' },
+];
+
 type DemoNotification = {
   id: string;
   icon: keyof typeof MaterialIcons.glyphMap;
@@ -107,7 +155,9 @@ export default function BuyerHome() {
     <SafeAreaView style={styles.container}>
       <View style={styles.appBar}>
         <View style={styles.brandRow}>
-          <Logo size={32} />
+          <View style={styles.brandLogoBubble}>
+            <Logo size={30} />
+          </View>
           <Text style={styles.brand}>Veribee</Text>
         </View>
         <Pressable
@@ -116,9 +166,9 @@ export default function BuyerHome() {
           accessibilityRole="button"
           accessibilityLabel={`Change location, currently ${location}`}
         >
-          <MaterialIcons name="location-on" size={14} color={Colors.onSurfaceVariant} />
+          <MaterialIcons name="location-on" size={14} color={Colors.onPrimary} />
           <Text style={styles.locationText}>{location}</Text>
-          <MaterialIcons name="expand-more" size={16} color={Colors.onSurfaceVariant} />
+          <MaterialIcons name="expand-more" size={16} color={Colors.onPrimary} />
         </Pressable>
         <Pressable
           onPress={() => setNotificationsOpen(true)}
@@ -127,7 +177,7 @@ export default function BuyerHome() {
           accessibilityRole="button"
           accessibilityLabel="Notifications"
         >
-          <MaterialIcons name="notifications-none" size={24} color={Colors.onSurface} />
+          <MaterialIcons name="notifications-none" size={24} color={Colors.onPrimary} />
           {unreadNotifications > 0 && <View style={styles.notificationDot} />}
         </Pressable>
       </View>
@@ -158,6 +208,15 @@ export default function BuyerHome() {
               <Text style={styles.heroCopy}>
                 Every product is routed through Veribee checks before it reaches your cart.
               </Text>
+              <View style={styles.heroDealRow}>
+                <View style={styles.heroDealPill}>
+                  <MaterialIcons name="local-fire-department" size={16} color={Colors.onWarningContainer} />
+                  <Text style={styles.heroDealText}>Launch vouchers live</Text>
+                </View>
+                <View style={styles.heroDealPillAlt}>
+                  <Text style={styles.heroDealTextAlt}>COD + OTP</Text>
+                </View>
+              </View>
               <View style={styles.heroStats}>
                 <View style={styles.heroStat}>
                   <Text style={styles.heroStatValue}>{marketplaceProducts.length}</Text>
@@ -184,7 +243,58 @@ export default function BuyerHome() {
             >
               <MaterialIcons name="search" size={20} color={Colors.outline} />
               <Text style={styles.searchText}>Search verified products...</Text>
+              <View style={styles.searchHotTag}>
+                <Text style={styles.searchHotText}>Tote</Text>
+              </View>
             </Pressable>
+
+            <View style={styles.perkRail}>
+              {marketplacePerks.map((perk) => (
+                <View key={perk.id} style={styles.perkCard}>
+                  <View style={styles.perkIcon}>
+                    <MaterialIcons name={perk.icon} size={17} color={Colors.primary} />
+                  </View>
+                  <Text style={styles.perkLabel}>{perk.label}</Text>
+                  <Text style={styles.perkValue} numberOfLines={1}>{perk.value}</Text>
+                </View>
+              ))}
+            </View>
+
+            <View style={styles.shortcutGrid}>
+              {commerceShortcuts.map((item) => (
+                <Pressable
+                  key={item.id}
+                  onPress={() => {
+                    if (item.id === 'deals') setActiveCategory('All');
+                    if (item.id === 'verified') setActiveCategory('Jewelry');
+                    if (item.id === 'local') setLocationOpen(true);
+                  }}
+                  style={({ pressed }) => [styles.shortcut, pressed && styles.pressed]}
+                  accessibilityRole="button"
+                  accessibilityLabel={item.label}
+                >
+                  <View style={[styles.shortcutIcon, { backgroundColor: item.bg }]}>
+                    <MaterialIcons name={item.icon} size={22} color={item.color} />
+                  </View>
+                  <Text style={styles.shortcutLabel} numberOfLines={2}>{item.label}</Text>
+                </Pressable>
+              ))}
+            </View>
+
+            <View style={styles.dealBand}>
+              <View style={styles.dealBandLeft}>
+                <View style={styles.dealBadge}>
+                  <MaterialIcons name="bolt" size={14} color={Colors.onDealContainer} />
+                  <Text style={styles.dealBadgeText}>HOT NOW</Text>
+                </View>
+                <Text style={styles.dealBandTitle}>Verified deals before tonight</Text>
+                <Text style={styles.dealBandBody}>Fast review, seller VSI, and secure handover in one order.</Text>
+              </View>
+              <View style={styles.dealTimer}>
+                <Text style={styles.dealTimerValue}>24h</Text>
+                <Text style={styles.dealTimerLabel}>target</Text>
+              </View>
+            </View>
 
             <ScrollView
               horizontal
@@ -320,9 +430,8 @@ const styles = StyleSheet.create({
   appBar: {
     minHeight: 64,
     paddingHorizontal: Spacing.containerMargin,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: Colors.outlineVariant,
-    backgroundColor: Colors.surface,
+    borderBottomWidth: 0,
+    backgroundColor: Colors.primaryContainer,
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.sm,
@@ -332,30 +441,44 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: Spacing.xs,
   },
+  brandLogoBubble: {
+    width: 36,
+    height: 36,
+    borderRadius: Radii.full,
+    backgroundColor: Colors.surfaceContainerLowest,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.32)',
+  },
   brand: {
     fontFamily: Fonts.epilogueBold,
     fontSize: 22,
-    color: Colors.primary,
+    color: Colors.onPrimary,
   },
   locationPill: {
     flex: 1,
     minHeight: 40,
     borderRadius: Radii.full,
-    backgroundColor: Colors.surfaceContainerLow,
+    backgroundColor: 'rgba(255,255,255,0.16)',
     paddingHorizontal: Spacing.sm,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 2,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)',
   },
   locationText: {
     ...Type.labelCaps,
     fontSize: 10,
-    color: Colors.onSurface,
+    color: Colors.onPrimary,
   },
   iconButton: {
     width: 40,
     height: 40,
+    borderRadius: Radii.full,
+    backgroundColor: 'rgba(255,255,255,0.14)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -368,11 +491,12 @@ const styles = StyleSheet.create({
     borderRadius: Radii.full,
     backgroundColor: Colors.primary,
     borderWidth: 1.5,
-    borderColor: Colors.surfaceContainerLowest,
+    borderColor: Colors.primaryContainer,
   },
   pressed: { opacity: 0.72 },
   content: {
-    padding: Spacing.containerMargin,
+    paddingHorizontal: Spacing.containerMargin,
+    paddingTop: Spacing.md,
     paddingBottom: 112,
     gap: Spacing.md,
   },
@@ -434,6 +558,40 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: Spacing.sm,
   },
+  heroDealRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: Spacing.sm,
+  },
+  heroDealPill: {
+    minHeight: 34,
+    borderRadius: Radii.full,
+    backgroundColor: Colors.warningContainer,
+    paddingHorizontal: Spacing.sm,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  heroDealText: {
+    fontFamily: Fonts.manropeBold,
+    fontSize: 12,
+    color: Colors.onWarningContainer,
+  },
+  heroDealPillAlt: {
+    minHeight: 34,
+    borderRadius: Radii.full,
+    backgroundColor: 'rgba(255,255,255,0.16)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.26)',
+    paddingHorizontal: Spacing.sm,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  heroDealTextAlt: {
+    fontFamily: Fonts.manropeBold,
+    fontSize: 12,
+    color: Colors.onPrimary,
+  },
   heroStat: {
     flex: 1,
     alignItems: 'center',
@@ -458,9 +616,9 @@ const styles = StyleSheet.create({
   },
   searchBar: {
     minHeight: 52,
-    borderRadius: Radii.DEFAULT,
-    borderWidth: 1,
-    borderColor: Colors.outlineVariant,
+    borderRadius: Radii.full,
+    borderWidth: 2,
+    borderColor: Colors.primary,
     backgroundColor: Colors.surfaceContainerLowest,
     paddingHorizontal: Spacing.md,
     flexDirection: 'row',
@@ -473,6 +631,150 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.manropeRegular,
     fontSize: 15,
     color: Colors.outline,
+    flex: 1,
+  },
+  searchHotTag: {
+    minHeight: 28,
+    borderRadius: Radii.full,
+    backgroundColor: Colors.dealContainer,
+    paddingHorizontal: Spacing.sm,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  searchHotText: {
+    fontFamily: Fonts.manropeBold,
+    fontSize: 11,
+    color: Colors.onDealContainer,
+  },
+  perkRail: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+    marginBottom: Spacing.md,
+  },
+  perkCard: {
+    flex: 1,
+    minHeight: 96,
+    borderRadius: Radii.card,
+    backgroundColor: Colors.surfaceContainerLowest,
+    borderWidth: 1,
+    borderColor: Colors.outlineVariant,
+    padding: Spacing.sm,
+    gap: 3,
+    ...Shadow.card,
+  },
+  perkIcon: {
+    width: 30,
+    height: 30,
+    borderRadius: Radii.full,
+    backgroundColor: Colors.primaryFixed,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 2,
+  },
+  perkLabel: {
+    fontFamily: Fonts.manropeBold,
+    fontSize: 10,
+    color: Colors.primary,
+    textTransform: 'uppercase',
+  },
+  perkValue: {
+    fontFamily: Fonts.manropeBold,
+    fontSize: 11,
+    lineHeight: 15,
+    color: Colors.onSurface,
+  },
+  shortcutGrid: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+    marginBottom: Spacing.md,
+  },
+  shortcut: {
+    flex: 1,
+    minHeight: 86,
+    borderRadius: Radii.card,
+    backgroundColor: Colors.surfaceContainerLowest,
+    borderWidth: 1,
+    borderColor: Colors.outlineVariant,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: Spacing.xs,
+    gap: 6,
+    ...Shadow.card,
+  },
+  shortcutIcon: {
+    width: 42,
+    height: 42,
+    borderRadius: Radii.full,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  shortcutLabel: {
+    fontFamily: Fonts.manropeBold,
+    fontSize: 11,
+    lineHeight: 14,
+    color: Colors.onSurface,
+    textAlign: 'center',
+  },
+  dealBand: {
+    minHeight: 112,
+    borderRadius: Radii.card,
+    backgroundColor: Colors.deal,
+    padding: Spacing.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.md,
+    marginBottom: Spacing.md,
+    overflow: 'hidden',
+    ...Shadow.fab,
+  },
+  dealBandLeft: {
+    flex: 1,
+    gap: 5,
+  },
+  dealBadge: {
+    alignSelf: 'flex-start',
+    minHeight: 28,
+    borderRadius: Radii.full,
+    backgroundColor: Colors.warningContainer,
+    paddingHorizontal: Spacing.sm,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  dealBadgeText: {
+    fontFamily: Fonts.manropeBold,
+    fontSize: 10,
+    color: Colors.onDealContainer,
+  },
+  dealBandTitle: {
+    fontFamily: Fonts.epilogueBold,
+    fontSize: 20,
+    lineHeight: 25,
+    color: Colors.onPrimary,
+  },
+  dealBandBody: {
+    fontFamily: Fonts.manropeMedium,
+    fontSize: 13,
+    lineHeight: 18,
+    color: '#fff5ee',
+  },
+  dealTimer: {
+    width: 74,
+    height: 74,
+    borderRadius: Radii.full,
+    backgroundColor: Colors.surfaceContainerLowest,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  dealTimerValue: {
+    fontFamily: Fonts.epilogueBold,
+    fontSize: 22,
+    color: Colors.deal,
+  },
+  dealTimerLabel: {
+    fontFamily: Fonts.manropeBold,
+    fontSize: 10,
+    color: Colors.onSurfaceVariant,
   },
   chips: {
     gap: Spacing.sm,
