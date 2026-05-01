@@ -50,7 +50,7 @@ export default function OrderTracking() {
           if (next.otp_code) setOtpReady(true);
           if (next.rider_current_lat && next.rider_current_lng) {
             setRiderCoordinate({
-              label: 'Angelo Reyes live location',
+              label: `${DEMO_ACCOUNTS.rider.fullName} live location`,
               latitude: Number(next.rider_current_lat),
               longitude: Number(next.rider_current_lng),
             });

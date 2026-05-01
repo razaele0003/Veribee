@@ -62,9 +62,9 @@ authScore =
 
 | Role | Name | Phone | Password |
 |---|---|---|---|
-| Seller | Maria Santos | +639171234501 | VeribeeTest123! |
-| Buyer | David Kim | +639171234502 | VeribeeTest123! |
-| Rider | Angelo Reyes | +639171234503 | VeribeeTest123! |
+| Seller | Camille Dizon | +639178642310 | VeribeeTest123! |
+| Buyer | Nico Villanueva | +639178642311 | VeribeeTest123! |
+| Rider | Paolo Reyes | +639178642312 | VeribeeTest123! |
 
 Local OTP for account and delivery testing: `123456`.
 
@@ -73,7 +73,7 @@ Local OTP for account and delivery testing: `123456`.
 | Product | Category | Price | Serial | Auth Score | Status |
 |---|---|---:|---|---:|---|
 | Series 9 Chronograph Smartwatch | Electronics | PHP 18,500 | VT-S9-2026-000184 | 97 | Verified |
-| Classic Artisan Leather Tote | Bags | PHP 12,990 | MA-TOTE-MM-042026-77 | 96 | Verified |
+| Structured Leather Tote MM | Bags | PHP 12,990 | MA-TOTE-MM-042026-77 | 96 | Verified |
 | Limited Edition Urban Kicks | Shoes | PHP 8,450 | NK-UK-LE-840221-PH | 93 | Verified |
 | 18k Gold Heritage Pendant | Jewelry | PHP 24,000 | HJ-18K-HP-2026-019 | 98 | Verified |
 | Monogram Canvas Wallet | Bags | PHP 6,900 | MA-WLT-CZ-2026-118 | 71 | Pending review |

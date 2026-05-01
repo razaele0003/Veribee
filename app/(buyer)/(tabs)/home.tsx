@@ -11,6 +11,7 @@ import { sellerProductToBuyerProduct, supabaseProductToBuyerProduct } from '@/li
 import { supabase } from '@/lib/supabase';
 import { BUYER_LOCATIONS, BuyerLocation, useBuyerPrefsStore } from '@/store/buyerPrefsStore';
 import { useSellerStore } from '@/store/sellerStore';
+import { DEMO_ACCOUNTS } from '@/lib/demoProfiles';
 import { Colors, Shadow } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
 import { Spacing } from '@/constants/spacing';
@@ -79,7 +80,7 @@ const DEMO_NOTIFICATIONS: DemoNotification[] = [
     id: 'n1',
     icon: 'verified',
     title: 'New verified seller nearby',
-    body: "Maria's Boutique just got Trusted Seller status.",
+    body: `${DEMO_ACCOUNTS.seller.storeName} just got Trusted Seller status.`,
     time: '2m',
   },
   {

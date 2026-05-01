@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { ProductImages } from '@/constants/productImages';
+import { DEMO_ROUTE } from '@/lib/demoProfiles';
 import { runLocalAiScanner } from '@/lib/veribeeScoring';
 
 export type ProductDraft = {
@@ -64,9 +65,9 @@ const initialProducts: LocalProduct[] = [
   {
     id: 'sample-tote-001',
     photos: [ProductImages.tote],
-    title: 'Classic Artisan Leather Tote',
+    title: DEMO_ROUTE.productName,
     category: 'Bags',
-    price: '12990',
+    price: String(DEMO_ROUTE.price),
     description:
       'Structured leather tote with interior label, stitching, and receipt evidence. Seller history supports the authenticity score.',
     serialNumber: 'MA-TOTE-MM-042026-77',

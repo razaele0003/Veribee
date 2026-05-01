@@ -6,6 +6,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { Button } from '@/components/ui/Button';
 import { formatPHP } from '@/lib/buyerData';
+import { DEMO_ROUTE } from '@/lib/demoProfiles';
 import { Colors, Shadow } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
 import { Spacing } from '@/constants/spacing';
@@ -56,14 +57,14 @@ export default function FileDispute() {
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.referenceCard}>
           <Text style={styles.referenceLabel}>Order Reference</Text>
-          <Text style={styles.referenceId}>Order #VB-9982</Text>
+          <Text style={styles.referenceId}>Order #{DEMO_ROUTE.orderId}</Text>
           <View style={styles.referenceRow}>
             <View style={styles.thumb}>
               <MaterialIcons name="inventory-2" size={28} color={Colors.primary} />
             </View>
             <View style={styles.referenceCopy}>
-              <Text style={styles.productName}>Classic Artisan Leather Tote</Text>
-              <Text style={styles.productPrice}>{formatPHP(12990)}</Text>
+              <Text style={styles.productName}>{DEMO_ROUTE.productName}</Text>
+              <Text style={styles.productPrice}>{formatPHP(DEMO_ROUTE.price)}</Text>
             </View>
           </View>
         </View>

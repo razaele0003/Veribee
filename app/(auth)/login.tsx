@@ -219,10 +219,10 @@ export default function Login() {
               <Text style={styles.googleButtonText}>Continue with Google</Text>
             </Pressable>
 
-            {/* Dev shortcuts */}
+            {/* Local test bypass */}
             <View style={styles.devDivider}>
               <View style={styles.devLine} />
-              <Text style={styles.devLabel}>DEV SHORTCUTS</Text>
+              <Text style={styles.devLabel}>TEST ACCOUNT BYPASS</Text>
               <View style={styles.devLine} />
             </View>
 
@@ -365,7 +365,7 @@ const styles = StyleSheet.create({
   },
   pressed: { opacity: 0.72 },
 
-  /* Dev shortcuts */
+  /* Local test bypass */
   devDivider: {
     flexDirection: 'row',
     alignItems: 'center',

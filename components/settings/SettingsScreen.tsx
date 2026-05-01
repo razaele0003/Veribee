@@ -22,6 +22,7 @@ import { Colors, Shadow } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
 import { Spacing } from '@/constants/spacing';
 import { Radii } from '@/constants/radii';
+import { DEMO_ACCOUNTS } from '@/lib/demoProfiles';
 
 export type SettingsRole = 'buyer' | 'seller' | 'rider';
 
@@ -143,9 +144,17 @@ function PersonalInformation({
   save: (label: string, task?: () => Promise<void>) => Promise<void>;
   saving: boolean;
 }) {
-  const [name, setName] = useState(role === 'seller' ? "Maria's Boutique" : role === 'rider' ? 'Angelo Reyes' : 'Buyer Test');
-  const [phone, setPhone] = useState('+63 917 123 4501');
-  const email = `${role}@veribee.test`;
+  const account =
+    role === 'seller'
+      ? DEMO_ACCOUNTS.seller
+      : role === 'rider'
+        ? DEMO_ACCOUNTS.rider
+        : DEMO_ACCOUNTS.buyer;
+  const [name, setName] = useState<string>(
+    role === 'seller' ? DEMO_ACCOUNTS.seller.storeName : account.fullName,
+  );
+  const [phone, setPhone] = useState<string>(account.phone);
+  const email = account.email;
 
   return (
     <View style={styles.form}>
@@ -312,7 +321,9 @@ function PayoutBank({
   saving: boolean;
 }) {
   const [bank, setBank] = useState(banks[0]);
-  const [holder, setHolder] = useState(role === 'seller' ? 'Maria Santos' : 'Angelo Reyes');
+  const [holder, setHolder] = useState<string>(
+    role === 'seller' ? DEMO_ACCOUNTS.seller.fullName : DEMO_ACCOUNTS.rider.fullName,
+  );
   const [number, setNumber] = useState('1234 5678 9012');
 
   return (
@@ -358,7 +369,7 @@ function StoreInformation({
   save: (label: string, task?: () => Promise<void>) => Promise<void>;
   saving: boolean;
 }) {
-  const [storeName, setStoreName] = useState("Maria's Boutique");
+  const [storeName, setStoreName] = useState<string>(DEMO_ACCOUNTS.seller.storeName);
   const [openTime, setOpenTime] = useState('09:00');
   const [closeTime, setCloseTime] = useState('18:00');
   const [weekendOpen, setWeekendOpen] = useState(true);
@@ -398,7 +409,7 @@ function DeliveryAddresses({
   saving: boolean;
 }) {
   const [label, setLabel] = useState('Home');
-  const [street, setStreet] = useState('Makati City, Metro Manila');
+  const [street, setStreet] = useState<string>(DEMO_ACCOUNTS.buyer.coordinate.address);
   const [defaultAddress, setDefaultAddress] = useState(true);
 
   return (

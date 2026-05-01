@@ -6,6 +6,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { ProductListItem } from '@/components/seller/ProductListItem';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { LocalProduct, useSellerStore } from '@/store/sellerStore';
+import { DEMO_ROUTE } from '@/lib/demoProfiles';
 import { ProductImages } from '@/constants/productImages';
 import { Colors, Shadow } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
@@ -33,13 +34,13 @@ const previewProducts: LocalProduct[] = [
   {
     id: 'preview-tote',
     photos: [ProductImages.tote],
-    title: 'Classic Artisan Tote',
+    title: DEMO_ROUTE.productName,
     category: 'Bags',
     price: '12990',
-    description: 'Artisan leather tote.',
+    description: 'Structured leather tote with Veribee evidence.',
     serialNumber: 'VB-BAG-002',
     brand: 'Other',
-    model: 'Classic Tote',
+    model: 'Structured Tote MM',
     evidencePhotos: [],
     submittedAt: new Date().toISOString(),
     authStatus: 'verified',

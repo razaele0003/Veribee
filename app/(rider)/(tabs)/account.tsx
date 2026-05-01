@@ -8,6 +8,7 @@ import { Colors, Shadow } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
 import { Radii } from '@/constants/radii';
 import { Spacing } from '@/constants/spacing';
+import { DEMO_ACCOUNTS } from '@/lib/demoProfiles';
 
 
 
@@ -64,14 +65,14 @@ export default function RiderAccount() {
               accessibilityRole="button"
               accessibilityLabel="Change profile photo"
             >
-              <Text style={styles.avatarText}>AR</Text>
+              <Text style={styles.avatarText}>PR</Text>
             </Pressable>
             <View style={styles.verifiedBadge}>
               <MaterialIcons name="verified" size={16} color={Colors.primary} />
             </View>
           </View>
 
-          <Text style={styles.name}>Angelo Reyes</Text>
+          <Text style={styles.name}>{DEMO_ACCOUNTS.rider.fullName}</Text>
           
           <View style={styles.badgeRow}>
             <View style={styles.statusPill}>
@@ -124,8 +125,8 @@ export default function RiderAccount() {
             <View>
               <Text style={styles.vehicleName}>Honda Click 125i</Text>
               <View style={styles.vehicleMetaRow}>
-                <Text style={styles.plate}>ABC 1234</Text>
-                <Text style={styles.vehicleColor}>• Black</Text>
+                <Text style={styles.plate}>{DEMO_ACCOUNTS.rider.plate}</Text>
+                <Text style={styles.vehicleColor}>Black</Text>
               </View>
             </View>
           </View>
@@ -146,21 +147,21 @@ export default function RiderAccount() {
                <Text style={styles.dataLabel}>Email Address</Text>
                <View style={styles.dataValueBox}>
                  <MaterialIcons name="mail" size={18} color={Colors.secondary} />
-                 <Text style={styles.dataValue}>angelo.reyes@example.com</Text>
+                 <Text style={styles.dataValue}>{DEMO_ACCOUNTS.rider.email}</Text>
                </View>
             </View>
             <View style={styles.dataGroup}>
                <Text style={styles.dataLabel}>Phone Number</Text>
                <View style={styles.dataValueBox}>
                  <MaterialIcons name="phone-iphone" size={18} color={Colors.secondary} />
-                 <Text style={styles.dataValue}>+63 917 123 4567</Text>
+                 <Text style={styles.dataValue}>{DEMO_ACCOUNTS.rider.phone}</Text>
                </View>
             </View>
             <View style={styles.dataGroup}>
                <Text style={styles.dataLabel}>Home Address</Text>
                <View style={styles.dataValueBox}>
                  <MaterialIcons name="home" size={18} color={Colors.secondary} />
-                 <Text style={styles.dataValue}>123 Sampaguita St, Brgy. San Lorenzo, Makati City</Text>
+                 <Text style={styles.dataValue}>{DEMO_ACCOUNTS.rider.coordinate.address}</Text>
                </View>
             </View>
           </View>
@@ -190,7 +191,7 @@ export default function RiderAccount() {
                  </View>
                  <View style={{ alignItems: 'flex-end' }}>
                    <Text style={styles.bankCardFooterLabel}>ACCOUNT HOLDER</Text>
-                   <Text style={styles.bankCardFooterValue}>Angelo Reyes</Text>
+                   <Text style={styles.bankCardFooterValue}>{DEMO_ACCOUNTS.rider.fullName}</Text>
                  </View>
                </View>
              </View>

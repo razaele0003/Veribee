@@ -9,6 +9,7 @@ import { Fonts, Type } from '@/constants/typography';
 import { Spacing } from '@/constants/spacing';
 import { Radii } from '@/constants/radii';
 import { useEffect, useState } from 'react';
+import { DEMO_ACCOUNTS } from '@/lib/demoProfiles';
 
 const rows: Array<{ icon: keyof typeof MaterialIcons.glyphMap; label: string; route: string }> = [
   { icon: 'person-outline', label: 'Personal Information', route: '/(buyer)/settings/personal-information' },
@@ -63,20 +64,20 @@ export default function BuyerProfile() {
           <View style={styles.profileGlow} pointerEvents="none" />
           <View style={styles.avatarContainer}>
             <View style={styles.avatar}>
-              <Text style={styles.avatarText}>DK</Text>
+              <Text style={styles.avatarText}>NV</Text>
             </View>
             <View style={styles.verifiedBadge}>
               <MaterialIcons name="verified" size={16} color={Colors.primary} />
             </View>
           </View>
-          <Text style={styles.name}>David Kim</Text>
+          <Text style={styles.name}>{DEMO_ACCOUNTS.buyer.fullName}</Text>
           <View style={styles.badgeRow}>
             <View style={styles.statusPill}>
               <View style={styles.statusDot} />
               <Text style={styles.statusText}>ACTIVE CUSTOMER</Text>
             </View>
           </View>
-          <Text style={styles.joinDate}>Joined Feb 2024 - Metro Manila</Text>
+          <Text style={styles.joinDate}>Joined Mar 2026 - Metro Manila</Text>
         </View>
 
         <View style={styles.statsRow}>

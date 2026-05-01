@@ -5,18 +5,17 @@ import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
 import { JobCard } from '@/components/rider/JobCard';
-import { MapCard } from '@/components/rider/MapCard';
 import { EmptyState } from '@/components/ui/EmptyState';
-import { DEMO_ROUTE } from '@/lib/demoProfiles';
 import { isLocalUserId } from '@/lib/localAuth';
-import { estimateRouteSummary } from '@/lib/maps';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/authStore';
-import { useRiderStore } from '@/store/riderStore';
+import { RiderJob, formatRiderMoney, useRiderStore } from '@/store/riderStore';
 import { Colors } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
 import { Spacing } from '@/constants/spacing';
 import { Radii } from '@/constants/radii';
+
+type PendingAction = 'accept' | 'decline';
 
 export default function RiderJobFeed() {
   const router = useRouter();
@@ -28,6 +27,18 @@ export default function RiderJobFeed() {
   const declineJob = useRiderStore((s) => s.declineJob);
   const todayEarnings = useRiderStore((s) => s.todayEarnings);
   const [refreshTick, setRefreshTick] = useState(0);
+  const [pendingJob, setPendingJob] = useState<RiderJob | null>(null);
+  const [pendingAction, setPendingAction] = useState<PendingAction | null>(null);
+
+  const openJobDialog = (job: RiderJob, action: PendingAction) => {
+    setPendingJob(job);
+    setPendingAction(action);
+  };
+
+  const closeJobDialog = () => {
+    setPendingJob(null);
+    setPendingAction(null);
+  };
 
   const onAccept = async (jobId: string) => {
     const delivery = acceptJob(jobId);
@@ -48,6 +59,21 @@ export default function RiderJobFeed() {
 
     router.push('/(rider)/navigation-pickup');
   };
+
+  const confirmJobAction = async () => {
+    if (!pendingJob || !pendingAction) return;
+    const jobId = pendingJob.id;
+    closeJobDialog();
+
+    if (pendingAction === 'accept') {
+      await onAccept(jobId);
+      return;
+    }
+
+    declineJob(jobId);
+  };
+
+  const isAcceptDialog = pendingAction === 'accept';
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -109,14 +135,6 @@ export default function RiderJobFeed() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <MapCard
-          label="Live route zone"
-          height={120}
-          origin={DEMO_ROUTE.riderStart}
-          destination={DEMO_ROUTE.pickup}
-          routeSummary={estimateRouteSummary(DEMO_ROUTE.riderStart, DEMO_ROUTE.pickup)}
-        />
-
         <View style={styles.sectionHeader}>
           <View>
             <Text style={styles.sectionEyebrow}>QUEUE</Text>
@@ -145,8 +163,8 @@ export default function RiderJobFeed() {
             <JobCard
               key={job.id}
               job={job}
-              onAccept={() => onAccept(job.id)}
-              onDecline={() => declineJob(job.id)}
+              onAccept={() => openJobDialog(job, 'accept')}
+              onDecline={() => openJobDialog(job, 'decline')}
             />
           ))
         ) : (
@@ -161,6 +179,70 @@ export default function RiderJobFeed() {
           />
         )}
       </ScrollView>
+
+      {!!pendingJob && (
+        <View style={styles.dialogScrim}>
+          <View style={styles.dialog}>
+            <View style={[styles.dialogIcon, !isAcceptDialog && styles.dialogIconMuted]}>
+              <MaterialIcons
+                name={isAcceptDialog ? 'check-circle' : 'close'}
+                size={28}
+                color={isAcceptDialog ? Colors.primary : Colors.onSurfaceVariant}
+              />
+            </View>
+            <Text style={styles.dialogTitle}>
+              {isAcceptDialog ? 'Accept this verified job?' : 'Decline this request?'}
+            </Text>
+            {!!pendingJob && (
+              <Text style={styles.dialogBody}>
+                {pendingJob.productName} from {pendingJob.pickupAddress} to{' '}
+                {pendingJob.deliveryAddress}. Fee {formatRiderMoney(pendingJob.jobFee)}.
+              </Text>
+            )}
+
+            <View style={styles.dialogMetaGrid}>
+              <View style={styles.dialogMeta}>
+                <Text style={styles.dialogMetaLabel}>ETA</Text>
+                <Text style={styles.dialogMetaValue}>{pendingJob?.etaMinutes ?? 0} min</Text>
+              </View>
+              <View style={styles.dialogMeta}>
+                <Text style={styles.dialogMetaLabel}>Distance</Text>
+                <Text style={styles.dialogMetaValue}>{pendingJob?.distanceKm.toFixed(1) ?? '0.0'} km</Text>
+              </View>
+            </View>
+
+            <View style={styles.dialogActions}>
+              <Pressable
+                onPress={closeJobDialog}
+                style={({ pressed }) => [styles.dialogCancel, pressed && styles.pressed]}
+                accessibilityRole="button"
+                accessibilityLabel="Cancel job action"
+              >
+                <Text style={styles.dialogCancelText}>Cancel</Text>
+              </Pressable>
+              <Pressable
+                onPress={confirmJobAction}
+                style={({ pressed }) => [
+                  styles.dialogConfirm,
+                  !isAcceptDialog && styles.dialogDeclineConfirm,
+                  pressed && styles.pressed,
+                ]}
+                accessibilityRole="button"
+                accessibilityLabel={isAcceptDialog ? 'Confirm accept job' : 'Confirm decline job'}
+              >
+                <MaterialIcons
+                  name={isAcceptDialog ? 'check' : 'close'}
+                  size={18}
+                  color={Colors.onPrimary}
+                />
+                <Text style={styles.dialogConfirmText}>
+                  {isAcceptDialog ? 'Accept Job' : 'Decline'}
+                </Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      )}
     </SafeAreaView>
   );
 }
@@ -290,6 +372,7 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: Spacing.md,
+    paddingTop: Spacing.lg,
     paddingBottom: 112,
     gap: Spacing.md,
   },
@@ -333,4 +416,111 @@ const styles = StyleSheet.create({
     color: Colors.onSurfaceVariant,
     marginTop: -Spacing.xs,
   },
+  dialogScrim: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 20,
+    elevation: 20,
+    backgroundColor: 'rgba(34,16,10,0.5)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: Spacing.containerMargin,
+  },
+  dialog: {
+    width: '100%',
+    maxWidth: 420,
+    borderRadius: Radii.xl,
+    backgroundColor: Colors.surfaceContainerLowest,
+    padding: Spacing.lg,
+    gap: Spacing.md,
+    borderWidth: 1,
+    borderColor: Colors.outlineVariant,
+    shadowColor: Colors.onSurface,
+    shadowOffset: { width: 0, height: 18 },
+    shadowOpacity: 0.2,
+    shadowRadius: 26,
+    elevation: 10,
+  },
+  dialogIcon: {
+    width: 52,
+    height: 52,
+    borderRadius: Radii.full,
+    backgroundColor: Colors.primaryFixed,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  dialogIconMuted: {
+    backgroundColor: Colors.surfaceContainer,
+  },
+  dialogTitle: {
+    fontFamily: Fonts.epilogueBold,
+    fontSize: 22,
+    lineHeight: 28,
+    color: Colors.onSurface,
+  },
+  dialogBody: {
+    fontFamily: Fonts.manropeMedium,
+    fontSize: 15,
+    lineHeight: 22,
+    color: Colors.onSurfaceVariant,
+  },
+  dialogMetaGrid: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+  },
+  dialogMeta: {
+    flex: 1,
+    borderRadius: Radii.lg,
+    backgroundColor: Colors.background,
+    borderWidth: 1,
+    borderColor: Colors.outlineVariant,
+    padding: Spacing.sm,
+    gap: 2,
+  },
+  dialogMetaLabel: {
+    ...Type.labelCaps,
+    color: Colors.primary,
+  },
+  dialogMetaValue: {
+    fontFamily: Fonts.epilogueBold,
+    fontSize: 16,
+    color: Colors.onSurface,
+  },
+  dialogActions: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+    marginTop: Spacing.xs,
+  },
+  dialogCancel: {
+    flex: 1,
+    minHeight: 48,
+    borderRadius: Radii.DEFAULT,
+    borderWidth: 1,
+    borderColor: Colors.outlineVariant,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  dialogCancelText: {
+    fontFamily: Fonts.epilogueBold,
+    fontSize: 14,
+    color: Colors.onSurface,
+  },
+  dialogConfirm: {
+    flex: 1,
+    minHeight: 48,
+    borderRadius: Radii.DEFAULT,
+    backgroundColor: Colors.primary,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.xs,
+  },
+  dialogDeclineConfirm: {
+    backgroundColor: Colors.error,
+  },
+  dialogConfirmText: {
+    fontFamily: Fonts.epilogueBold,
+    fontSize: 14,
+    color: Colors.onPrimary,
+  },
+  pressed: { opacity: 0.72 },
 });

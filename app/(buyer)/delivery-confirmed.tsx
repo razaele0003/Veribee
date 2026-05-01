@@ -8,6 +8,7 @@ import { Fonts, Type } from '@/constants/typography';
 import { Spacing } from '@/constants/spacing';
 import { Radii } from '@/constants/radii';
 import { useState } from 'react';
+import { DEMO_ACCOUNTS, DEMO_ROUTE } from '@/lib/demoProfiles';
 
 export default function DeliveryConfirmed() {
   const router = useRouter();
@@ -36,13 +37,13 @@ export default function DeliveryConfirmed() {
             <MaterialIcons name="inventory-2" size={28} color={Colors.primary} />
           </View>
           <View style={styles.cardCopy}>
-            <Text style={styles.cardTitle}>Classic Artisan Leather Tote</Text>
-            <Text style={styles.cardBody}>Order #VB-9982</Text>
+            <Text style={styles.cardTitle}>{DEMO_ROUTE.productName}</Text>
+            <Text style={styles.cardBody}>Order #{DEMO_ROUTE.orderId}</Text>
           </View>
         </View>
 
         <View style={styles.detailRow}>
-          <Text style={styles.detailText}>Rider: Juan dela Cruz</Text>
+          <Text style={styles.detailText}>Rider: {DEMO_ACCOUNTS.rider.fullName}</Text>
           <Text style={styles.detailText}>April 20, 2026</Text>
         </View>
 
@@ -71,9 +72,9 @@ export default function DeliveryConfirmed() {
               <MaterialIcons name="close" size={24} color={Colors.onSurfaceVariant} />
             </Pressable>
             <Text style={styles.receiptTitle}>Receipt</Text>
-            <ReceiptRow label="Order" value="VB-9982" />
-            <ReceiptRow label="Item" value="Classic Artisan Leather Tote" />
-            <ReceiptRow label="Rider" value="Juan dela Cruz" />
+            <ReceiptRow label="Order" value={DEMO_ROUTE.orderId} />
+            <ReceiptRow label="Item" value={DEMO_ROUTE.productName} />
+            <ReceiptRow label="Rider" value={DEMO_ACCOUNTS.rider.fullName} />
             <ReceiptRow label="Verification" value="OTP Confirmed" />
             <Button title="Done" onPress={() => setReceiptOpen(false)} />
           </View>

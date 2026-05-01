@@ -13,6 +13,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { useAuthStore } from '@/store/authStore';
 import { useSellerStore } from '@/store/sellerStore';
 import { calculateSellerVsiFromProducts } from '@/lib/veribeeScoring';
+import { DEMO_ACCOUNTS } from '@/lib/demoProfiles';
 import { Colors, Shadow } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
 import { Spacing } from '@/constants/spacing';
@@ -108,14 +109,14 @@ export default function Profile() {
           {/* Avatar with gold verified badge */}
           <View style={styles.avatarWrap}>
             <View style={styles.avatar}>
-              <Text style={styles.avatarText}>M</Text>
+              <Text style={styles.avatarText}>CD</Text>
             </View>
             <View style={styles.verifiedBadgeOverlay}>
               <MaterialIcons name="verified" size={18} color={Colors.onSurface} />
             </View>
           </View>
 
-          <Text style={styles.storeName}>Maria's Boutique</Text>
+          <Text style={styles.storeName}>{DEMO_ACCOUNTS.seller.storeName}</Text>
 
           {/* Verified pills */}
           <View style={styles.verifiedPills}>

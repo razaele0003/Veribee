@@ -12,20 +12,20 @@ For the safest three-device demo, use the fixed shared order below. It is alread
 
 | Role | Name | Phone | Password | OTP |
 |---|---|---|---|---|
-| Seller | Maria Santos | +639171234501 | VeribeeTest123! | 123456 |
-| Buyer | David Kim | +639171234502 | VeribeeTest123! | 123456 |
-| Rider | Angelo Reyes | +639171234503 | VeribeeTest123! | 123456 |
+| Seller | Camille Dizon | +639178642310 | VeribeeTest123! | 123456 |
+| Buyer | Nico Villanueva | +639178642311 | VeribeeTest123! | 123456 |
+| Rider | Paolo Reyes | +639178642312 | VeribeeTest123! | 123456 |
 
 ## Seller Profile
 
 | Field | Value |
 |---|---|
-| Owner | Maria Santos |
-| Store | LuxeGoods Manila |
-| Phone | +639171234501 |
-| Email | maria.santos@veribee.demo |
+| Owner | Camille Dizon |
+| Store | LuxeLane Manila |
+| Phone | +639178642310 |
+| Email | camille.dizon@luxelane.ph |
 | Location | Makati City, Metro Manila |
-| Pickup address | Unit 14B, Salcedo Market Tower, Makati City |
+| Pickup address | Unit 14B, Salcedo Market Tower, H.V. Dela Costa Street, Makati City |
 | Coordinates | 14.5608, 121.0244 |
 | Verified since | February 12, 2026 |
 | VSI | 96 |
@@ -35,11 +35,11 @@ For the safest three-device demo, use the fixed shared order below. It is alread
 
 | Field | Value |
 |---|---|
-| Name | David Kim |
-| Phone | +639171234502 |
-| Email | david.kim@veribee.demo |
+| Name | Nico Villanueva |
+| Phone | +639178642311 |
+| Email | nico.villanueva@veribee.test |
 | Location | Bonifacio Global City, Taguig |
-| Delivery address | 45 Hive Avenue, BGC, Taguig City |
+| Delivery address | One Uptown Residence, 36th Street, Bonifacio Global City, Taguig City |
 | Coordinates | 14.5503, 121.0518 |
 | Verified since | March 5, 2026 |
 | Demo behavior | High-value buyer using OTP handover and verified delivery tracking |
@@ -48,13 +48,13 @@ For the safest three-device demo, use the fixed shared order below. It is alread
 
 | Field | Value |
 |---|---|
-| Name | Angelo Reyes |
-| Phone | +639171234503 |
-| Email | angelo.reyes@veribee.demo |
-| Start location | 123 Sampaguita Street, Mandaluyong City |
+| Name | Paolo Reyes |
+| Phone | +639178642312 |
+| Email | paolo.reyes@veribee.test |
+| Start location | Plainview Barangay Hall, Mandaluyong City |
 | Start coordinates | 14.5794, 121.0359 |
 | Vehicle | Honda Click 125i |
-| Plate | ABC 1234 |
+| Plate | NCR 4821 |
 | Rating | 4.9 |
 | KYC | Complete: driver's license, OR/CR, profile verification |
 
@@ -64,12 +64,12 @@ For the safest three-device demo, use the fixed shared order below. It is alread
 |---|---|
 | Order ID | VB-9982 |
 | Delivery ID | delivery-vb-9982 |
-| Product | Classic Artisan Leather Tote |
+| Product | Structured Leather Tote MM |
 | Category | Bags |
 | Price | PHP 12,990 |
-| Seller | LuxeGoods Manila |
-| Buyer | David Kim |
-| Rider | Angelo Reyes |
+| Seller | LuxeLane Manila |
+| Buyer | Nico Villanueva |
+| Rider | Paolo Reyes |
 | Status | In transit |
 | Auth score | 96 |
 | Handover method | OTP |
@@ -83,20 +83,20 @@ For the safest three-device demo, use the fixed shared order below. It is alread
 | Product | Seller | Price | Status | Auth Score | Handover |
 |---|---|---:|---|---:|---|
 | Series 9 Chronograph Smartwatch | TechHaven PH | PHP 18,500 | Verified | 97 | Biometric + OTP |
-| Classic Artisan Leather Tote | LuxeGoods Manila | PHP 12,990 | Verified | 96 | OTP |
+| Structured Leather Tote MM | LuxeLane Manila | PHP 12,990 | Verified | 96 | OTP |
 | Limited Edition Urban Kicks | SoleAuthentic | PHP 8,450 | Verified | 93 | OTP |
 | 18k Gold Heritage Pendant | Heirloom Jewels | PHP 24,000 | Verified | 98 | Biometric + OTP |
-| Monogram Canvas Wallet | LuxeGoods Manila | PHP 6,900 | Pending review | 71 | OTP |
+| Monogram Canvas Wallet | LuxeLane Manila | PHP 6,900 | Pending review | 71 | OTP |
 
 ## Three-Device Demo Script
 
-1. Seller device: log in as Maria Santos and show `Classic Artisan Leather Tote` in Products.
-2. Buyer device: log in as David Kim and open Orders. Use order `VB-9982` as the active in-transit delivery.
-3. Rider device: log in as Angelo Reyes, go Online, accept the `VB-9982` job, and start pickup navigation.
-4. Rider device: tap Google Maps to open the free Google Maps directions URL for the pickup route.
+1. Seller device: log in as Camille Dizon and show `Structured Leather Tote MM` in Products.
+2. Buyer device: log in as Nico Villanueva and open Orders. Use order `VB-9982` as the active in-transit delivery.
+3. Rider device: log in as Paolo Reyes, go Online, accept the `VB-9982` job, and start pickup navigation.
+4. Rider device: use the in-app OSM navigation preview for the pickup route.
 5. Rider device: tap `I've Arrived at Pickup`, confirm pickup, then continue to customer navigation.
-6. Buyer device: open order tracking for `VB-9982` and show Angelo Reyes as the assigned rider.
-7. Rider device: tap Google Maps again for the delivery route, then tap `I've Arrived at Customer`.
+6. Buyer device: open order tracking for `VB-9982` and show Paolo Reyes as the assigned rider.
+7. Rider device: use the in-app OSM delivery preview, then tap `I've Arrived at Customer`.
 8. Rider device: enter OTP `123456`.
 9. Buyer device: complete the handover/rating flow.
 
@@ -104,7 +104,7 @@ For the safest three-device demo, use the fixed shared order below. It is alread
 
 | Need | Free demo choice | Notes |
 |---|---|---|
-| Open route in maps | Google Maps URLs | No API key is needed for directions links. It opens the Google Maps app or browser. |
+| In-app route preview | OpenStreetMap tiles | No API key is needed for lightweight demo tiles. Keep attribution visible and avoid heavy production tile usage without a tile provider. |
 | Device GPS | Expo Location | Free native/browser geolocation permission flow. Used on rider navigation screens. |
 | Live cross-device rider coordinates | Supabase Realtime | Free-tier friendly for demo scale. Requires `deliveries.rider_current_lat` and `deliveries.rider_current_lng`. |
 | Embedded map tiles | OpenStreetMap tiles | Free only under tile usage policy. Good for light demo usage, not heavy production traffic without a tile provider. |
