@@ -5,7 +5,9 @@ import { Redirect, useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Button } from '@/components/ui/Button';
 import { OTPInput } from '@/components/ui/OTPInput';
+import { isLocalUserId } from '@/lib/localAuth';
 import { supabase } from '@/lib/supabase';
+import { useAuthStore } from '@/store/authStore';
 import { useRiderStore } from '@/store/riderStore';
 import { Colors } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
@@ -14,6 +16,7 @@ import { Radii } from '@/constants/radii';
 
 export default function RiderOtpEntry() {
   const router = useRouter();
+  const userId = useAuthStore((s) => s.userId);
   const activeDelivery = useRiderStore((s) => s.activeDelivery);
   const completeActiveDelivery = useRiderStore((s) => s.completeActiveDelivery);
   const [otp, setOtp] = useState('');
@@ -32,17 +35,19 @@ export default function RiderOtpEntry() {
 
     const completed = completeActiveDelivery();
     if (completed) {
-      await supabase
-        .from('deliveries')
-        .update({
-          status: 'delivered',
-          otp_confirmed_at: new Date().toISOString(),
-        })
-        .eq('id', completed.deliveryId);
-      await supabase
-        .from('orders')
-        .update({ status: 'delivered' })
-        .eq('id', completed.orderId);
+      if (!isLocalUserId(userId)) {
+        await supabase
+          .from('deliveries')
+          .update({
+            status: 'delivered',
+            otp_confirmed_at: new Date().toISOString(),
+          })
+          .eq('id', completed.deliveryId);
+        await supabase
+          .from('orders')
+          .update({ status: 'delivered' })
+          .eq('id', completed.orderId);
+      }
       router.replace({
         pathname: '/(rider)/delivery-complete',
         params: { orderId: completed.orderId, fee: String(completed.jobFee) },
@@ -69,7 +74,7 @@ export default function RiderOtpEntry() {
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.successBanner}>
-          <MaterialIcons name="verified-user" size={28} color={Colors.onTertiary} />
+          <MaterialIcons name="verified-user" size={28} color={Colors.onTertiaryContainer} />
           <Text style={styles.successText}>You have arrived. Verify buyer handover.</Text>
         </View>
 
@@ -162,7 +167,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontFamily: Fonts.manropeBold,
     fontSize: 15,
-    color: Colors.onTertiary,
+    color: Colors.onTertiaryContainer,
   },
   iconCircle: {
     width: 104,

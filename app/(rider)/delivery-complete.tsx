@@ -19,7 +19,7 @@ export default function DeliveryComplete() {
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.completeIcon}>
-          <MaterialIcons name="check" size={52} color={Colors.onTertiary} />
+          <MaterialIcons name="check" size={52} color={Colors.onSuccessContainer} />
         </View>
         <Text style={styles.title}>Delivery complete</Text>
         <Text style={styles.subtitle}>
@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
     width: 116,
     height: 116,
     borderRadius: Radii.full,
-    backgroundColor: Colors.tertiaryContainer,
+    backgroundColor: Colors.successContainer,
     alignItems: 'center',
     justifyContent: 'center',
   },

@@ -4,7 +4,9 @@ import { Redirect, useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Button } from '@/components/ui/Button';
 import { supabase } from '@/lib/supabase';
+import { isLocalUserId } from '@/lib/localAuth';
 import { useRiderStore } from '@/store/riderStore';
+import { useAuthStore } from '@/store/authStore';
 import { Colors, Shadow } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
 import { Spacing } from '@/constants/spacing';
@@ -13,6 +15,7 @@ import { useState } from 'react';
 
 export default function PickupConfirm() {
   const router = useRouter();
+  const userId = useAuthStore((s) => s.userId);
   const activeDelivery = useRiderStore((s) => s.activeDelivery);
   const updateActiveStatus = useRiderStore((s) => s.updateActiveStatus);
   const [checked, setChecked] = useState([false, false, false]);
@@ -22,10 +25,12 @@ export default function PickupConfirm() {
 
   const onConfirm = async () => {
     updateActiveStatus('heading_to_buyer');
-    await supabase
-      .from('deliveries')
-      .update({ status: 'heading_to_buyer', picked_up_at: new Date().toISOString() })
-      .eq('id', activeDelivery.deliveryId);
+    if (userId && !isLocalUserId(userId)) {
+      await supabase
+        .from('deliveries')
+        .update({ status: 'heading_to_buyer', picked_up_at: new Date().toISOString() })
+        .eq('id', activeDelivery.deliveryId);
+    }
     router.replace('/(rider)/navigation-delivery');
   };
 
@@ -98,8 +103,8 @@ function ChecklistItem({
       accessibilityRole="checkbox"
       accessibilityState={{ checked }}
     >
-      <View style={[styles.checkIcon, !checked && styles.checkIconEmpty]}>
-        {checked && <MaterialIcons name="check" size={18} color={Colors.onTertiary} />}
+    <View style={[styles.checkIcon, !checked && styles.checkIconEmpty]}>
+        {checked && <MaterialIcons name="check" size={18} color={Colors.onPrimary} />}
       </View>
       <Text style={styles.checkText}>{label}</Text>
     </Pressable>
@@ -178,7 +183,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: Radii.full,
-    backgroundColor: Colors.tertiaryContainer,
+    backgroundColor: Colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },

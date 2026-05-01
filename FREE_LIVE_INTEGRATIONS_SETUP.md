@@ -36,6 +36,7 @@ Current implementation files:
 - `lib/supabase.ts`
 - `app/(auth)/login.tsx`
 - `app/(auth)/callback.tsx`
+- `GOOGLE_OAUTH_SETUP.md`
 
 Supabase dashboard setup still required:
 

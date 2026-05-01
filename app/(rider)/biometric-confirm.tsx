@@ -3,7 +3,9 @@ import { Animated, Easing, Pressable, StyleSheet, Text, View } from 'react-nativ
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Redirect, useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
+import { isLocalUserId } from '@/lib/localAuth';
 import { supabase } from '@/lib/supabase';
+import { useAuthStore } from '@/store/authStore';
 import { useRiderStore } from '@/store/riderStore';
 import { Colors, Shadow } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
@@ -25,16 +27,16 @@ function usePulse() {
 
 export default function BiometricConfirm() {
   const router = useRouter();
+  const userId = useAuthStore((s) => s.userId);
   const activeDelivery = useRiderStore((s) => s.activeDelivery);
   const completeActiveDelivery = useRiderStore((s) => s.completeActiveDelivery);
   const [status, setStatus] = useState<'waiting' | 'confirmed' | 'failed'>('waiting');
   const pulseAnim = usePulse();
-
-  if (!activeDelivery) return <Redirect href="/(rider)/(tabs)/job-feed" />;
+  const isLocalDemo = isLocalUserId(userId);
 
   // Poll Supabase for biometric_confirmed flag
   useEffect(() => {
-    if (status !== 'waiting') return;
+    if (!activeDelivery || isLocalDemo || status !== 'waiting') return;
     const interval = setInterval(async () => {
       const { data } = await supabase
         .from('deliveries')
@@ -47,14 +49,16 @@ export default function BiometricConfirm() {
         setTimeout(async () => {
           const completed = completeActiveDelivery();
           if (completed) {
-            await supabase
-              .from('deliveries')
-              .update({ status: 'delivered', otp_confirmed_at: new Date().toISOString() })
-              .eq('id', completed.deliveryId);
-            await supabase
-              .from('orders')
-              .update({ status: 'delivered' })
-              .eq('id', completed.orderId);
+            if (!isLocalDemo) {
+              await supabase
+                .from('deliveries')
+                .update({ status: 'delivered', otp_confirmed_at: new Date().toISOString() })
+                .eq('id', completed.deliveryId);
+              await supabase
+                .from('orders')
+                .update({ status: 'delivered' })
+                .eq('id', completed.orderId);
+            }
             router.replace({
               pathname: '/(rider)/delivery-complete',
               params: { orderId: completed.orderId, fee: String(completed.jobFee) },
@@ -64,7 +68,9 @@ export default function BiometricConfirm() {
       }
     }, 2000);
     return () => clearInterval(interval);
-  }, [status]);
+  }, [activeDelivery, completeActiveDelivery, isLocalDemo, router, status]);
+
+  if (!activeDelivery) return <Redirect href="/(rider)/(tabs)/job-feed" />;
 
   // For demo/local: manually simulate confirmation
   const simulateConfirmed = () => {
@@ -137,7 +143,7 @@ export default function BiometricConfirm() {
               style={({ pressed }) => [styles.simulateButton, pressed && { opacity: 0.7 }]}
               onPress={simulateConfirmed}
             >
-              <Text style={styles.simulateText}>Simulate Confirmed (Dev)</Text>
+              <Text style={styles.simulateText}>Mark Customer Verified</Text>
             </Pressable>
           </>
         )}

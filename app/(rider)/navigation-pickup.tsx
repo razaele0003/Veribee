@@ -13,40 +13,50 @@ import {
 } from '@/lib/locationTracking';
 import { getFreeRouteSummary, type Coordinate, type RouteSummary } from '@/lib/maps';
 import { supabase } from '@/lib/supabase';
-import { useRiderStore } from '@/store/riderStore';
+import { isLocalUserId } from '@/lib/localAuth';
+import { ActiveDelivery, useRiderStore } from '@/store/riderStore';
+import { useAuthStore } from '@/store/authStore';
 import { Colors } from '@/constants/colors';
 import { Fonts } from '@/constants/typography';
 import { Spacing } from '@/constants/spacing';
 
 export default function NavigationPickup() {
   const router = useRouter();
+  const userId = useAuthStore((s) => s.userId);
   const activeDelivery = useRiderStore((s) => s.activeDelivery);
   const updateActiveStatus = useRiderStore((s) => s.updateActiveStatus);
   const [riderCoordinate, setRiderCoordinate] = useState<Coordinate>(DEMO_ROUTE.riderStart);
   const [isLiveLocation, setIsLiveLocation] = useState(false);
   const [routeSummary, setRouteSummary] = useState<RouteSummary | null>(null);
 
+  const pickupCoordinate = useMemo(
+    () => makePickupCoordinate(activeDelivery),
+    [activeDelivery],
+  );
+
   const mapsUrl = useMemo(
-    () => makeGoogleMapsDirectionsUrl(riderCoordinate, DEMO_ROUTE.pickup),
-    [riderCoordinate],
+    () => makeGoogleMapsDirectionsUrl(riderCoordinate, pickupCoordinate),
+    [pickupCoordinate, riderCoordinate],
   );
 
   useEffect(() => {
     if (!activeDelivery) return;
     let subscription: { remove: () => void } | null = null;
     let cancelled = false;
-    startRiderLocationTracking(activeDelivery.deliveryId).then((next) => {
-      if (cancelled) {
-        next?.remove();
-        return;
-      }
-      subscription = next;
-    });
+    if (userId && !isLocalUserId(userId)) {
+      startRiderLocationTracking(activeDelivery.deliveryId).then((next) => {
+        if (cancelled) {
+          next?.remove();
+          return;
+        }
+        subscription = next;
+      });
+    }
     getCurrentRiderCoordinate(DEMO_ROUTE.riderStart).then(({ coordinate, live }) => {
       if (cancelled) return;
       setRiderCoordinate(coordinate);
       setIsLiveLocation(live);
-      getFreeRouteSummary(coordinate, DEMO_ROUTE.pickup).then((summary) => {
+      getFreeRouteSummary(coordinate, pickupCoordinate).then((summary) => {
         if (!cancelled) setRouteSummary(summary);
       });
     });
@@ -55,17 +65,19 @@ export default function NavigationPickup() {
       cancelled = true;
       subscription?.remove();
     };
-  }, [activeDelivery?.deliveryId]);
+  }, [activeDelivery?.deliveryId, pickupCoordinate, userId]);
 
   if (!activeDelivery) return <Redirect href="/(rider)/(tabs)/job-feed" />;
 
   const onArrived = async () => {
-    await publishCurrentRiderLocation(activeDelivery.deliveryId);
+    if (userId && !isLocalUserId(userId)) {
+      await publishCurrentRiderLocation(activeDelivery.deliveryId);
+      await supabase
+        .from('deliveries')
+        .update({ status: 'arrived_pickup' })
+        .eq('id', activeDelivery.deliveryId);
+    }
     updateActiveStatus('arrived_pickup');
-    await supabase
-      .from('deliveries')
-      .update({ status: 'arrived_pickup' })
-      .eq('id', activeDelivery.deliveryId);
     router.replace('/(rider)/pickup-confirm');
   };
 
@@ -84,8 +96,8 @@ export default function NavigationPickup() {
           height={360}
           origin={DEMO_ROUTE.riderStart}
           current={riderCoordinate}
-          destination={DEMO_ROUTE.pickup}
-          routeSummary={routeSummary}
+          destination={pickupCoordinate}
+          routeSummary={routeSummary ?? makeJobRouteSummary(activeDelivery)}
           isLive={isLiveLocation}
           onOpenMaps={() => Linking.openURL(mapsUrl)}
         />
@@ -99,6 +111,23 @@ export default function NavigationPickup() {
       />
     </SafeAreaView>
   );
+}
+
+function makePickupCoordinate(delivery: ActiveDelivery | null): Coordinate {
+  return {
+    label: delivery?.pickupAddress ?? DEMO_ROUTE.pickup.label,
+    address: delivery?.pickupAddress ?? DEMO_ROUTE.pickup.address,
+    latitude: delivery?.pickupLatitude ?? DEMO_ROUTE.pickup.latitude,
+    longitude: delivery?.pickupLongitude ?? DEMO_ROUTE.pickup.longitude,
+  };
+}
+
+function makeJobRouteSummary(delivery: ActiveDelivery): RouteSummary {
+  return {
+    distanceKm: delivery.distanceKm,
+    etaMinutes: delivery.etaMinutes,
+    source: 'local',
+  };
 }
 
 const styles = StyleSheet.create({

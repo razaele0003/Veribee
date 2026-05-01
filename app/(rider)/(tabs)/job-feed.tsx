@@ -8,6 +8,7 @@ import { JobCard } from '@/components/rider/JobCard';
 import { MapCard } from '@/components/rider/MapCard';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { DEMO_ROUTE } from '@/lib/demoProfiles';
+import { isLocalUserId } from '@/lib/localAuth';
 import { estimateRouteSummary } from '@/lib/maps';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/authStore';
@@ -32,7 +33,7 @@ export default function RiderJobFeed() {
     const delivery = acceptJob(jobId);
     if (!delivery) return;
 
-    if (userId) {
+    if (userId && !isLocalUserId(userId)) {
       await supabase
         .from('orders')
         .update({ rider_id: userId, status: 'processing' })

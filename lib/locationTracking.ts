@@ -1,4 +1,5 @@
 import * as Location from 'expo-location';
+import { Platform } from 'react-native';
 import { supabase } from '@/lib/supabase';
 import { DEMO_ROUTE } from '@/lib/demoProfiles';
 import type { Coordinate } from '@/lib/maps';
@@ -68,6 +69,8 @@ export async function publishCurrentRiderLocation(deliveryId: string) {
 
 export async function startRiderLocationTracking(deliveryId: string) {
   try {
+    if (Platform.OS === 'web') return null;
+
     const hasPermission = await requestTrackingPermission();
     if (!hasPermission) return null;
 

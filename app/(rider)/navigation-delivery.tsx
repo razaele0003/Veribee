@@ -13,40 +13,50 @@ import {
 } from '@/lib/locationTracking';
 import { getFreeRouteSummary, type Coordinate, type RouteSummary } from '@/lib/maps';
 import { supabase } from '@/lib/supabase';
-import { useRiderStore } from '@/store/riderStore';
+import { isLocalUserId } from '@/lib/localAuth';
+import { ActiveDelivery, useRiderStore } from '@/store/riderStore';
+import { useAuthStore } from '@/store/authStore';
 import { Colors } from '@/constants/colors';
 import { Fonts } from '@/constants/typography';
 import { Spacing } from '@/constants/spacing';
 
 export default function NavigationDelivery() {
   const router = useRouter();
+  const userId = useAuthStore((s) => s.userId);
   const activeDelivery = useRiderStore((s) => s.activeDelivery);
   const updateActiveStatus = useRiderStore((s) => s.updateActiveStatus);
   const [riderCoordinate, setRiderCoordinate] = useState<Coordinate>(DEMO_ROUTE.pickup);
   const [isLiveLocation, setIsLiveLocation] = useState(false);
   const [routeSummary, setRouteSummary] = useState<RouteSummary | null>(null);
 
+  const deliveryCoordinate = useMemo(
+    () => makeDeliveryCoordinate(activeDelivery),
+    [activeDelivery],
+  );
+
   const mapsUrl = useMemo(
-    () => makeGoogleMapsDirectionsUrl(riderCoordinate, DEMO_ROUTE.dropoff),
-    [riderCoordinate],
+    () => makeGoogleMapsDirectionsUrl(riderCoordinate, deliveryCoordinate),
+    [deliveryCoordinate, riderCoordinate],
   );
 
   useEffect(() => {
     if (!activeDelivery) return;
     let subscription: { remove: () => void } | null = null;
     let cancelled = false;
-    startRiderLocationTracking(activeDelivery.deliveryId).then((next) => {
-      if (cancelled) {
-        next?.remove();
-        return;
-      }
-      subscription = next;
-    });
+    if (userId && !isLocalUserId(userId)) {
+      startRiderLocationTracking(activeDelivery.deliveryId).then((next) => {
+        if (cancelled) {
+          next?.remove();
+          return;
+        }
+        subscription = next;
+      });
+    }
     getCurrentRiderCoordinate(DEMO_ROUTE.pickup).then(({ coordinate, live }) => {
       if (cancelled) return;
       setRiderCoordinate(coordinate);
       setIsLiveLocation(live);
-      getFreeRouteSummary(coordinate, DEMO_ROUTE.dropoff).then((summary) => {
+      getFreeRouteSummary(coordinate, deliveryCoordinate).then((summary) => {
         if (!cancelled) setRouteSummary(summary);
       });
     });
@@ -55,22 +65,27 @@ export default function NavigationDelivery() {
       cancelled = true;
       subscription?.remove();
     };
-  }, [activeDelivery?.deliveryId]);
+  }, [activeDelivery?.deliveryId, deliveryCoordinate, userId]);
 
   if (!activeDelivery) return <Redirect href="/(rider)/(tabs)/job-feed" />;
 
   const onArrived = async () => {
-    const currentLocation = await publishCurrentRiderLocation(activeDelivery.deliveryId);
+    const currentLocation =
+      userId && !isLocalUserId(userId)
+        ? await publishCurrentRiderLocation(activeDelivery.deliveryId)
+        : null;
     updateActiveStatus('arrived_buyer');
-    await supabase
-      .from('deliveries')
-      .update({
-        status: 'arrived_buyer',
-        otp_code: activeDelivery.otpCode,
-        rider_current_lat: currentLocation?.latitude ?? DEMO_ROUTE.dropoff.latitude,
-        rider_current_lng: currentLocation?.longitude ?? DEMO_ROUTE.dropoff.longitude,
-      })
-      .eq('id', activeDelivery.deliveryId);
+    if (userId && !isLocalUserId(userId)) {
+      await supabase
+        .from('deliveries')
+        .update({
+          status: 'arrived_buyer',
+          otp_code: activeDelivery.otpCode,
+          rider_current_lat: currentLocation?.latitude ?? DEMO_ROUTE.dropoff.latitude,
+          rider_current_lng: currentLocation?.longitude ?? DEMO_ROUTE.dropoff.longitude,
+        })
+        .eq('id', activeDelivery.deliveryId);
+    }
     router.replace('/(rider)/verify-delivery');
   };
 
@@ -97,8 +112,8 @@ export default function NavigationDelivery() {
           height={360}
           origin={DEMO_ROUTE.pickup}
           current={riderCoordinate}
-          destination={DEMO_ROUTE.dropoff}
-          routeSummary={routeSummary}
+          destination={deliveryCoordinate}
+          routeSummary={routeSummary ?? makeJobRouteSummary(activeDelivery)}
           isLive={isLiveLocation}
           onOpenMaps={() => Linking.openURL(mapsUrl)}
         />
@@ -112,6 +127,23 @@ export default function NavigationDelivery() {
       />
     </SafeAreaView>
   );
+}
+
+function makeDeliveryCoordinate(delivery: ActiveDelivery | null): Coordinate {
+  return {
+    label: delivery?.deliveryAddress ?? DEMO_ROUTE.dropoff.label,
+    address: delivery?.deliveryAddress ?? DEMO_ROUTE.dropoff.address,
+    latitude: delivery?.deliveryLatitude ?? DEMO_ROUTE.dropoff.latitude,
+    longitude: delivery?.deliveryLongitude ?? DEMO_ROUTE.dropoff.longitude,
+  };
+}
+
+function makeJobRouteSummary(delivery: ActiveDelivery): RouteSummary {
+  return {
+    distanceKm: delivery.distanceKm,
+    etaMinutes: delivery.etaMinutes,
+    source: 'local',
+  };
 }
 
 const styles = StyleSheet.create({

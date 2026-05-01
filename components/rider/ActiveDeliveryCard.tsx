@@ -35,7 +35,7 @@ export function ActiveDeliveryCard({
           <Text style={styles.title}>{title}</Text>
         </View>
         <View style={styles.etaPill}>
-          <MaterialIcons name="schedule" size={15} color={Colors.tertiaryContainer} />
+          <MaterialIcons name="schedule" size={15} color={Colors.primary} />
           <Text style={styles.etaText}>{delivery.etaMinutes} mins</Text>
           <Text style={styles.etaMeta}>{delivery.distanceKm.toFixed(1)} km</Text>
         </View>
@@ -83,7 +83,7 @@ export function ActiveDeliveryCard({
           accessibilityLabel={actionLabel}
         >
           <Text style={styles.actionText}>{actionLabel}</Text>
-          <MaterialIcons name="check-circle" size={18} color={Colors.onTertiary} />
+          <MaterialIcons name="check-circle" size={18} color={Colors.onPrimary} />
         </Pressable>
       )}
     </View>
@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
     borderRadius: Radii.md,
     borderWidth: 1,
     borderColor: Colors.outlineVariant,
-    backgroundColor: Colors.surfaceContainerLow,
+    backgroundColor: Colors.dealContainer,
     paddingHorizontal: Spacing.sm,
     paddingVertical: Spacing.base,
     alignItems: 'flex-end',
@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
   },
   etaText: {
     ...Type.labelCaps,
-    color: Colors.tertiaryContainer,
+    color: Colors.primary,
   },
   etaMeta: {
     fontFamily: Fonts.manropeMedium,
@@ -222,7 +222,7 @@ const styles = StyleSheet.create({
   action: {
     minHeight: 48,
     borderRadius: Radii.DEFAULT,
-    backgroundColor: Colors.tertiaryContainer,
+    backgroundColor: Colors.primary,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
   actionText: {
     fontFamily: Fonts.manropeBold,
     fontSize: 15,
-    color: Colors.onTertiary,
+    color: Colors.onPrimary,
   },
   pressed: { opacity: 0.74 },
 });

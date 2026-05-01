@@ -21,7 +21,7 @@ export default function VerifyDelivery() {
         <Pressable onPress={() => router.back()} hitSlop={12} style={styles.iconButton}>
           <MaterialIcons name="arrow-back" size={24} color={Colors.onSurface} />
         </Pressable>
-        <Text style={styles.headerTitle}>Confirm Delivery</Text>
+        <Text style={styles.headerTitle}>Verify Delivery</Text>
         <View style={styles.iconButton} />
       </View>
 

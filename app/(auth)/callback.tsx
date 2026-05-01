@@ -2,6 +2,8 @@ import { useEffect } from 'react';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import * as Linking from 'expo-linking';
+import { Platform } from 'react-native';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore, type Role } from '@/store/authStore';
 import { Colors } from '@/constants/colors';
@@ -17,7 +19,44 @@ export default function AuthCallback() {
   useEffect(() => {
     let cancelled = false;
 
+    async function resolveOAuthSessionFromUrl() {
+      const currentUrl =
+        Platform.OS === 'web' && typeof window !== 'undefined'
+          ? window.location.href
+          : await Linking.getInitialURL();
+      if (!currentUrl) return;
+
+      const normalizedUrl = currentUrl.replace('#', '?');
+      const params = new URL(normalizedUrl).searchParams;
+      const errorDescription = params.get('error_description') ?? params.get('error');
+      if (errorDescription) throw new Error(errorDescription);
+
+      const code = params.get('code');
+      if (code) {
+        const { error } = await supabase.auth.exchangeCodeForSession(code);
+        if (error) throw error;
+        return;
+      }
+
+      const accessToken = params.get('access_token');
+      const refreshToken = params.get('refresh_token');
+      if (accessToken && refreshToken) {
+        const { error } = await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken,
+        });
+        if (error) throw error;
+      }
+    }
+
     async function finishOAuth() {
+      try {
+        await resolveOAuthSessionFromUrl();
+      } catch {
+        if (!cancelled) router.replace('/(auth)/login');
+        return;
+      }
+
       const { data } = await supabase.auth.getSession();
       const user = data.session?.user;
 
