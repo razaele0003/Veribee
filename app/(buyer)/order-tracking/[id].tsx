@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Button } from '@/components/ui/Button';
-import { DEMO_ACCOUNTS, DEMO_ROUTE, makeGoogleMapsDirectionsUrl } from '@/lib/demoProfiles';
+import { LiveOsmMap } from '@/components/rider/LiveOsmMap';
+import { DEMO_ACCOUNTS, DEMO_ROUTE } from '@/lib/demoProfiles';
 import type { Coordinate } from '@/lib/maps';
 import { supabase } from '@/lib/supabase';
 import { Colors, Shadow } from '@/constants/colors';
@@ -20,10 +21,6 @@ export default function OrderTracking() {
   const [deliveryStatus, setDeliveryStatus] = useState('heading_to_buyer');
   const [otpReady, setOtpReady] = useState(false);
   const [riderCoordinate, setRiderCoordinate] = useState<Coordinate>(DEMO_ROUTE.riderStart);
-  const mapsUrl = useMemo(
-    () => makeGoogleMapsDirectionsUrl(riderCoordinate, DEMO_ROUTE.dropoff),
-    [riderCoordinate],
-  );
   const activeStep = useMemo(() => {
     if (deliveryStatus === 'delivered') return 3;
     if (deliveryStatus === 'heading_to_buyer' || deliveryStatus === 'arrived_buyer') return 2;
@@ -72,6 +69,7 @@ export default function OrderTracking() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.map}>
+        <LiveOsmMap origin={DEMO_ROUTE.riderStart} destination={DEMO_ROUTE.dropoff} current={riderCoordinate} />
         <Pressable
           onPress={() => router.back()}
           hitSlop={12}
@@ -81,28 +79,12 @@ export default function OrderTracking() {
         >
           <MaterialIcons name="arrow-back" size={24} color={Colors.primary} />
         </Pressable>
-        <View style={styles.routeLine} />
         <View style={styles.liveBadge}>
           <View style={styles.liveDot} />
           <Text style={styles.liveBadgeText}>
             Live rider GPS {riderCoordinate.latitude.toFixed(4)}, {riderCoordinate.longitude.toFixed(4)}
           </Text>
         </View>
-        <View style={styles.riderMarker}>
-          <MaterialIcons name="delivery-dining" size={28} color={Colors.onPrimary} />
-        </View>
-        <View style={styles.homeMarker}>
-          <MaterialIcons name="home" size={26} color={Colors.onSecondaryContainer} />
-        </View>
-        <Pressable
-          onPress={() => Linking.openURL(mapsUrl)}
-          style={({ pressed }) => [styles.mapsButton, pressed && styles.pressed]}
-          accessibilityRole="button"
-          accessibilityLabel="Open delivery route in Google Maps"
-        >
-          <MaterialIcons name="map" size={16} color={Colors.onPrimary} />
-          <Text style={styles.mapsButtonText}>Google Maps</Text>
-        </Pressable>
       </View>
 
       <View style={styles.sheet}>
@@ -275,6 +257,18 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.manropeBold,
     fontSize: 12,
     color: Colors.onPrimary,
+  },
+  mapAttribution: {
+    position: 'absolute',
+    right: Spacing.sm,
+    bottom: 72,
+    borderRadius: Radii.full,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    fontFamily: Fonts.manropeBold,
+    fontSize: 9,
+    color: Colors.onSurfaceVariant,
   },
   pressed: {
     opacity: 0.74,

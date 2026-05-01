@@ -16,22 +16,21 @@ export type RouteSummary = {
 const OSRM_TIMEOUT_MS = 3500;
 const AVERAGE_CITY_SPEED_KPH = 24;
 
-function toCoordParam(coord: Coordinate) {
-  return `${coord.latitude},${coord.longitude}`;
-}
-
 function toOsrmParam(coord: Coordinate) {
   return `${coord.longitude},${coord.latitude}`;
 }
 
-export function makeGoogleMapsDirectionsUrl(origin: Coordinate, destination: Coordinate) {
-  const originCoord = toCoordParam(origin);
-  const destinationCoord = toCoordParam(destination);
-  return `https://www.google.com/maps/dir/?api=1&origin=${originCoord}&destination=${destinationCoord}&travelmode=driving`;
+export function makeOpenStreetMapDirectionsUrl(origin: Coordinate, destination: Coordinate) {
+  const route = encodeURIComponent(
+    `${origin.latitude},${origin.longitude};${destination.latitude},${destination.longitude}`,
+  );
+  const midpointLatitude = (origin.latitude + destination.latitude) / 2;
+  const midpointLongitude = (origin.longitude + destination.longitude) / 2;
+  return `https://www.openstreetmap.org/directions?engine=fossgis_osrm_car&route=${route}#map=14/${midpointLatitude}/${midpointLongitude}`;
 }
 
 export async function openDirections(origin: Coordinate, destination: Coordinate) {
-  await Linking.openURL(makeGoogleMapsDirectionsUrl(origin, destination));
+  await Linking.openURL(makeOpenStreetMapDirectionsUrl(origin, destination));
 }
 
 export function estimateRouteSummary(origin: Coordinate, destination: Coordinate): RouteSummary {

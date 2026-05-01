@@ -5,7 +5,7 @@ export type DemoCoordinate = {
   longitude: number;
 };
 
-export { makeGoogleMapsDirectionsUrl } from '@/lib/maps';
+export { makeOpenStreetMapDirectionsUrl } from '@/lib/maps';
 
 export const DEMO_PASSWORD = 'VeribeeTest123!';
 export const DEMO_OTP = '123456';

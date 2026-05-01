@@ -21,7 +21,7 @@ This is based on `4ECED-Market Research-G1.pdf`. The core user pain is trust for
 | AI Scanner MVP | Implemented as a free local rules-based scanner. It scores serial quality, photo presence, evidence completeness, brand/category details, and high-value handover risk. It does not call paid APIs. | `lib/veribeeScoring.ts`, `store/sellerStore.ts`, `app/(seller)/add-product/step3-review.tsx` |
 | Tesseract OCR | Planned, not installed yet. Current scanner uses serial format rules, not OCR extraction from images. | Future: add Tesseract.js inside the scanner flow. |
 | Transformers.js image model | Planned, not installed yet. Current scanner does not run a real image embedding/classification model. | Future: add browser/on-device model inference. |
-| OpenStreetMap/Nominatim | Planned for production geocoding. Current maps are demo UI cards/static route states. | Future: add cached user-triggered geocoding. |
+| OpenStreetMap/OSRM/Nominatim | In-app OSM raster tiles, route markers, visible attribution, and OSRM route estimates are wired. Geocoding remains a future cached user-triggered feature. | `components/rider/LiveOsmMap.tsx`, `lib/maps.ts`, `components/rider/MapCard.tsx`, rider navigation screens, buyer tracking screen. |
 | Biometric handover | Implemented for the buyer biometric handover flow using Expo LocalAuthentication. | `app/(buyer)/biometric-handover.tsx` |
 | OTP handover | Implemented as local demo OTP flow. | `app/(buyer)/otp-handover.tsx`, `app/(rider)/otp-entry.tsx` |
 
@@ -35,6 +35,7 @@ This is based on `4ECED-Market Research-G1.pdf`. The core user pain is trust for
 | Auth scoring | Local deterministic scoring function | Combine OCR match, image confidence, seller VSI, receipt presence, KYC status, and prior dispute history. Keep explainable. |
 | Database and auth | Supabase Free Plan | Free plan is enough for demo users, product tables, orders, and auth experiments. |
 | Maps / geocoding | OpenStreetMap + Nominatim | Use only for user-triggered search, max 1 request/second on public Nominatim, include attribution, and cache results. |
+| Code-generation AI experiments | Puter Codex API | Optional for web/internal tooling only. Not recommended as the product authenticity scanner because Codex models are for coding tasks, not image/serial verification. |
 | Biometric handover | Expo LocalAuthentication | Local device biometric prompt; no paid service. Pair with OTP for high-value deliveries. |
 | Push notifications | Expo Notifications | Free for prototype/demo use. For production, verify platform limits before launch. |
 
@@ -83,3 +84,5 @@ Local OTP for account and delivery testing: `123456`.
 - Tesseract OCR documentation: https://github.com/tesseract-ocr/tessdoc
 - Supabase billing/free plan overview: https://supabase.com/docs/guides/platform/billing-on-supabase
 - OpenStreetMap Nominatim usage policy: https://operations.osmfoundation.org/policies/nominatim/
+- OpenStreetMap tile usage policy: https://operations.osmfoundation.org/policies/tiles/
+- Puter Codex API tutorial: https://developer.puter.com/tutorials/free-unlimited-codex-api/

@@ -8,7 +8,8 @@ This file documents what is now wired in the app and what still needs dashboard 
 |---|---|---|
 | Rider current location | `expo-location` foreground permission, `getLastKnownPositionAsync`, `getCurrentPositionAsync`, and `watchPositionAsync` | Implemented |
 | Buyer live tracking | Supabase Realtime subscription on `deliveries` updates | Implemented |
-| Route open in maps | Google Maps URLs with origin/destination coordinates | Implemented, no API key |
+| In-app live map | OpenStreetMap raster tiles with visible attribution and rider/dropoff markers | Implemented, no API key |
+| Optional route link | OpenStreetMap directions URL helper retained for secondary use | Implemented, not shown as the primary map action |
 | Route estimate | OSRM public route endpoint with local haversine fallback | Implemented |
 | Address search/geocoding | OpenStreetMap Nominatim | Not implemented yet; use only on user action, max 1 request/sec, cache results |
 
@@ -21,7 +22,18 @@ Current implementation files:
 - `app/(rider)/navigation-delivery.tsx`
 - `app/(buyer)/order-tracking/[id].tsx`
 
-Google Maps URLs are not the paid Google Maps Platform SDK. They open Google Maps with route parameters and do not require an API key.
+OpenStreetMap tiles are now rendered in-app for the active route views. The app requests only the currently visible viewport tiles and keeps OSM attribution visible. For production APK scale, use an OSM-compatible tile provider, self-hosted tiles, or a small backend tile proxy with a proper Veribee User-Agent/contact because native image requests do not reliably let Expo set a custom tile User-Agent.
+
+## AI / ML Model Choice
+
+| Need | Free implementation | Decision |
+|---|---|---|
+| Product serial/label/receipt text extraction | Tesseract.js or another local OCR engine | Recommended next step |
+| Product image/category signal | Transformers.js image model or embeddings | Recommended next step |
+| Seller/product trust scoring | Local deterministic scoring in `lib/veribeeScoring.ts` | Implemented |
+| Puter Codex API | User-pays code-generation model access | Not selected for product verification because Codex is for coding tasks, not image/serial authenticity checks |
+
+Puter can be useful for web-only experiments or internal developer tools, but it should not be the APK's core product verification model. For the app, keep the scanner explainable and free by using local OCR, local image embeddings/classification, seller VSI, and manual review notes.
 
 ## Google Authentication
 
@@ -70,7 +82,7 @@ For production, treat the current free ID flow as `ready_for_review`, not fully 
 ## Sources
 
 - Expo Location: https://docs.expo.dev/versions/latest/sdk/location/
-- Google Maps URLs: https://developers.google.com/maps/documentation/urls/guide
-- OpenStreetMap Nominatim policy: https://operations.osmfoundation.org/policies/nominatim/
 - OpenStreetMap tile policy: https://operations.osmfoundation.org/policies/tiles/
+- OpenStreetMap Nominatim policy: https://operations.osmfoundation.org/policies/nominatim/
+- Puter Codex API tutorial: https://developer.puter.com/tutorials/free-unlimited-codex-api/
 - Supabase Google Auth: https://supabase.com/docs/guides/auth/social-login/auth-google

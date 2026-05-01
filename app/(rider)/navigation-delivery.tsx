@@ -5,7 +5,7 @@ import { Redirect, useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { ActiveDeliveryCard } from '@/components/rider/ActiveDeliveryCard';
 import { MapCard } from '@/components/rider/MapCard';
-import { DEMO_ROUTE, makeGoogleMapsDirectionsUrl } from '@/lib/demoProfiles';
+import { DEMO_ROUTE } from '@/lib/demoProfiles';
 import {
   getCurrentRiderCoordinate,
   publishCurrentRiderLocation,
@@ -32,11 +32,6 @@ export default function NavigationDelivery() {
   const deliveryCoordinate = useMemo(
     () => makeDeliveryCoordinate(activeDelivery),
     [activeDelivery],
-  );
-
-  const mapsUrl = useMemo(
-    () => makeGoogleMapsDirectionsUrl(riderCoordinate, deliveryCoordinate),
-    [deliveryCoordinate, riderCoordinate],
   );
 
   useEffect(() => {
@@ -115,7 +110,6 @@ export default function NavigationDelivery() {
           destination={deliveryCoordinate}
           routeSummary={routeSummary ?? makeJobRouteSummary(activeDelivery)}
           isLive={isLiveLocation}
-          onOpenMaps={() => Linking.openURL(mapsUrl)}
         />
       </View>
       <ActiveDeliveryCard

@@ -5,6 +5,7 @@ import { Fonts, Type } from '@/constants/typography';
 import { Radii } from '@/constants/radii';
 import { Spacing } from '@/constants/spacing';
 import type { Coordinate, RouteSummary } from '@/lib/maps';
+import { LiveOsmMap } from '@/components/rider/LiveOsmMap';
 
 type Props = {
   label?: string;
@@ -32,19 +33,23 @@ export function MapCard({
 
   return (
     <View style={[styles.map, { height }]}>
-      <View style={styles.gridLayer}>
-        <View style={[styles.road, styles.roadOne]} />
-        <View style={[styles.road, styles.roadTwo]} />
-        <View style={[styles.road, styles.roadThree]} />
-        <View style={[styles.route, styles.routeOne]} />
-        <View style={[styles.route, styles.routeTwo]} />
-        <View style={styles.pinPrimary}>
-          <MaterialIcons name="navigation" size={14} color={Colors.onTertiary} />
+      {origin && destination ? (
+        <LiveOsmMap origin={origin} destination={destination} current={current} />
+      ) : (
+        <View style={styles.gridLayer}>
+          <View style={[styles.road, styles.roadOne]} />
+          <View style={[styles.road, styles.roadTwo]} />
+          <View style={[styles.road, styles.roadThree]} />
+          <View style={[styles.route, styles.routeOne]} />
+          <View style={[styles.route, styles.routeTwo]} />
+          <View style={styles.pinPrimary}>
+            <MaterialIcons name="navigation" size={14} color={Colors.onTertiary} />
+          </View>
+          <View style={styles.pinDestination}>
+            <MaterialIcons name="location-on" size={20} color={Colors.onPrimary} />
+          </View>
         </View>
-        <View style={styles.pinDestination}>
-          <MaterialIcons name="location-on" size={20} color={Colors.onPrimary} />
-        </View>
-      </View>
+      )}
       
       <View style={styles.topLabel}>
         <View style={[styles.pulseDot, isLive && styles.pulseDotLive]} />
@@ -83,7 +88,7 @@ export function MapCard({
           pressed && styles.pressed,
         ]}
         accessibilityRole="button"
-        accessibilityLabel="Open route in Google Maps"
+        accessibilityLabel="Open route in OpenStreetMap"
       >
         <MaterialIcons name="my-location" size={20} color={Colors.onSurface} />
       </Pressable>
@@ -93,12 +98,13 @@ export function MapCard({
           onPress={onOpenMaps}
           style={({ pressed }) => [styles.mapsButton, pressed && styles.pressed]}
           accessibilityRole="button"
-          accessibilityLabel="Open Google Maps directions"
+          accessibilityLabel="Open OpenStreetMap directions"
         >
           <MaterialIcons name="map" size={16} color={Colors.onPrimary} />
-          <Text style={styles.mapsButtonText}>Google Maps</Text>
+          <Text style={styles.mapsButtonText}>Open OSM</Text>
         </Pressable>
       )}
+
     </View>
   );
 }

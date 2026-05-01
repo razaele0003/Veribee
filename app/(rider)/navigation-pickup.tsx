@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Redirect, useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { ActiveDeliveryCard } from '@/components/rider/ActiveDeliveryCard';
 import { MapCard } from '@/components/rider/MapCard';
-import { DEMO_ROUTE, makeGoogleMapsDirectionsUrl } from '@/lib/demoProfiles';
+import { DEMO_ROUTE } from '@/lib/demoProfiles';
 import {
   getCurrentRiderCoordinate,
   publishCurrentRiderLocation,
@@ -32,11 +32,6 @@ export default function NavigationPickup() {
   const pickupCoordinate = useMemo(
     () => makePickupCoordinate(activeDelivery),
     [activeDelivery],
-  );
-
-  const mapsUrl = useMemo(
-    () => makeGoogleMapsDirectionsUrl(riderCoordinate, pickupCoordinate),
-    [pickupCoordinate, riderCoordinate],
   );
 
   useEffect(() => {
@@ -99,7 +94,6 @@ export default function NavigationPickup() {
           destination={pickupCoordinate}
           routeSummary={routeSummary ?? makeJobRouteSummary(activeDelivery)}
           isLive={isLiveLocation}
-          onOpenMaps={() => Linking.openURL(mapsUrl)}
         />
       </View>
       <ActiveDeliveryCard
