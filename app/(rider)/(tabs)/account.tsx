@@ -156,7 +156,7 @@ export default function RiderAccount() {
             <View style={styles.dataGroup}>
                <Text style={styles.dataLabel}>Home Address</Text>
                <View style={styles.dataValueBox}>
-                 <MaterialIcons name="home-pin" size={18} color={Colors.secondary} />
+                 <MaterialIcons name="home" size={18} color={Colors.secondary} />
                  <Text style={styles.dataValue}>123 Sampaguita St, Brgy. San Lorenzo, Makati City</Text>
                </View>
             </View>

@@ -142,6 +142,12 @@ export default function ProductDetail() {
         <View style={styles.descriptionBlock}>
           <Text style={styles.sectionTitle}>Description</Text>
           <Text style={styles.description}>{product.description}</Text>
+          <View style={styles.specGrid}>
+            <Spec label="Brand" value={product.brand} />
+            <Spec label="Model" value={product.model} />
+            <Spec label="Condition" value={product.condition} />
+            <Spec label="Serial" value={product.serialNumber} />
+          </View>
           <View style={styles.bulletRow}>
             <MaterialIcons name="check-circle" size={18} color={Colors.primary} />
             <Text style={styles.bulletText}>Serial and photo evidence reviewed</Text>
@@ -178,22 +184,51 @@ export default function ProductDetail() {
             <MaterialIcons name="verified" size={42} color={Colors.primary} />
             <Text style={styles.modalTitle}>Authentication Report</Text>
             <Text style={styles.modalBody}>
-              Serial review, seller history, product imagery, and transaction signals were checked
-              before this item was marked verified.
+              {product.aiScannerResult}
             </Text>
             <View style={styles.reportRow}>
               <Text style={styles.reportLabel}>Seller VSI</Text>
               <Text style={styles.reportValue}>{product.sellerVsi}</Text>
             </View>
             <View style={styles.reportRow}>
-              <Text style={styles.reportLabel}>Result</Text>
-              <Text style={styles.reportValue}>Verified</Text>
+              <Text style={styles.reportLabel}>Auth score</Text>
+              <Text style={styles.reportValue}>{product.authScore}</Text>
             </View>
+            <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>Handover</Text>
+              <Text style={styles.reportValue}>{product.handoverMethod}</Text>
+            </View>
+            <View style={styles.reportRow}>
+              <Text style={styles.reportLabel}>Result</Text>
+              <Text style={styles.reportValue}>
+                {product.authStatus === 'verified' ? 'Verified' : 'Pending'}
+              </Text>
+            </View>
+            <View style={styles.evidenceList}>
+              {product.evidence.map((item) => (
+                <View key={item} style={styles.evidenceRow}>
+                  <MaterialIcons name="fact-check" size={17} color={Colors.primary} />
+                  <Text style={styles.evidenceText}>{item}</Text>
+                </View>
+              ))}
+            </View>
+            <Text style={styles.warrantyText}>{product.warrantyNote}</Text>
             <Button title="Close Report" onPress={() => setAuthReportOpen(false)} />
           </View>
         </View>
       </Modal>
     </SafeAreaView>
+  );
+}
+
+function Spec({ label, value }: { label: string; value: string }) {
+  return (
+    <View style={styles.specItem}>
+      <Text style={styles.specLabel}>{label}</Text>
+      <Text style={styles.specValue} numberOfLines={2}>
+        {value}
+      </Text>
+    </View>
   );
 }
 
@@ -327,6 +362,33 @@ const styles = StyleSheet.create({
   },
   sectionTitle: { ...Type.h3, color: Colors.onSurface },
   description: { ...Type.bodyMd, color: Colors.onSurfaceVariant },
+  specGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: Spacing.sm,
+    marginVertical: Spacing.xs,
+  },
+  specItem: {
+    width: '48%',
+    minHeight: 70,
+    borderRadius: Radii.DEFAULT,
+    borderWidth: 1,
+    borderColor: Colors.surfaceVariant,
+    backgroundColor: Colors.surfaceContainerLowest,
+    padding: Spacing.sm,
+    gap: 4,
+  },
+  specLabel: {
+    ...Type.labelCaps,
+    fontSize: 10,
+    color: Colors.onSurfaceVariant,
+  },
+  specValue: {
+    fontFamily: Fonts.manropeBold,
+    fontSize: 13,
+    lineHeight: 18,
+    color: Colors.onSurface,
+  },
   bulletRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -387,5 +449,26 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.manropeBold,
     fontSize: 15,
     color: Colors.primary,
+  },
+  evidenceList: {
+    borderRadius: Radii.DEFAULT,
+    backgroundColor: Colors.surfaceContainerLow,
+    padding: Spacing.sm,
+    gap: Spacing.xs,
+  },
+  evidenceRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+  },
+  evidenceText: {
+    flex: 1,
+    fontFamily: Fonts.manropeMedium,
+    fontSize: 13,
+    color: Colors.onSurface,
+  },
+  warrantyText: {
+    ...Type.bodySm,
+    color: Colors.onSurfaceVariant,
   },
 });

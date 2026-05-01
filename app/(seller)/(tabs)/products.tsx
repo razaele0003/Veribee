@@ -98,7 +98,7 @@ export default function Products() {
   const [sortMode, setSortMode] = useState<SortMode>('recent');
 
   const products = useMemo(
-    () => [...storeProducts, ...previewProducts],
+    () => (storeProducts.length > 0 ? storeProducts : previewProducts),
     [storeProducts],
   );
   const counts = useMemo(

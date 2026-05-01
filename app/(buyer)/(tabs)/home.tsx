@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { FlatList, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Logo } from '@/components/ui/Logo';
 import { ProductCard } from '@/components/buyer/ProductCard';
@@ -140,6 +141,41 @@ export default function BuyerHome() {
         contentContainerStyle={styles.content}
         ListHeaderComponent={
           <>
+            <LinearGradient
+              colors={[Colors.primaryContainer, Colors.primary]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.heroCard}
+            >
+              <View style={styles.heroTopRow}>
+                <View style={styles.heroBadge}>
+                  <MaterialIcons name="verified-user" size={15} color={Colors.onSecondaryContainer} />
+                  <Text style={styles.heroBadgeText}>VERIFIED MARKETPLACE</Text>
+                </View>
+                <Text style={styles.heroLocation}>{location}</Text>
+              </View>
+              <Text style={styles.heroTitle}>Shop authenticated finds from trusted local sellers.</Text>
+              <Text style={styles.heroCopy}>
+                Every product is routed through Veribee checks before it reaches your cart.
+              </Text>
+              <View style={styles.heroStats}>
+                <View style={styles.heroStat}>
+                  <Text style={styles.heroStatValue}>{marketplaceProducts.length}</Text>
+                  <Text style={styles.heroStatLabel}>Listings</Text>
+                </View>
+                <View style={styles.heroStatDivider} />
+                <View style={styles.heroStat}>
+                  <Text style={styles.heroStatValue}>98%</Text>
+                  <Text style={styles.heroStatLabel}>Seller trust</Text>
+                </View>
+                <View style={styles.heroStatDivider} />
+                <View style={styles.heroStat}>
+                  <Text style={styles.heroStatValue}>24h</Text>
+                  <Text style={styles.heroStatLabel}>Review target</Text>
+                </View>
+              </View>
+            </LinearGradient>
+
             <Pressable
               onPress={() => router.push('/(buyer)/(tabs)/search')}
               style={({ pressed }) => [styles.searchBar, pressed && styles.pressed]}
@@ -172,6 +208,14 @@ export default function BuyerHome() {
                 );
               })}
             </ScrollView>
+
+            <View style={styles.sectionHeader}>
+              <View>
+                <Text style={styles.sectionKicker}>CURATED FOR YOU</Text>
+                <Text style={styles.sectionTitle}>Verified products</Text>
+              </View>
+              <Text style={styles.resultCount}>{products.length} items</Text>
+            </View>
           </>
         }
         renderItem={({ item }) => (
@@ -332,15 +376,91 @@ const styles = StyleSheet.create({
     paddingBottom: 112,
     gap: Spacing.md,
   },
+  heroCard: {
+    borderRadius: Radii.card,
+    padding: Spacing.lg,
+    gap: Spacing.md,
+    marginBottom: Spacing.md,
+    overflow: 'hidden',
+    ...Shadow.fab,
+  },
+  heroTopRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: Spacing.sm,
+  },
+  heroBadge: {
+    minHeight: 30,
+    borderRadius: Radii.full,
+    backgroundColor: Colors.secondaryContainer,
+    paddingHorizontal: Spacing.sm,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+  },
+  heroBadgeText: {
+    ...Type.labelCaps,
+    fontSize: 10,
+    color: Colors.onSecondaryContainer,
+  },
+  heroLocation: {
+    ...Type.labelMd,
+    color: Colors.onPrimary,
+  },
+  heroTitle: {
+    fontFamily: Fonts.epilogueBold,
+    fontSize: 28,
+    lineHeight: 34,
+    color: Colors.onPrimary,
+  },
+  heroCopy: {
+    ...Type.bodyMd,
+    color: Colors.onPrimaryContainer,
+  },
+  heroStats: {
+    minHeight: 70,
+    borderRadius: Radii.DEFAULT,
+    backgroundColor: 'rgba(255,255,255,0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.18)',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: Spacing.sm,
+  },
+  heroStat: {
+    flex: 1,
+    alignItems: 'center',
+    gap: 2,
+  },
+  heroStatValue: {
+    fontFamily: Fonts.epilogueBold,
+    fontSize: 19,
+    color: Colors.onPrimary,
+  },
+  heroStatLabel: {
+    fontFamily: Fonts.manropeMedium,
+    fontSize: 11,
+    color: Colors.onPrimaryContainer,
+    textAlign: 'center',
+  },
+  heroStatDivider: {
+    width: StyleSheet.hairlineWidth,
+    height: 36,
+    backgroundColor: 'rgba(255,255,255,0.24)',
+  },
   searchBar: {
     minHeight: 52,
-    borderRadius: Radii.full,
-    backgroundColor: Colors.surfaceContainerLow,
+    borderRadius: Radii.DEFAULT,
+    borderWidth: 1,
+    borderColor: Colors.outlineVariant,
+    backgroundColor: Colors.surfaceContainerLowest,
     paddingHorizontal: Spacing.md,
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.sm,
     marginBottom: Spacing.md,
+    ...Shadow.card,
   },
   searchText: {
     fontFamily: Fonts.manropeRegular,
@@ -353,7 +473,7 @@ const styles = StyleSheet.create({
   },
   chip: {
     minHeight: 36,
-    borderRadius: Radii.full,
+    borderRadius: Radii.DEFAULT,
     borderWidth: 1.5,
     borderColor: Colors.surfaceVariant,
     backgroundColor: Colors.surfaceContainerLowest,
@@ -374,6 +494,25 @@ const styles = StyleSheet.create({
   productRow: {
     gap: Spacing.md,
     marginBottom: Spacing.md,
+  },
+  sectionHeader: {
+    marginBottom: Spacing.md,
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    justifyContent: 'space-between',
+  },
+  sectionKicker: {
+    ...Type.labelCaps,
+    color: Colors.primary,
+    marginBottom: 4,
+  },
+  sectionTitle: {
+    ...Type.h3,
+    color: Colors.onSurface,
+  },
+  resultCount: {
+    ...Type.labelMd,
+    color: Colors.onSurfaceVariant,
   },
   sheetScrim: {
     flex: 1,

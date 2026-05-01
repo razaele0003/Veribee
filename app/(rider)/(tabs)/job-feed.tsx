@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
 import { JobCard } from '@/components/rider/JobCard';
 import { MapCard } from '@/components/rider/MapCard';
@@ -22,6 +23,7 @@ export default function RiderJobFeed() {
   const setOnline = useRiderStore((s) => s.setOnline);
   const acceptJob = useRiderStore((s) => s.acceptJob);
   const declineJob = useRiderStore((s) => s.declineJob);
+  const todayEarnings = useRiderStore((s) => s.todayEarnings);
   const [refreshTick, setRefreshTick] = useState(0);
 
   const onAccept = async (jobId: string) => {
@@ -46,10 +48,24 @@ export default function RiderJobFeed() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <View style={styles.hero}>
+      <LinearGradient
+        colors={[Colors.primaryContainer, Colors.primary]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.hero}
+      >
         <View style={styles.heroRow}>
-          <Text style={styles.heroTitle}>Available Jobs</Text>
-          <Text style={styles.heroBody}>Looking for requests...</Text>
+          <View style={styles.heroTitleRow}>
+            <View>
+              <Text style={styles.heroKicker}>RIDER WORKSPACE</Text>
+              <Text style={styles.heroTitle}>Available Jobs</Text>
+            </View>
+            <View style={[styles.onlineBadge, !isOnline && styles.offlineBadge]}>
+              <View style={[styles.onlineDot, !isOnline && styles.offlineDot]} />
+              <Text style={styles.onlineBadgeText}>{isOnline ? 'Online' : 'Offline'}</Text>
+            </View>
+          </View>
+          <Text style={styles.heroBody}>Accept nearby verified deliveries and track your route from pickup to handoff.</Text>
           
           <View style={styles.statusPill}>
             <Text style={styles.statusLabel}>STATUS</Text>
@@ -66,8 +82,25 @@ export default function RiderJobFeed() {
               />
             </View>
           </View>
+
+          <View style={styles.heroStats}>
+            <View style={styles.heroStat}>
+              <Text style={styles.heroStatValue}>{jobs.length}</Text>
+              <Text style={styles.heroStatLabel}>Open jobs</Text>
+            </View>
+            <View style={styles.heroStatDivider} />
+            <View style={styles.heroStat}>
+              <Text style={styles.heroStatValue}>PHP {todayEarnings}</Text>
+              <Text style={styles.heroStatLabel}>Today</Text>
+            </View>
+            <View style={styles.heroStatDivider} />
+            <View style={styles.heroStat}>
+              <Text style={styles.heroStatValue}>4.9</Text>
+              <Text style={styles.heroStatLabel}>Rating</Text>
+            </View>
+          </View>
         </View>
-      </View>
+      </LinearGradient>
 
       <ScrollView
         contentContainerStyle={styles.content}
@@ -118,41 +151,80 @@ export default function RiderJobFeed() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },
   hero: {
-    backgroundColor: Colors.surfaceContainerLowest,
     paddingHorizontal: Spacing.containerMargin,
     paddingVertical: Spacing.lg,
+    borderBottomLeftRadius: Radii.xl,
+    borderBottomRightRadius: Radii.xl,
   },
   heroRow: {
     flexDirection: 'column',
     alignItems: 'stretch',
     gap: Spacing.sm,
   },
+  heroTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    gap: Spacing.md,
+  },
+  heroKicker: {
+    ...Type.labelCaps,
+    color: Colors.onPrimaryContainer,
+    marginBottom: 6,
+  },
   heroTitle: {
     fontFamily: Fonts.epilogueBold,
-    fontSize: 24,
-    color: Colors.onSurface,
+    fontSize: 30,
+    lineHeight: 36,
+    color: Colors.onPrimary,
   },
   heroBody: {
     ...Type.bodyMd,
-    color: Colors.onSurfaceVariant,
+    color: Colors.onPrimaryContainer,
+  },
+  onlineBadge: {
+    minHeight: 34,
+    borderRadius: Radii.full,
+    backgroundColor: Colors.successContainer,
+    paddingHorizontal: Spacing.sm,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+  },
+  offlineBadge: {
+    backgroundColor: Colors.surfaceContainerHigh,
+  },
+  onlineDot: {
+    width: 8,
+    height: 8,
+    borderRadius: Radii.full,
+    backgroundColor: Colors.success,
+  },
+  offlineDot: {
+    backgroundColor: Colors.outline,
+  },
+  onlineBadgeText: {
+    fontFamily: Fonts.manropeBold,
+    fontSize: 12,
+    color: Colors.onSuccessContainer,
   },
   statusPill: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: Colors.surfaceContainerLow,
-    borderRadius: Radii.lg,
+    backgroundColor: 'rgba(255,255,255,0.12)',
+    borderRadius: Radii.DEFAULT,
     paddingHorizontal: Spacing.md,
     paddingVertical: 8,
     borderWidth: 1,
-    borderColor: Colors.surfaceContainerHighest,
+    borderColor: 'rgba(255,255,255,0.18)',
     marginTop: Spacing.sm,
   },
   statusLabel: {
     fontFamily: Fonts.epilogueBold,
     fontSize: 10,
-    color: Colors.onSurfaceVariant,
-    letterSpacing: 0.5,
+    color: Colors.onPrimaryContainer,
+    letterSpacing: 0,
   },
   statusToggleContainer: {
     flexDirection: 'row',
@@ -162,7 +234,37 @@ const styles = StyleSheet.create({
   onlineText: {
     fontFamily: Fonts.manropeMedium,
     fontSize: 14,
-    color: Colors.primary,
+    color: Colors.onPrimary,
+  },
+  heroStats: {
+    minHeight: 68,
+    marginTop: Spacing.xs,
+    borderRadius: Radii.DEFAULT,
+    backgroundColor: 'rgba(255,255,255,0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.18)',
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  heroStat: {
+    flex: 1,
+    alignItems: 'center',
+    gap: 2,
+  },
+  heroStatValue: {
+    fontFamily: Fonts.epilogueBold,
+    fontSize: 18,
+    color: Colors.onPrimary,
+  },
+  heroStatLabel: {
+    fontFamily: Fonts.manropeMedium,
+    fontSize: 11,
+    color: Colors.onPrimaryContainer,
+  },
+  heroStatDivider: {
+    height: 34,
+    width: StyleSheet.hairlineWidth,
+    backgroundColor: 'rgba(255,255,255,0.24)',
   },
   content: {
     padding: Spacing.containerMargin,
@@ -186,4 +288,3 @@ const styles = StyleSheet.create({
     marginTop: -Spacing.xs,
   },
 });
-

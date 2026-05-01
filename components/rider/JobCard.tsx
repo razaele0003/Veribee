@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
     color: Colors.primary,
   },
   highPriorityPill: {
-    backgroundColor: '#effded',
+    backgroundColor: Colors.successContainer,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: Radii.full,
@@ -156,8 +156,8 @@ const styles = StyleSheet.create({
   highPriorityText: {
     fontFamily: Fonts.epilogueBold,
     fontSize: 10,
-    color: '#15803d',
-    letterSpacing: 0.5,
+    color: Colors.onSuccessContainer,
+    letterSpacing: 0,
   },
   routeContainer: {
     paddingLeft: Spacing.lg,

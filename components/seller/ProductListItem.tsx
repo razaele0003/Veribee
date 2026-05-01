@@ -1,6 +1,5 @@
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import { Badge, BadgeType } from '@/components/ui/Badge';
 import { LocalProduct } from '@/store/sellerStore';
 import { Colors, Shadow } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
@@ -15,19 +14,19 @@ type Props = {
 
 function formatPrice(price: string) {
   const value = Number(price || 0);
-  return `$${value.toFixed(2)}`;
+  return `PHP ${Math.round(value).toLocaleString('en-PH')}`;
 }
 
 function getStatusColor(status: LocalProduct['authStatus']) {
-  if (status === 'verified') return '#10b981'; // Green for In Stock
-  if (status === 'pending') return '#f59e0b'; // Orange for Low Stock
-  return '#474747'; // Grey for Out of Stock
+  if (status === 'verified') return Colors.success;
+  if (status === 'pending') return Colors.warning;
+  return Colors.onSurfaceVariant;
 }
 
 function getStatusLabel(status: LocalProduct['authStatus']) {
-  if (status === 'verified') return 'In Stock';
-  if (status === 'pending') return 'Low Stock';
-  return 'Out of Stock';
+  if (status === 'verified') return 'Verified';
+  if (status === 'pending') return 'Pending review';
+  return 'Needs update';
 }
 
 export function ProductListItem({ product, onMenu, onPress }: Props) {
@@ -60,7 +59,12 @@ export function ProductListItem({ product, onMenu, onPress }: Props) {
               <Text style={[styles.title, product.authStatus === 'failed' && styles.titleDisabled]} numberOfLines={2}>
                 {product.title || 'Untitled product'}
               </Text>
-              <View style={[styles.statusDot, { backgroundColor: statusColor }]} />
+              <View style={[styles.statusPill, { borderColor: statusColor }]}>
+                <View style={[styles.statusDot, { backgroundColor: statusColor }]} />
+                <Text style={[styles.statusText, { color: statusColor }]}>
+                  {getStatusLabel(product.authStatus)}
+                </Text>
+              </View>
             </View>
             <Text style={styles.sku}>SKU: {product.serialNumber || 'N/A'}</Text>
           </View>
@@ -125,9 +129,17 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
   },
   titleRow: {
+    gap: Spacing.xs,
+  },
+  statusPill: {
+    alignSelf: 'flex-start',
+    minHeight: 26,
+    borderRadius: Radii.full,
+    borderWidth: 1,
+    backgroundColor: Colors.surfaceContainerLowest,
+    paddingHorizontal: Spacing.base,
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     gap: Spacing.xs,
   },
   title: {
@@ -139,11 +151,13 @@ const styles = StyleSheet.create({
   },
   titleDisabled: { color: Colors.onSurfaceVariant },
   statusDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    marginTop: 4,
-    ...Shadow.input,
+    width: 7,
+    height: 7,
+    borderRadius: Radii.full,
+  },
+  statusText: {
+    fontFamily: Fonts.manropeBold,
+    fontSize: 11,
   },
   sku: {
     fontFamily: Fonts.manropeRegular,
@@ -183,7 +197,7 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
-  statLabelWarning: { color: '#f59e0b' },
+  statLabelWarning: { color: Colors.warning },
   statValue: {
     fontFamily: Fonts.epilogueSemiBold,
     fontSize: 16,

@@ -5,6 +5,7 @@ export const Fonts = {
   epilogueSemiBold: 'Epilogue_600SemiBold',
   manropeRegular: 'Manrope_400Regular',
   manropeMedium: 'Manrope_500Medium',
+  manropeSemiBold: 'Manrope_600SemiBold',
   manropeBold: 'Manrope_700Bold',
 } as const;
 
@@ -16,13 +17,13 @@ export const Type: Record<
     fontFamily: Fonts.epilogueBold,
     fontSize: 40,
     lineHeight: 44,
-    letterSpacing: -0.8,
+    letterSpacing: 0,
   },
   h2: {
     fontFamily: Fonts.epilogueBold,
     fontSize: 32,
     lineHeight: 38,
-    letterSpacing: -0.32,
+    letterSpacing: 0,
   },
   h3: {
     fontFamily: Fonts.epilogueSemiBold,
@@ -48,7 +49,7 @@ export const Type: Record<
     fontFamily: Fonts.manropeBold,
     fontSize: 12,
     lineHeight: 14,
-    letterSpacing: 0.6,
+    letterSpacing: 0,
     textTransform: 'uppercase',
   },
   labelMd: {
