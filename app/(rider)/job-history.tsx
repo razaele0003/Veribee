@@ -25,7 +25,11 @@ export default function RiderJobHistory() {
       </View>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         {rows.map((job) => (
-          <View key={job.id} style={styles.row}>
+          <Pressable 
+            key={job.id} 
+            style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
+            onPress={() => router.push(`/(rider)/job/${job.id}`)}
+          >
             <Image source={{ uri: job.productImage }} style={styles.image} />
             <View style={styles.copy}>
               <Text style={styles.title} numberOfLines={1}>
@@ -37,7 +41,7 @@ export default function RiderJobHistory() {
               </Text>
             </View>
             <Text style={styles.fee}>{formatRiderMoney(job.jobFee)}</Text>
-          </View>
+          </Pressable>
         ))}
       </ScrollView>
     </SafeAreaView>
@@ -73,6 +77,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: Spacing.md,
     ...Shadow.card,
+  },
+  rowPressed: {
+    opacity: 0.72,
+    backgroundColor: Colors.surface,
   },
   image: {
     width: 62,

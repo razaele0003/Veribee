@@ -1,8 +1,8 @@
 // Mirrors Design.md frontmatter. Do not hardcode hex values elsewhere.
 export const Colors = {
-  surface: '#fcf9f8',
+  surface: '#f9f9ff',
   surfaceDim: '#dcd9d9',
-  surfaceBright: '#fcf9f8',
+  surfaceBright: '#f9f9ff',
   surfaceContainerLowest: '#ffffff',
   surfaceContainerLow: '#f6f3f2',
   surfaceContainer: '#f0eded',
@@ -44,7 +44,7 @@ export const Colors = {
   tertiaryFixedDim: '#80d0f8',
   onTertiaryFixed: '#001e2b',
   onTertiaryFixedVariant: '#004d66',
-  background: '#fcf9f8',
+  background: '#f9f9ff',
   onBackground: '#1c1b1b',
   surfaceVariant: '#e5e2e1',
 } as const;
@@ -63,5 +63,19 @@ export const Shadow = {
     shadowOpacity: 0.18,
     shadowRadius: 16,
     elevation: 6,
+  },
+  sheet: {
+    shadowColor: '#1c1b1b',
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.10,
+    shadowRadius: 24,
+    elevation: 16,
+  },
+  input: {
+    shadowColor: '#9e2016',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
+    elevation: 2,
   },
 } as const;

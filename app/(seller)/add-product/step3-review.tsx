@@ -5,6 +5,8 @@ import { useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Button } from '@/components/ui/Button';
 import { StepIndicator } from '@/components/ui/StepIndicator';
+import { supabase } from '@/lib/supabase';
+import { useAuthStore } from '@/store/authStore';
 import { useSellerStore } from '@/store/sellerStore';
 import { Colors, Shadow } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
@@ -25,11 +27,28 @@ function maskSerial(value: string) {
 
 export default function AddProductStep3() {
   const router = useRouter();
+  const userId = useAuthStore((s) => s.userId);
   const draft = useSellerStore((s) => s.productDraft);
   const addProductFromDraft = useSellerStore((s) => s.addProductFromDraft);
 
-  const submit = () => {
-    const product = addProductFromDraft('verified');
+  const submit = async () => {
+    const product = addProductFromDraft('pending');
+    if (userId) {
+      await supabase.from('products').insert({
+        id: product.id,
+        seller_id: userId,
+        title: product.title,
+        category: product.category,
+        price: Number(product.price || 0),
+        description: product.description,
+        serial_number: product.serialNumber,
+        brand: product.brand,
+        model: product.model,
+        images: product.photos,
+        auth_status: product.authStatus,
+        auth_score: product.authScore,
+      });
+    }
     router.replace(`/(seller)/auth-status/${product.id}`);
   };
 

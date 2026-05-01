@@ -1,43 +1,55 @@
-import { Alert, Image, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Image, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Button } from '@/components/ui/Button';
 import { findBuyerProduct, formatPHP } from '@/lib/buyerData';
+import { sellerProductToBuyerProduct } from '@/lib/marketplaceProducts';
 import { useCartStore } from '@/store/cartStore';
+import { useBuyerPrefsStore } from '@/store/buyerPrefsStore';
+import { useSellerStore } from '@/store/sellerStore';
 import { Colors, Shadow } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
 import { Spacing } from '@/constants/spacing';
 import { Radii } from '@/constants/radii';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 export default function ProductDetail() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id?: string }>();
-  const product = findBuyerProduct(id);
+  const sellerProducts = useSellerStore((s) => s.products);
+  const product = useMemo(() => {
+    const productId = Array.isArray(id) ? id[0] : id;
+    const localProduct = sellerProducts.find((item) => item.id === productId);
+    return localProduct ? sellerProductToBuyerProduct(localProduct) : findBuyerProduct(id);
+  }, [id, sellerProducts]);
   const addItem = useCartStore((s) => s.addItem);
+  const isSaved = useBuyerPrefsStore((s) => s.savedProductIds.includes(product.id));
+  const toggleSaved = useBuyerPrefsStore((s) => s.toggleSavedProduct);
   const [authReportOpen, setAuthReportOpen] = useState(false);
 
+  const cartItem = () => ({
+    productId: product.id,
+    title: product.title,
+    price: product.price,
+    sellerId: product.sellerId,
+    sellerName: product.sellerName,
+    imageUrl: product.imageUrl,
+    quantity: 1,
+    authStatus: product.authStatus,
+  });
+
   const addToCart = () => {
-    addItem({
-      productId: product.id,
-      title: product.title,
-      price: product.price,
-      sellerId: product.sellerId,
-      sellerName: product.sellerName,
-      imageUrl: product.imageUrl,
-      quantity: 1,
-      authStatus: product.authStatus,
-    });
-    Alert.alert('Added to cart', `${product.title} is now in your cart.`, [
-      { text: 'Keep Browsing' },
-      { text: 'View Cart', onPress: () => router.push('/(buyer)/cart') },
-    ]);
+    addItem(cartItem());
+    router.push('/(buyer)/(tabs)/cart');
   };
 
   const buyNow = () => {
-    addToCart();
-    router.push('/(buyer)/cart');
+    addItem({
+      ...cartItem(),
+      quantity: 1,
+    });
+    router.push('/(buyer)/checkout');
   };
 
   return (
@@ -54,13 +66,18 @@ export default function ProductDetail() {
         </Pressable>
         <Text style={styles.headerTitle}>Veribee</Text>
         <Pressable
-          onPress={() => Alert.alert('Saved', 'Saved products come next.')}
+          onPress={() => toggleSaved(product.id)}
           hitSlop={12}
           style={({ pressed }) => [styles.iconButton, pressed && styles.pressed]}
           accessibilityRole="button"
-          accessibilityLabel="Save product"
+          accessibilityLabel={isSaved ? 'Remove from saved' : 'Save product'}
+          accessibilityState={{ selected: isSaved }}
         >
-          <MaterialIcons name="favorite-border" size={24} color={Colors.onSurface} />
+          <MaterialIcons
+            name={isSaved ? 'favorite' : 'favorite-border'}
+            size={24}
+            color={isSaved ? Colors.primary : Colors.onSurface}
+          />
         </Pressable>
       </View>
 
@@ -110,7 +127,12 @@ export default function ProductDetail() {
             <Text style={styles.sellerMeta}>Elite Verified Seller</Text>
           </View>
           <Pressable
-            onPress={() => Alert.alert('Seller profile', 'Seller profile comes next.')}
+            onPress={() =>
+              router.push({
+                pathname: '/(buyer)/seller-profile/[id]',
+                params: { id: product.sellerId },
+              })
+            }
             hitSlop={10}
           >
             <Text style={styles.viewProfile}>View Profile</Text>

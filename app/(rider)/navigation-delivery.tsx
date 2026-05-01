@@ -1,9 +1,10 @@
-import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { Redirect, useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { ActiveDeliveryCard } from '@/components/rider/ActiveDeliveryCard';
 import { MapCard } from '@/components/rider/MapCard';
+import { supabase } from '@/lib/supabase';
 import { useRiderStore } from '@/store/riderStore';
 import { Colors } from '@/constants/colors';
 import { Fonts } from '@/constants/typography';
@@ -14,16 +15,21 @@ export default function NavigationDelivery() {
   const activeDelivery = useRiderStore((s) => s.activeDelivery);
   const updateActiveStatus = useRiderStore((s) => s.updateActiveStatus);
 
-  if (!activeDelivery) {
-    router.replace('/(rider)/job-feed');
-    return null;
-  }
 
-  const onArrived = () => {
+  if (!activeDelivery) return <Redirect href="/(rider)/(tabs)/job-feed" />;
+
+  const onArrived = async () => {
     updateActiveStatus('arrived_buyer');
-    Alert.alert('Generate OTP', `Buyer OTP for local testing is ${activeDelivery.otpCode}.`, [
-      { text: 'Enter OTP', onPress: () => router.push('/(rider)/otp-entry') },
-    ]);
+    await supabase
+      .from('deliveries')
+      .update({
+        status: 'arrived_buyer',
+        otp_code: activeDelivery.otpCode,
+        rider_current_lat: 14.5547,
+        rider_current_lng: 121.0244,
+      })
+      .eq('id', activeDelivery.deliveryId);
+    router.replace('/(rider)/verify-delivery');
   };
 
   return (
@@ -32,11 +38,13 @@ export default function NavigationDelivery() {
         <Pressable onPress={() => router.back()} hitSlop={12} style={styles.iconButton}>
           <MaterialIcons name="arrow-back" size={26} color={Colors.primary} />
         </Pressable>
-        <Text style={styles.headerTitle}>Buyer Navigation</Text>
+        <Text style={styles.headerTitle}>Customer Navigation</Text>
         <Pressable
-          onPress={() => Alert.alert('Contact buyer', activeDelivery.buyerPhone)}
+          onPress={() => Linking.openURL(`tel:${activeDelivery.buyerPhone}`)}
           hitSlop={12}
           style={styles.iconButton}
+          accessibilityRole="button"
+          accessibilityLabel="Call buyer"
         >
           <MaterialIcons name="call" size={24} color={Colors.onSurfaceVariant} />
         </Pressable>
@@ -48,7 +56,7 @@ export default function NavigationDelivery() {
         delivery={activeDelivery}
         title={activeDelivery.deliveryAddress}
         subtitle="Heading to buyer"
-        actionLabel="I've Arrived at Buyer"
+        actionLabel="I've Arrived at Customer"
         onAction={onArrived}
       />
     </SafeAreaView>

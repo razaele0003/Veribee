@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import {
-  Alert,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -8,6 +7,7 @@ import {
   StyleSheet,
   Text,
   View,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -42,7 +42,7 @@ export default function ForgotPassword() {
       return;
     }
     if (!findLocalAccountByPhone(normalized)) {
-      setError('No local test account uses this phone');
+      setError('No account found with this phone number');
       return;
     }
     setError('');
@@ -68,10 +68,27 @@ export default function ForgotPassword() {
       setError('Passwords do not match');
       return;
     }
-    Alert.alert('Password reset', 'Local password reset flow completed.', [
-      { text: 'Log In', onPress: () => router.replace('/(auth)/login') },
+    Alert.alert('Password reset', 'Your password has been updated.', [
+      { text: 'Log in', onPress: () => router.replace('/(auth)/login') },
     ]);
   };
+
+  const stepTitles: Record<typeof step, { title: string; subtitle: string }> = {
+    phone: {
+      title: 'Reset password',
+      subtitle: 'Enter your phone number and we\'ll send a verification code.',
+    },
+    otp: {
+      title: 'Enter the code',
+      subtitle: `Enter the 6-digit code sent to +63${phone}.`,
+    },
+    password: {
+      title: 'New password',
+      subtitle: 'Choose a strong password for your account.',
+    },
+  };
+
+  const { title, subtitle } = stepTitles[step];
 
   return (
     <SafeAreaView style={styles.container}>
@@ -80,22 +97,36 @@ export default function ForgotPassword() {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-          <Pressable onPress={() => router.back()} hitSlop={12} style={styles.backButton}>
-            <MaterialIcons name="arrow-back" size={26} color={Colors.primary} />
+          {/* Back button */}
+          <Pressable
+            onPress={() => router.back()}
+            hitSlop={12}
+            style={styles.backButton}
+            accessibilityRole="button"
+            accessibilityLabel="Go back"
+          >
+            <MaterialIcons name="arrow-back" size={22} color={Colors.onSurface} />
           </Pressable>
 
+          {/* Icon */}
           <View style={styles.iconCircle}>
-            <MaterialIcons name="lock-reset" size={44} color={Colors.primary} />
+            <MaterialIcons name="lock-reset" size={40} color={Colors.primary} />
           </View>
-          <Text style={styles.title}>Reset Password</Text>
-          <Text style={styles.subtitle}>
-            Verify your local test phone, then choose a new password.
-          </Text>
+
+          <Text style={styles.title}>{title}</Text>
+          <Text style={styles.subtitle}>{subtitle}</Text>
+
+          {!!error && (
+            <View style={styles.errorBanner}>
+              <MaterialIcons name="error-outline" size={16} color={Colors.error} />
+              <Text style={styles.errorText}>{error}</Text>
+            </View>
+          )}
 
           {step === 'phone' && (
             <>
               <Input
-                label="Phone Number"
+                label="Phone number"
                 prefix="+63"
                 keyboardType="phone-pad"
                 value={phone}
@@ -105,31 +136,26 @@ export default function ForgotPassword() {
                 }}
                 placeholder="9171234501"
                 maxLength={10}
-                error={error}
               />
-              <Button title="Send OTP" onPress={onSendCode} />
+              <Button title="Send code" onPress={onSendCode} />
             </>
           )}
 
           {step === 'otp' && (
             <>
-              <Text style={styles.helper}>
-                Enter the local reset code sent to +63{phone}.
-              </Text>
               <OTPInput value={code} onChange={setCode} />
-              {!!error && <Text style={styles.error}>{error}</Text>}
               <View style={styles.testCode}>
-                <Text style={styles.testCodeLabel}>Local Code</Text>
+                <Text style={styles.testCodeLabel}>Local test code</Text>
                 <Text style={styles.testCodeValue}>{LOCAL_OTP_CODE}</Text>
               </View>
-              <Button title="Verify OTP" onPress={onVerify} disabled={code.length !== 6} />
+              <Button title="Verify code" onPress={onVerify} disabled={code.length !== 6} />
             </>
           )}
 
           {step === 'password' && (
             <>
               <PasswordInput
-                label="New Password"
+                label="New password"
                 value={password}
                 onChangeText={(value) => {
                   setPassword(value);
@@ -138,16 +164,15 @@ export default function ForgotPassword() {
                 placeholder="At least 8 characters"
               />
               <PasswordInput
-                label="Confirm Password"
+                label="Confirm password"
                 value={confirmPassword}
                 onChangeText={(value) => {
                   setConfirmPassword(value);
                   setError('');
                 }}
                 placeholder="Re-enter password"
-                error={error}
               />
-              <Button title="Save Password" onPress={onSave} />
+              <Button title="Save password" onPress={onSave} />
             </>
           )}
         </ScrollView>
@@ -164,34 +189,49 @@ const styles = StyleSheet.create({
     gap: Spacing.md,
   },
   backButton: {
-    width: 44,
-    height: 44,
+    width: 40,
+    height: 40,
+    borderRadius: Radii.full,
+    backgroundColor: Colors.surfaceContainerLow,
     alignItems: 'center',
     justifyContent: 'center',
+    marginBottom: Spacing.base,
   },
   iconCircle: {
-    width: 96,
-    height: 96,
-    borderRadius: Radii.full,
+    width: 88,
+    height: 88,
+    borderRadius: Radii.card,
     backgroundColor: Colors.primaryFixed,
     alignSelf: 'center',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: Spacing.lg,
+    marginTop: Spacing.md,
+    marginBottom: Spacing.sm,
   },
-  title: { ...Type.h2, color: Colors.onSurface, textAlign: 'center' },
+  title: {
+    ...Type.h2,
+    color: Colors.onSurface,
+    textAlign: 'center',
+  },
   subtitle: {
     ...Type.bodyMd,
     color: Colors.onSurfaceVariant,
     textAlign: 'center',
     marginBottom: Spacing.md,
   },
-  helper: { ...Type.bodyMd, color: Colors.onSurfaceVariant, textAlign: 'center' },
-  error: {
-    fontFamily: Fonts.manropeMedium,
-    fontSize: 13,
-    color: Colors.error,
-    textAlign: 'center',
+  errorBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+    backgroundColor: Colors.errorContainer,
+    borderRadius: Radii.md,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+  },
+  errorText: {
+    ...Type.bodySm,
+    color: Colors.onErrorContainer,
+    flex: 1,
   },
   testCode: {
     borderRadius: Radii.lg,
@@ -201,7 +241,10 @@ const styles = StyleSheet.create({
     padding: Spacing.md,
     alignItems: 'center',
   },
-  testCodeLabel: { ...Type.labelCaps, color: Colors.onSurfaceVariant },
+  testCodeLabel: {
+    ...Type.labelMd,
+    color: Colors.onSurfaceVariant,
+  },
   testCodeValue: {
     fontFamily: Fonts.epilogueBold,
     fontSize: 28,

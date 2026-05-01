@@ -14,3 +14,17 @@ android/
 
 expo-env.d.ts
 # @end expo-cli
+
+# Local QA / Playwright temporary files
+playwright.temp.config.ts
+temp_button_test.spec.ts
+README_BUTTON_TEST.md
+run-button-tests.bat
+run_tests.bat
+run_tests.py
+run-test.js
+qa-artifacts/
+button-test-report/
+playwright-report/
+test-results/
+.playwright/

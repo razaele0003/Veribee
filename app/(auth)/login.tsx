@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import { MaterialIcons } from '@expo/vector-icons';
 import { Button } from '@/components/ui/Button';
 import { Input, PasswordInput } from '@/components/ui/Input';
 import {
@@ -18,10 +19,13 @@ import {
   toLocalPhoneDigits,
 } from '@/lib/localAuth';
 import { useAuthStore } from '@/store/authStore';
-import { Colors } from '@/constants/colors';
+import { Colors, Shadow } from '@/constants/colors';
 import { Type, Fonts } from '@/constants/typography';
 import { Spacing } from '@/constants/spacing';
+import { Radii } from '@/constants/radii';
 import { Logo } from '@/components/ui/Logo';
+import { supabase } from '@/lib/supabase';
+import type { Role } from '@/store/authStore';
 
 export default function Login() {
   const router = useRouter();
@@ -44,139 +48,182 @@ export default function Login() {
     setUser('local-seller');
     setActiveRole('seller');
     setRoles(['seller']);
-    router.replace('/(seller)/dashboard');
+    router.replace('/(seller)/(tabs)/dashboard');
   };
 
   const onDevBuyerLogin = () => {
     setUser('local-buyer');
     setActiveRole('buyer');
     setRoles(['buyer']);
-    router.replace('/(buyer)/home');
+    router.replace('/(buyer)/(tabs)/home');
   };
 
   const onDevRiderLogin = () => {
     setUser('local-rider');
     setActiveRole('rider');
     setRoles(['rider']);
-    router.replace('/(rider)/job-feed');
+    router.replace('/(rider)/(tabs)/job-feed');
   };
 
-  const onLogin = async () => {
-    setPhoneError('');
-    setPasswordError('');
-
-    if (!phone) {
+  const handleLogin = async () => {
+    let valid = true;
+    if (!phone.trim()) {
       setPhoneError('Phone number is required');
-    } else if (phone.length !== 10) {
-      setPhoneError('Phone must be 10 digits');
+      valid = false;
     }
-
-    if (!password) {
+    if (!password.trim()) {
       setPasswordError('Password is required');
+      valid = false;
     }
-
-    if (!phone || phone.length !== 10 || !password) {
-      return;
-    }
-
-    const knownAccount = findLocalAccountByPhone(phone);
-    const account = findLocalAccount(phone, password);
-    if (!knownAccount || !account) {
-      setPasswordError('Invalid credentials');
-      return;
-    }
+    if (!valid) return;
 
     setLoading(true);
-    setUser(account.id);
-    setRoles([account.role]);
-    setActiveRole(account.role);
-    setLoading(false);
 
-    if (account.role === 'seller') {
-      router.replace('/(seller)/dashboard');
-    } else if (account.role === 'buyer') {
-      router.replace('/(buyer)/home');
-    } else if (account.role === 'rider') {
-      router.replace('/(rider)/job-feed');
+    // Try local accounts first
+    const localByPhone = findLocalAccountByPhone(phone);
+    if (localByPhone) {
+      const localById = findLocalAccount(phone, password);
+      if (localById) {
+        setUser(localById.id);
+        setActiveRole(localById.role);
+        setRoles([localById.role]);
+        router.replace(
+          localById.role === 'seller'
+            ? '/(seller)/(tabs)/dashboard'
+            : localById.role === 'rider'
+              ? '/(rider)/(tabs)/job-feed'
+              : '/(buyer)/(tabs)/home',
+        );
+        setLoading(false);
+        return;
+      }
+      setPhoneError('Incorrect password');
+      setLoading(false);
+      return;
     }
+
+    const email = `${phone}@veribee.ph`;
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error || !data.user) {
+      setPhoneError(error?.message ?? 'Login failed');
+      setLoading(false);
+      return;
+    }
+
+    const { data: roleData } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', data.user.id);
+
+    const roles = (roleData ?? []).map((r: { role: string }) => r.role as Role);
+    const primary = roles[0] ?? 'buyer';
+
+    setUser(data.user.id);
+    setRoles(roles);
+    setActiveRole(primary);
+
+    if (primary === 'seller') router.replace('/(seller)/(tabs)/dashboard');
+    else if (primary === 'rider') router.replace('/(rider)/(tabs)/job-feed');
+    else router.replace('/(buyer)/(tabs)/home');
+
+    setLoading(false);
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <ScrollView
-          contentContainerStyle={styles.content}
+          contentContainerStyle={styles.scroll}
           keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
         >
-          <View style={styles.logoWrap}>
-            <Logo size={64} />
+          {/* ── Hero banner ── */}
+          <View style={styles.hero}>
+            <View style={styles.heroGlow} />
+            <Logo size={72} />
+            <Text style={styles.heroTitle}>Welcome back</Text>
+            <Text style={styles.heroSub}>Sign in to your Veribee account</Text>
           </View>
-          <Text style={styles.title}>Welcome Back</Text>
-          <Text style={styles.subtitle}>Log in to keep buzzing with trust.</Text>
 
-          <View style={styles.form}>
+          {/* ── Form card ── */}
+          <View style={styles.card}>
+            {/* Inline error banner */}
+            {(!!phoneError || !!passwordError) && (
+              <View style={styles.errorBanner}>
+                <MaterialIcons name="error-outline" size={18} color={Colors.error} />
+                <Text style={styles.errorText}>{phoneError || passwordError}</Text>
+              </View>
+            )}
+
             <Input
-              label="Phone Number"
-              prefix="+63"
-              keyboardType="phone-pad"
+              label="Phone number"
               value={phone}
               onChangeText={setPhoneDigits}
-              placeholder="9171234567"
-              maxLength={10}
+              keyboardType="phone-pad"
+              autoComplete="tel"
+              placeholder="09XX XXX XXXX"
               error={phoneError}
             />
+
             <PasswordInput
               label="Password"
               value={password}
-              onChangeText={(value) => {
-                setPassword(value);
-                setPasswordError('');
-              }}
-              placeholder="********"
+              onChangeText={(v) => { setPassword(v); setPasswordError(''); }}
               error={passwordError}
             />
+
             <Pressable
-              style={styles.forgot}
-              hitSlop={8}
               onPress={() => router.push('/(auth)/forgot-password')}
+              hitSlop={10}
+              style={styles.forgotWrap}
             >
-              <Text style={styles.forgotText}>Forgot Password?</Text>
+              <Text style={styles.forgot}>Forgot password?</Text>
             </Pressable>
 
-            <Button title="Login" onPress={onLogin} loading={loading} />
-            {__DEV__ && (
-              <>
-                <Button
-                  title="Use Test Buyer"
-                  variant="outlined"
-                  onPress={onDevBuyerLogin}
-                />
-                <Button
-                  title="Use Test Seller"
-                  variant="outlined"
-                  onPress={onDevSellerLogin}
-                />
-                <Button
-                  title="Use Test Rider"
-                  variant="outlined"
-                  onPress={onDevRiderLogin}
-                />
-              </>
-            )}
+            <Button
+              title="Sign in"
+              onPress={handleLogin}
+              loading={loading}
+              style={styles.signInBtn}
+            />
+
+            {/* Dev shortcuts */}
+            <View style={styles.devDivider}>
+              <View style={styles.devLine} />
+              <Text style={styles.devLabel}>DEV SHORTCUTS</Text>
+              <View style={styles.devLine} />
+            </View>
+
+            <View style={styles.devRow}>
+              <Pressable onPress={onDevBuyerLogin} style={styles.devChip}>
+                <MaterialIcons name="shopping-bag" size={14} color={Colors.primary} />
+                <Text style={styles.devChipText}>Buyer</Text>
+              </Pressable>
+              <Pressable onPress={onDevSellerLogin} style={styles.devChip}>
+                <MaterialIcons name="storefront" size={14} color={Colors.primary} />
+                <Text style={styles.devChipText}>Seller</Text>
+              </Pressable>
+              <Pressable onPress={onDevRiderLogin} style={styles.devChip}>
+                <MaterialIcons name="two-wheeler" size={14} color={Colors.primary} />
+                <Text style={styles.devChipText}>Rider</Text>
+              </Pressable>
+            </View>
           </View>
 
-          <Pressable
-            style={styles.footer}
-            onPress={() => router.push('/(auth)/register')}
-          >
-            <Text style={styles.footerText}>
-              Don't have an account?{' '}
-              <Text style={styles.footerLink}>Sign Up</Text>
-            </Text>
-          </Pressable>
+          {/* Register link */}
+          <View style={styles.registerRow}>
+            <Text style={styles.registerText}>Don't have an account?</Text>
+            <Pressable onPress={() => router.push('/(auth)/register')} hitSlop={10}>
+              <Text style={styles.registerLink}> Sign up</Text>
+            </Pressable>
+          </View>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -185,27 +232,130 @@ export default function Login() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.surface },
-  content: { padding: Spacing.containerMargin, paddingTop: 40, gap: 8 },
-  logoWrap: { alignItems: 'center', marginBottom: Spacing.md },
-  title: {
-    ...Type.h2,
-    color: Colors.onSurface,
-    textAlign: 'center',
+  scroll: { flexGrow: 1 },
+
+  /* Hero */
+  hero: {
+    minHeight: 260,
+    backgroundColor: Colors.primaryContainer,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.sm,
+    paddingHorizontal: Spacing.containerMargin,
+    paddingBottom: Spacing.xl,
+    paddingTop: Spacing.lg,
+    overflow: 'hidden',
   },
-  subtitle: {
-    ...Type.bodyMd,
+  heroGlow: {
+    position: 'absolute',
+    width: 240,
+    height: 240,
+    borderRadius: 120,
+    backgroundColor: Colors.primary,
+    opacity: 0.15,
+    top: -60,
+    right: -60,
+  },
+  heroTitle: {
+    fontFamily: Fonts.epilogueBold,
+    fontSize: 30,
+    lineHeight: 36,
+    color: Colors.onPrimary,
+    letterSpacing: -0.5,
+  },
+  heroSub: {
+    fontFamily: Fonts.manropeRegular,
+    fontSize: 15,
+    color: Colors.onPrimaryContainer,
+    opacity: 0.85,
+  },
+
+  /* Card */
+  card: {
+    marginHorizontal: Spacing.containerMargin,
+    marginTop: -Radii.xl,
+    borderRadius: Radii.card,
+    backgroundColor: Colors.surfaceContainerLowest,
+    padding: Spacing.lg,
+    gap: Spacing.md,
+    ...Shadow.sheet,
+  },
+
+  /* Inline error banner */
+  errorBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+    backgroundColor: Colors.errorContainer,
+    borderRadius: Radii.md,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+  },
+  errorText: {
+    fontFamily: Fonts.manropeMedium,
+    fontSize: 13,
+    color: Colors.onErrorContainer,
+    flex: 1,
+  },
+
+  forgotWrap: { alignSelf: 'flex-end' },
+  forgot: {
+    fontFamily: Fonts.manropeBold,
+    fontSize: 13,
+    color: Colors.primary,
+  },
+
+  signInBtn: { marginTop: Spacing.xs },
+
+  /* Dev shortcuts */
+  devDivider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    marginTop: Spacing.xs,
+  },
+  devLine: { flex: 1, height: StyleSheet.hairlineWidth, backgroundColor: Colors.outlineVariant },
+  devLabel: {
+    fontFamily: Fonts.manropeBold,
+    fontSize: 10,
+    letterSpacing: 0.8,
     color: Colors.onSurfaceVariant,
-    textAlign: 'center',
-    marginBottom: Spacing.lg,
   },
-  form: { gap: Spacing.md },
-  forgot: { alignSelf: 'flex-end', marginTop: -4 },
-  forgotText: {
+  devRow: { flexDirection: 'row', gap: Spacing.sm },
+  devChip: {
+    flex: 1,
+    minHeight: 40,
+    borderRadius: Radii.DEFAULT,
+    borderWidth: 1,
+    borderColor: Colors.outlineVariant,
+    backgroundColor: Colors.surfaceContainerLow,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.xs,
+  },
+  devChipText: {
+    fontFamily: Fonts.manropeBold,
+    fontSize: 12,
+    color: Colors.primary,
+  },
+
+  /* Register link */
+  registerRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: Spacing.lg,
+    marginTop: Spacing.sm,
+  },
+  registerText: {
+    fontFamily: Fonts.manropeRegular,
+    fontSize: 14,
+    color: Colors.onSurfaceVariant,
+  },
+  registerLink: {
     fontFamily: Fonts.manropeBold,
     fontSize: 14,
     color: Colors.primary,
   },
-  footer: { marginTop: Spacing.lg, alignItems: 'center' },
-  footerText: { fontFamily: Fonts.manropeRegular, fontSize: 14, color: Colors.onSurfaceVariant },
-  footerLink: { fontFamily: Fonts.manropeBold, color: Colors.primary },
 });

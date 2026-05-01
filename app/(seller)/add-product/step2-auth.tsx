@@ -25,7 +25,14 @@ import { Fonts, Type } from '@/constants/typography';
 import { Spacing } from '@/constants/spacing';
 import { Radii } from '@/constants/radii';
 
-const brands = ['Chanel', 'Rolex', 'Hermes', 'Apple', 'Nike', 'Other'];
+const categoryBrands: Record<string, string[]> = {
+  Bags: ['Chanel', 'Hermes', 'Louis Vuitton', 'Gucci', 'Prada', 'Other'],
+  Shoes: ['Nike', 'Adidas', 'New Balance', 'Balenciaga', 'Jordan', 'Other'],
+  Electronics: ['Apple', 'Samsung', 'Sony', 'Nintendo', 'Other'],
+  Jewelry: ['Rolex', 'Cartier', 'Tiffany & Co.', 'Van Cleef', 'Other'],
+  Clothes: ['Supreme', 'Gucci', 'Prada', 'Balenciaga', 'Other'],
+  Other: ['Generic', 'Other'],
+};
 const evidenceLabels = [
   'Box/Packaging',
   'Serial Number Closeup',
@@ -63,6 +70,9 @@ export default function AddProductStep2() {
 
   const selectedBrand = watch('brand');
 
+  const category = draft.category || 'Other';
+  const brands = categoryBrands[category] || categoryBrands.Other;
+
   const pickEvidence = async (index: number) => {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) {
@@ -83,7 +93,6 @@ export default function AddProductStep2() {
   };
 
   const scanSerial = () => {
-    Alert.alert('Barcode scanner', 'Scanner modal comes next; entering a sample serial.');
     setValue('serialNumber', 'VB-AUTH-2026-001', { shouldValidate: true });
   };
 

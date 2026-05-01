@@ -76,6 +76,8 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.epilogueBold,
     fontSize: 22,
     color: Colors.onSurface,
+    textAlign: 'center',
+    padding: 0,
   },
   focused: { borderColor: Colors.primary },
 });

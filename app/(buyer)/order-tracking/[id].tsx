@@ -1,8 +1,10 @@
+import { useEffect, useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Button } from '@/components/ui/Button';
+import { supabase } from '@/lib/supabase';
 import { Colors, Shadow } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
 import { Spacing } from '@/constants/spacing';
@@ -12,7 +14,46 @@ const steps = ['Confirmed', 'Picked Up', 'On the Way', 'Delivered'];
 
 export default function OrderTracking() {
   const router = useRouter();
-  const activeStep = 2;
+  const { id } = useLocalSearchParams<{ id?: string }>();
+  const [deliveryStatus, setDeliveryStatus] = useState('heading_to_buyer');
+  const [otpReady, setOtpReady] = useState(false);
+  const activeStep = useMemo(() => {
+    if (deliveryStatus === 'delivered') return 3;
+    if (deliveryStatus === 'heading_to_buyer' || deliveryStatus === 'arrived_buyer') return 2;
+    if (deliveryStatus === 'picked_up') return 1;
+    return 0;
+  }, [deliveryStatus]);
+
+  useEffect(() => {
+    if (!id) return;
+
+    // Append a timestamp to the channel name so each mount gets a fresh
+    // channel. This prevents "cannot add postgres_changes callbacks after
+    // subscribe()" which occurs when React StrictMode double-fires
+    // useEffect or the user navigates back/forward before cleanup completes.
+    const channelName = `delivery-${id}-${Date.now()}`;
+    let active = true;
+
+    const channel = supabase
+      .channel(channelName)
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'deliveries', filter: `order_id=eq.${id}` },
+        (payload: any) => {
+          if (!active) return;
+          const next = payload.new ?? {};
+          if (next.status) setDeliveryStatus(String(next.status));
+          if (next.otp_code) setOtpReady(true);
+          if (next.status === 'delivered') router.replace('/(buyer)/delivery-confirmed');
+        },
+      )
+      .subscribe();
+
+    return () => {
+      active = false;
+      supabase.removeChannel(channel);
+    };
+  }, [id, router]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -94,11 +135,17 @@ export default function OrderTracking() {
           </Pressable>
         </View>
 
-        <Button
-          title="Enter OTP to Receive"
-          onPress={() => router.push('/(buyer)/otp-handover')}
-        />
       </View>
+
+      {/* Dev Tool: Simulate rider arriving and triggering handover */}
+      <Pressable
+        style={styles.devFab}
+        onPress={() => router.push('/(buyer)/handover-select')}
+        accessibilityRole="button"
+      >
+        <MaterialIcons name="bug-report" size={20} color="#fff" />
+        <Text style={styles.devFabText}>Trigger Handover (Dev)</Text>
+      </Pressable>
     </SafeAreaView>
   );
 }
@@ -231,5 +278,27 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  devFab: {
+    position: 'absolute',
+    bottom: Spacing.xl * 2,
+    right: Spacing.containerMargin,
+    backgroundColor: '#333',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    borderRadius: Radii.full,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+  },
+  devFabText: {
+    fontFamily: Fonts.manropeBold,
+    fontSize: 12,
+    color: '#fff',
   },
 });

@@ -2,30 +2,41 @@ import { useEffect, useRef } from 'react';
 import { Animated, StyleSheet, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Colors } from '@/constants/colors';
-import { Type } from '@/constants/typography';
+import { Type, Fonts } from '@/constants/typography';
 import { Spacing } from '@/constants/spacing';
 import { Logo } from '@/components/ui/Logo';
 
 export default function Splash() {
   const router = useRouter();
   const fade = useRef(new Animated.Value(0)).current;
+  const scale = useRef(new Animated.Value(0.85)).current;
 
   useEffect(() => {
-    Animated.timing(fade, {
-      toValue: 1,
-      duration: 600,
-      useNativeDriver: true,
-    }).start();
-    const t = setTimeout(() => router.replace('/(auth)/onboarding'), 2000);
+    Animated.parallel([
+      Animated.timing(fade, {
+        toValue: 1,
+        duration: 700,
+        useNativeDriver: true,
+      }),
+      Animated.spring(scale, {
+        toValue: 1,
+        tension: 60,
+        friction: 9,
+        useNativeDriver: true,
+      }),
+    ]).start();
+    const t = setTimeout(() => router.replace('/(auth)/onboarding'), 2400);
     return () => clearTimeout(t);
-  }, [fade, router]);
+  }, [fade, scale, router]);
 
   return (
     <View style={styles.container}>
-      <Animated.View style={[styles.inner, { opacity: fade }]}>
-        <Logo size={120} />
-        <Text style={styles.title}>Veribee Delivery</Text>
-        <Text style={styles.tagline}>Buzzing with Trust</Text>
+      {/* Ambient glow behind logo */}
+      <View style={styles.glow} />
+      <Animated.View style={[styles.inner, { opacity: fade, transform: [{ scale }] }]}>
+        <Logo size={96} />
+        <Text style={styles.title}>Veribee</Text>
+        <Text style={styles.tagline}>Buzzing with trust</Text>
       </Animated.View>
     </View>
   );
@@ -38,14 +49,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  glow: {
+    position: 'absolute',
+    width: 280,
+    height: 280,
+    borderRadius: 140,
+    backgroundColor: Colors.primaryFixed,
+    opacity: 0.35,
+  },
   inner: { alignItems: 'center', gap: Spacing.sm },
   title: {
-    ...Type.h2,
+    fontFamily: Fonts.epilogueBold,
+    fontSize: 36,
+    lineHeight: 42,
+    letterSpacing: -0.5,
     color: Colors.primary,
     marginTop: Spacing.md,
   },
   tagline: {
-    ...Type.labelCaps,
+    ...Type.bodySm,
     color: Colors.onSurfaceVariant,
+    letterSpacing: 0.2,
   },
 });

@@ -30,7 +30,7 @@ export default function DeliveryComplete() {
           <Text style={styles.cardLabel}>Job Earnings</Text>
           <Text style={styles.jobFee}>{formatRiderMoney(feeValue)}</Text>
           <Pressable
-            onPress={() => router.push('/(rider)/earnings')}
+            onPress={() => router.push('/(rider)/(tabs)/earnings')}
             style={styles.totalRow}
             accessibilityRole="button"
             accessibilityLabel="Open rider earnings"
@@ -43,7 +43,7 @@ export default function DeliveryComplete() {
           </Pressable>
         </View>
 
-        <Button title="Back to Jobs" onPress={() => router.replace('/(rider)/job-feed')} />
+        <Button title="Back to Jobs" onPress={() => router.replace('/(rider)/(tabs)/job-feed')} />
       </ScrollView>
     </SafeAreaView>
   );

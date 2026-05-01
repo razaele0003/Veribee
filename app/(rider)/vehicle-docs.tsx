@@ -1,7 +1,9 @@
-import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useState } from 'react';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
 import { Button } from '@/components/ui/Button';
 import { Colors, Shadow } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
@@ -17,6 +19,19 @@ const docs = [
 
 export default function VehicleDocs() {
   const router = useRouter();
+  const [selectedDocs, setSelectedDocs] = useState<Record<string, boolean>>({});
+  const [saved, setSaved] = useState(false);
+
+  const pickDocument = async (label: string) => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 0.85,
+    });
+    if (!result.canceled) {
+      setSelectedDocs((current) => ({ ...current, [label]: true }));
+      setSaved(false);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -39,7 +54,7 @@ export default function VehicleDocs() {
         {docs.map((doc) => (
           <Pressable
             key={doc.label}
-            onPress={() => Alert.alert(doc.label, 'Local file upload comes next.')}
+            onPress={() => pickDocument(doc.label)}
             style={({ pressed }) => [styles.docRow, pressed && styles.pressed]}
             accessibilityRole="button"
             accessibilityLabel={`Open ${doc.label}`}
@@ -49,13 +64,25 @@ export default function VehicleDocs() {
             </View>
             <View style={styles.docCopy}>
               <Text style={styles.docLabel}>{doc.label}</Text>
-              <Text style={styles.docStatus}>{doc.status}</Text>
+              <Text style={styles.docStatus}>
+                {selectedDocs[doc.label] ? 'Ready to submit' : doc.status}
+              </Text>
             </View>
-            <MaterialIcons name="upload-file" size={22} color={Colors.onSurfaceVariant} />
+            <MaterialIcons
+              name={selectedDocs[doc.label] ? 'check-circle' : 'upload-file'}
+              size={22}
+              color={selectedDocs[doc.label] ? Colors.tertiaryContainer : Colors.onSurfaceVariant}
+            />
           </Pressable>
         ))}
 
-        <Button title="Submit Updates" onPress={() => Alert.alert('Submitted', 'Documents saved locally.')} />
+        {!!saved && (
+          <View style={styles.savedBanner}>
+            <MaterialIcons name="check-circle" size={18} color={Colors.tertiaryContainer} />
+            <Text style={styles.savedText}>Vehicle documents saved.</Text>
+          </View>
+        )}
+        <Button title="Submit Updates" onPress={() => setSaved(true)} />
       </ScrollView>
     </SafeAreaView>
   );
@@ -126,4 +153,17 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   pressed: { opacity: 0.72 },
+  savedBanner: {
+    borderRadius: Radii.DEFAULT,
+    backgroundColor: Colors.tertiaryFixed,
+    padding: Spacing.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+  },
+  savedText: {
+    fontFamily: Fonts.manropeBold,
+    fontSize: 14,
+    color: Colors.onTertiaryFixed,
+  },
 });

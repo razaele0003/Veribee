@@ -15,26 +15,27 @@ type Props = {
 
 function formatPrice(price: string) {
   const value = Number(price || 0);
-  return `PHP ${Math.round(value).toLocaleString('en-PH')}`;
+  return `$${value.toFixed(2)}`;
 }
 
-function badgeFor(status: LocalProduct['authStatus']): {
-  type: BadgeType;
-  label: string;
-} {
-  if (status === 'pending') return { type: 'pending', label: 'Pending Auth' };
-  if (status === 'failed') return { type: 'rejected', label: 'Rejected' };
-  return { type: 'verified', label: 'Live' };
+function getStatusColor(status: LocalProduct['authStatus']) {
+  if (status === 'verified') return '#10b981'; // Green for In Stock
+  if (status === 'pending') return '#f59e0b'; // Orange for Low Stock
+  return '#474747'; // Grey for Out of Stock
 }
 
-function vsiDelta(status: LocalProduct['authStatus']) {
-  if (status === 'verified') return '+2';
-  if (status === 'pending') return '+0';
-  return '+0';
+function getStatusLabel(status: LocalProduct['authStatus']) {
+  if (status === 'verified') return 'In Stock';
+  if (status === 'pending') return 'Low Stock';
+  return 'Out of Stock';
 }
 
 export function ProductListItem({ product, onMenu, onPress }: Props) {
-  const badge = badgeFor(product.authStatus);
+  const statusColor = getStatusColor(product.authStatus);
+
+  // Derive some dummy stats for visual fidelity with the design
+  const weeklySales = product.authStatus === 'failed' ? 0 : Math.floor(product.authScore / 2);
+  const inventory = product.authStatus === 'failed' ? 0 : product.authScore;
 
   return (
     <Pressable
@@ -42,41 +43,52 @@ export function ProductListItem({ product, onMenu, onPress }: Props) {
       onLongPress={onMenu}
       style={({ pressed }) => [styles.card, pressed && styles.pressed]}
       accessibilityRole="button"
-      accessibilityLabel={`${product.title}, ${badge.label}`}
+      accessibilityLabel={`${product.title}`}
     >
-      <View style={styles.thumb}>
-        {product.photos[0] ? (
-          <Image source={{ uri: product.photos[0] }} style={styles.image} />
-        ) : (
-          <MaterialIcons name="inventory-2" size={30} color={Colors.primary} />
-        )}
+      <View style={styles.topRow}>
+        <View style={styles.thumb}>
+          {product.photos[0] ? (
+            <Image source={{ uri: product.photos[0] }} style={[styles.image, product.authStatus === 'failed' && styles.imageDisabled]} />
+          ) : (
+            <MaterialIcons name="inventory-2" size={30} color={Colors.primary} />
+          )}
+        </View>
+
+        <View style={styles.infoCol}>
+          <View>
+            <View style={styles.titleRow}>
+              <Text style={[styles.title, product.authStatus === 'failed' && styles.titleDisabled]} numberOfLines={2}>
+                {product.title || 'Untitled product'}
+              </Text>
+              <View style={[styles.statusDot, { backgroundColor: statusColor }]} />
+            </View>
+            <Text style={styles.sku}>SKU: {product.serialNumber || 'N/A'}</Text>
+          </View>
+          <Text style={[styles.price, product.authStatus === 'failed' && styles.priceDisabled]}>{formatPrice(product.price)}</Text>
+        </View>
       </View>
 
-      <View style={styles.body}>
-        <View style={styles.topRow}>
-          <Text style={styles.category}>{product.category || 'Uncategorized'}</Text>
-          <Pressable
-            onPress={onMenu}
-            hitSlop={10}
-            accessibilityRole="button"
-            accessibilityLabel={`Open actions for ${product.title}`}
-          >
-            <MaterialIcons name="more-vert" size={22} color={Colors.onSurfaceVariant} />
-          </Pressable>
-        </View>
+      <View style={styles.divider} />
 
-        <Text style={styles.title} numberOfLines={2}>
-          {product.title || 'Untitled product'}
-        </Text>
-
-        <View style={styles.metaRow}>
-          <Badge type={badge.type} label={badge.label} />
-          <View style={styles.vsiPill}>
-            <Text style={styles.vsiText}>VSI {vsiDelta(product.authStatus)}</Text>
+      <View style={styles.bottomRow}>
+        <View style={styles.statsGroup}>
+          <View style={styles.statCol}>
+            <Text style={styles.statLabel}>Weekly Sales</Text>
+            <Text style={[styles.statValue, product.authStatus === 'failed' && styles.statValueDisabled]}>{weeklySales} units</Text>
+          </View>
+          <View style={styles.statCol}>
+            <Text style={[styles.statLabel, product.authStatus === 'pending' && styles.statLabelWarning]}>Inventory</Text>
+            <Text style={[styles.statValue, product.authStatus === 'failed' && styles.statValueDisabled]}>{inventory}</Text>
           </View>
         </View>
-
-        <Text style={styles.price}>{formatPrice(product.price)}</Text>
+        <Pressable
+          onPress={onMenu}
+          hitSlop={10}
+          style={({ pressed }) => [styles.menuBtn, pressed && styles.menuBtnPressed]}
+          accessibilityRole="button"
+        >
+          <MaterialIcons name="more-vert" size={20} color={Colors.onSurfaceVariant} />
+        </Pressable>
       </View>
     </Pressable>
   );
@@ -85,64 +97,105 @@ export function ProductListItem({ product, onMenu, onPress }: Props) {
 const styles = StyleSheet.create({
   card: {
     backgroundColor: Colors.surfaceContainerLowest,
-    borderRadius: Radii.lg,
-    borderWidth: 1,
-    borderColor: Colors.outlineVariant,
-    padding: Spacing.md,
-    flexDirection: 'row',
-    gap: Spacing.md,
+    borderRadius: Radii.xl,
+    padding: Spacing.sm,
+    flexDirection: 'column',
+    gap: Spacing.sm,
     ...Shadow.card,
   },
   pressed: { opacity: 0.72 },
+  topRow: {
+    flexDirection: 'row',
+    gap: Spacing.md,
+  },
   thumb: {
-    width: 72,
-    height: 72,
-    borderRadius: Radii.md,
-    backgroundColor: Colors.surfaceContainer,
+    width: 96,
+    height: 96,
+    borderRadius: Radii.lg,
+    backgroundColor: Colors.surfaceContainerLow,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
   },
-  image: { width: '100%', height: '100%' },
-  body: { flex: 1, gap: Spacing.xs },
-  topRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  image: { width: '100%', height: '100%', objectFit: 'cover' },
+  imageDisabled: { opacity: 0.7 },
+  infoCol: {
+    flex: 1,
     justifyContent: 'space-between',
-    gap: Spacing.sm,
+    paddingVertical: 2,
   },
-  category: {
-    ...Type.labelCaps,
-    fontSize: 10,
-    color: Colors.onSurfaceVariant,
+  titleRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    gap: Spacing.xs,
   },
   title: {
+    flex: 1,
     fontFamily: Fonts.epilogueSemiBold,
-    fontSize: 16,
-    lineHeight: 21,
+    fontSize: 20,
+    lineHeight: 26,
     color: Colors.onSurface,
   },
-  metaRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flexWrap: 'wrap',
-    gap: Spacing.sm,
+  titleDisabled: { color: Colors.onSurfaceVariant },
+  statusDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    marginTop: 4,
+    ...Shadow.input,
   },
-  vsiPill: {
-    borderRadius: Radii.full,
-    backgroundColor: Colors.surfaceContainerLow,
-    paddingHorizontal: Spacing.base,
-    paddingVertical: 4,
-  },
-  vsiText: {
-    fontFamily: Fonts.manropeMedium,
-    fontSize: 10,
+  sku: {
+    fontFamily: Fonts.manropeRegular,
+    fontSize: 14,
     color: Colors.onSurfaceVariant,
+    marginTop: 4,
   },
   price: {
     fontFamily: Fonts.epilogueBold,
-    fontSize: 18,
-    color: Colors.primary,
+    fontSize: 28,
+    color: Colors.onBackground,
     marginTop: Spacing.xs,
   },
+  priceDisabled: { color: Colors.onSurfaceVariant },
+  divider: {
+    height: 1,
+    backgroundColor: Colors.secondaryContainer,
+    opacity: 0.5,
+    marginVertical: Spacing.xs,
+  },
+  bottomRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  statsGroup: {
+    flexDirection: 'row',
+    gap: Spacing.md,
+  },
+  statCol: {
+    flexDirection: 'column',
+  },
+  statLabel: {
+    fontFamily: Fonts.epilogueSemiBold,
+    fontSize: 12,
+    color: Colors.onSurfaceVariant,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  statLabelWarning: { color: '#f59e0b' },
+  statValue: {
+    fontFamily: Fonts.epilogueSemiBold,
+    fontSize: 16,
+    color: Colors.onSurface,
+  },
+  statValueDisabled: { color: Colors.onSurfaceVariant },
+  menuBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  menuBtnPressed: { backgroundColor: Colors.surfaceContainer },
 });

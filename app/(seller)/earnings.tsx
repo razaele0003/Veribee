@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -68,6 +68,7 @@ function money(value: number) {
 export default function EarningsScreen() {
   const router = useRouter();
   const [filter, setFilter] = useState<Filter>('All');
+  const [payoutRequested, setPayoutRequested] = useState(false);
   const filteredTransactions = useMemo(
     () =>
       filter === 'All'
@@ -77,13 +78,12 @@ export default function EarningsScreen() {
   );
 
   const requestPayout = () => {
-    Alert.alert('Request payout', 'Submit a payout request for PHP 12,400.00?', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Request',
-        onPress: () => Alert.alert('Payout requested', 'This is local-only for Phase 1.'),
-      },
-    ]);
+    setPayoutRequested(true);
+  };
+
+  const cycleFilter = () => {
+    const index = filters.indexOf(filter);
+    setFilter(filters[(index + 1) % filters.length]);
   };
 
   return (
@@ -114,6 +114,7 @@ export default function EarningsScreen() {
           </Text>
           <Pressable
             onPress={requestPayout}
+            disabled={payoutRequested}
             style={({ pressed }) => [styles.payoutButton, pressed && styles.pressed]}
             accessibilityRole="button"
             accessibilityLabel="Request payout"
@@ -123,9 +124,17 @@ export default function EarningsScreen() {
               size={20}
               color={Colors.onSecondaryContainer}
             />
-            <Text style={styles.payoutText}>Request Payout</Text>
+            <Text style={styles.payoutText}>
+              {payoutRequested ? 'Payout Requested' : 'Request Payout'}
+            </Text>
           </Pressable>
         </View>
+        {payoutRequested && (
+          <View style={styles.savedBanner}>
+            <MaterialIcons name="check-circle" size={18} color={Colors.tertiaryContainer} />
+            <Text style={styles.savedText}>Payout request queued for review.</Text>
+          </View>
+        )}
 
         <View style={styles.statsRow}>
           <StatCard label="This Month" value="PHP 8,200" />
@@ -136,8 +145,10 @@ export default function EarningsScreen() {
         <View style={styles.historyHeader}>
           <Text style={styles.sectionTitle}>Transaction History</Text>
           <Pressable
-            onPress={() => Alert.alert('Filters', 'Advanced filters come next.')}
+            onPress={cycleFilter}
             hitSlop={10}
+            accessibilityRole="button"
+            accessibilityLabel="Cycle transaction filter"
           >
             <MaterialIcons name="tune" size={22} color={Colors.onSurfaceVariant} />
           </Pressable>
@@ -186,7 +197,7 @@ export default function EarningsScreen() {
         <Button
           title="Back to Dashboard"
           variant="outlined"
-          onPress={() => router.replace('/(seller)/dashboard')}
+          onPress={() => router.replace('/(seller)/(tabs)/dashboard')}
         />
       </ScrollView>
     </SafeAreaView>
@@ -405,4 +416,18 @@ const styles = StyleSheet.create({
   },
   emptyTitle: { ...Type.h3, color: Colors.onSurface },
   emptyBody: { ...Type.bodyMd, color: Colors.onSurfaceVariant },
+  savedBanner: {
+    borderRadius: Radii.DEFAULT,
+    backgroundColor: Colors.tertiaryFixed,
+    padding: Spacing.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+  },
+  savedText: {
+    flex: 1,
+    fontFamily: Fonts.manropeBold,
+    fontSize: 14,
+    color: Colors.onTertiaryFixed,
+  },
 });

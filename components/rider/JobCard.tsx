@@ -15,197 +15,244 @@ type Props = {
 export function JobCard({ job, onAccept, onDecline }: Props) {
   return (
     <View style={styles.card}>
-      <View style={styles.accent} />
       <View style={styles.cardHeader}>
-        <View style={styles.categoryPill}>
-          <MaterialIcons name="inventory-2" size={14} color={Colors.primary} />
-          <Text style={styles.categoryText}>{job.category} Verified</Text>
+        <View style={styles.headerLeft}>
+          <View style={styles.iconBox}>
+            <MaterialIcons name="inventory-2" size={24} color={Colors.primary} />
+          </View>
+          <View>
+            <Text style={styles.categoryText}>{job.category} Verified</Text>
+            <View style={styles.distanceRow}>
+              <MaterialIcons name="directions-walk" size={14} color={Colors.onSurfaceVariant} />
+              <Text style={styles.distanceText}>{job.distanceKm.toFixed(1)} km away</Text>
+            </View>
+          </View>
         </View>
-        <View style={styles.feeBlock}>
-          <Text style={styles.fee}>{formatRiderMoney(job.jobFee)}</Text>
-          <Text style={styles.distance}>{job.distanceKm.toFixed(1)} km</Text>
+        <View style={styles.headerRight}>
+          <Text style={styles.feeText}>{formatRiderMoney(job.jobFee)}</Text>
+          {job.jobFee > 70 && (
+            <View style={styles.highPriorityPill}>
+              <Text style={styles.highPriorityText}>HIGH PRIORITY</Text>
+            </View>
+          )}
         </View>
       </View>
 
-      <View style={styles.routeBlock}>
-        <View style={styles.routeLine} />
-        <AddressDot label="Pickup" value={job.pickupAddress} dot="secondary" />
-        <AddressDot label="Deliver To" value={job.deliveryAddress} dot="primary" />
+      <View style={styles.routeContainer}>
+        <View style={styles.routeTimeline}>
+          <View style={styles.routeLine} />
+          <View style={styles.routeStep}>
+            <View style={styles.pickupDotOuter}>
+              <View style={styles.pickupDotInner} />
+            </View>
+            <Text style={styles.stepLabel}>PICKUP</Text>
+            <Text style={styles.stepValue}>{job.pickupAddress}</Text>
+          </View>
+          
+          <View style={[styles.routeStep, { marginTop: Spacing.md }]}>
+            <View style={styles.deliveryDotOuter}>
+              <MaterialIcons name="location-on" size={12} color={Colors.onPrimary} />
+            </View>
+            <Text style={styles.stepLabel}>DELIVERY</Text>
+            <Text style={styles.stepValue}>{job.deliveryAddress}</Text>
+          </View>
+        </View>
       </View>
 
-      <View style={styles.actions}>
-        <Pressable
-          onPress={onAccept}
-          style={({ pressed }) => [styles.acceptButton, pressed && styles.pressed]}
-          accessibilityRole="button"
-          accessibilityLabel={`Accept ${job.orderId}`}
-        >
-          <Text style={styles.acceptText}>Accept Job</Text>
-        </Pressable>
+      <View style={styles.actionsGrid}>
         <Pressable
           onPress={onDecline}
           style={({ pressed }) => [styles.declineButton, pressed && styles.pressed]}
           accessibilityRole="button"
           accessibilityLabel={`Decline ${job.orderId}`}
         >
+          <MaterialIcons name="close" size={16} color={Colors.onSurface} />
           <Text style={styles.declineText}>Decline</Text>
+        </Pressable>
+        <Pressable
+          onPress={onAccept}
+          style={({ pressed }) => [styles.acceptButton, pressed && styles.pressed]}
+          accessibilityRole="button"
+          accessibilityLabel={`Accept ${job.orderId}`}
+        >
+          <MaterialIcons name="check" size={16} color={Colors.onPrimary} />
+          <Text style={styles.acceptText}>Accept Job</Text>
         </Pressable>
       </View>
     </View>
   );
 }
 
-function AddressDot({
-  label,
-  value,
-  dot,
-}: {
-  label: string;
-  value: string;
-  dot: 'primary' | 'secondary';
-}) {
-  return (
-    <View style={styles.addressRow}>
-      <View style={styles.dotOuter}>
-        {dot === 'primary' ? (
-          <MaterialIcons name="location-on" size={13} color={Colors.primary} />
-        ) : (
-          <View style={styles.dotInner} />
-        )}
-      </View>
-      <View style={styles.addressCopy}>
-        <Text style={styles.addressLabel}>{label}</Text>
-        <Text style={styles.addressValue}>{value}</Text>
-      </View>
-    </View>
-  );
-}
+// AddressDot component removed because it's merged inline
 
 const styles = StyleSheet.create({
   card: {
-    borderRadius: Radii.lg,
+    borderRadius: Radii.card,
     borderWidth: 1,
-    borderColor: Colors.outlineVariant,
+    borderColor: 'rgba(211, 218, 234, 0.4)',
     backgroundColor: Colors.surfaceContainerLowest,
-    padding: Spacing.md,
+    padding: Spacing.lg,
     overflow: 'hidden',
-    ...Shadow.card,
-  },
-  accent: {
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    bottom: 0,
-    width: 4,
-    backgroundColor: Colors.primary,
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
+    marginBottom: Spacing.sm,
   },
   cardHeader: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
-    gap: Spacing.md,
+    paddingBottom: Spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.surfaceContainerHighest,
     marginBottom: Spacing.md,
   },
-  categoryPill: {
-    maxWidth: '62%',
-    borderRadius: Radii.full,
-    backgroundColor: Colors.primaryFixed,
-    paddingHorizontal: Spacing.base,
-    paddingVertical: Spacing.xs,
+  headerLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: Spacing.xs,
-  },
-  categoryText: {
-    ...Type.labelCaps,
-    fontSize: 10,
-    color: Colors.primary,
-  },
-  feeBlock: { alignItems: 'flex-end' },
-  fee: {
-    fontFamily: Fonts.epilogueBold,
-    fontSize: 24,
-    color: Colors.onSurface,
-  },
-  distance: {
-    fontFamily: Fonts.manropeBold,
-    fontSize: 13,
-    color: Colors.onSurfaceVariant,
-  },
-  routeBlock: {
-    gap: Spacing.sm,
-    marginBottom: Spacing.lg,
-  },
-  routeLine: {
-    position: 'absolute',
-    left: 9,
-    top: 24,
-    bottom: 24,
-    width: 1,
-    backgroundColor: Colors.outlineVariant,
-  },
-  addressRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
     gap: Spacing.sm,
   },
-  dotOuter: {
-    width: 20,
-    height: 20,
-    borderRadius: Radii.full,
-    borderWidth: 1,
-    borderColor: Colors.outlineVariant,
-    backgroundColor: Colors.surfaceContainerLow,
+  iconBox: {
+    width: 40,
+    height: 40,
+    borderRadius: Radii.lg,
+    backgroundColor: Colors.surfaceContainerHigh,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 4,
   },
-  dotInner: {
-    width: 8,
-    height: 8,
-    borderRadius: Radii.full,
-    backgroundColor: Colors.secondaryContainer,
-  },
-  addressCopy: { flex: 1 },
-  addressLabel: {
-    ...Type.labelCaps,
-    fontSize: 10,
-    color: Colors.onSurfaceVariant,
-  },
-  addressValue: {
-    ...Type.bodyLg,
-    fontFamily: Fonts.manropeBold,
+  categoryText: {
+    fontFamily: Fonts.epilogueBold,
+    fontSize: 16,
     color: Colors.onSurface,
   },
-  actions: {
+  distanceRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginTop: 2,
+  },
+  distanceText: {
+    fontFamily: Fonts.manropeMedium,
+    fontSize: 12,
+    color: Colors.onSurfaceVariant,
+  },
+  headerRight: {
+    alignItems: 'flex-end',
+  },
+  feeText: {
+    fontFamily: Fonts.epilogueBold,
+    fontSize: 20,
+    color: Colors.primary,
+  },
+  highPriorityPill: {
+    backgroundColor: '#effded',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: Radii.full,
+    marginTop: 4,
+  },
+  highPriorityText: {
+    fontFamily: Fonts.epilogueBold,
+    fontSize: 10,
+    color: '#15803d',
+    letterSpacing: 0.5,
+  },
+  routeContainer: {
+    paddingLeft: Spacing.lg,
+    marginBottom: Spacing.lg,
+  },
+  routeTimeline: {
+    position: 'relative',
+    borderLeftWidth: 2,
+    borderLeftColor: Colors.surfaceContainerHighest,
+    paddingLeft: Spacing.lg,
+  },
+  routeLine: {
+    display: 'none',
+  },
+  routeStep: {
+    position: 'relative',
+  },
+  pickupDotOuter: {
+    position: 'absolute',
+    left: -43,
+    top: 4,
+    width: 14,
+    height: 14,
+    borderRadius: Radii.full,
+    borderWidth: 2,
+    borderColor: Colors.primary,
+    backgroundColor: Colors.surfaceContainerLowest,
+  },
+  pickupDotInner: {
+    display: 'none',
+  },
+  deliveryDotOuter: {
+    position: 'absolute',
+    left: -43,
+    top: 4,
+    width: 14,
+    height: 14,
+    borderRadius: Radii.full,
+    backgroundColor: Colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  stepLabel: {
+    fontFamily: Fonts.epilogueBold,
+    fontSize: 10,
+    color: Colors.onSurfaceVariant,
+    letterSpacing: 0.5,
+    marginBottom: 4,
+  },
+  stepValue: {
+    ...Type.bodyMd,
+    fontFamily: Fonts.manropeMedium,
+    color: Colors.onSurface,
+  },
+  actionsGrid: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.md,
+  },
+  declineButton: {
+    flex: 1,
+    height: 48,
+    borderRadius: Radii.lg,
+    borderWidth: 1,
+    borderColor: Colors.outlineVariant,
+    backgroundColor: Colors.surfaceContainerLowest,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  declineText: {
+    fontFamily: Fonts.epilogueBold,
+    fontSize: 14,
+    color: Colors.onSurface,
   },
   acceptButton: {
     flex: 1,
-    minHeight: 48,
-    borderRadius: Radii.DEFAULT,
-    backgroundColor: Colors.tertiaryContainer,
+    height: 48,
+    borderRadius: Radii.lg,
+    backgroundColor: Colors.primary,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    gap: 8,
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
   },
   acceptText: {
-    fontFamily: Fonts.manropeBold,
-    fontSize: 16,
-    color: Colors.onTertiary,
-  },
-  declineButton: {
-    minHeight: 48,
-    paddingHorizontal: Spacing.md,
-    borderRadius: Radii.DEFAULT,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  declineText: {
-    fontFamily: Fonts.manropeBold,
+    fontFamily: Fonts.epilogueBold,
     fontSize: 14,
-    color: Colors.error,
+    color: Colors.onPrimary,
   },
   pressed: { opacity: 0.72 },
 });

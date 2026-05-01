@@ -10,7 +10,7 @@ import {
   ViewStyle,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import { Colors } from '@/constants/colors';
+import { Colors, Shadow } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
 import { Radii } from '@/constants/radii';
 
@@ -39,6 +39,7 @@ export function Input({
         style={[
           styles.field,
           focused && styles.focused,
+          focused && Shadow.input,
           !!error && styles.errorField,
         ]}
       >
@@ -84,21 +85,24 @@ export function PasswordInput(props: Props) {
 
 const styles = StyleSheet.create({
   label: {
-    ...Type.labelCaps,
+    ...Type.labelMd,
     color: Colors.onSurfaceVariant,
-    marginBottom: 6,
+    marginBottom: 8,
   },
   field: {
-    minHeight: 52,
-    borderRadius: Radii.DEFAULT,
-    borderWidth: 1,
+    minHeight: 56,
+    borderRadius: Radii.input,
+    borderWidth: 1.5,
     borderColor: Colors.outlineVariant,
     backgroundColor: Colors.surfaceContainerLowest,
-    paddingHorizontal: 14,
+    paddingHorizontal: 16,
     flexDirection: 'row',
     alignItems: 'center',
   },
-  focused: { borderColor: Colors.primary },
+  focused: {
+    borderColor: Colors.primary,
+    backgroundColor: Colors.surfaceContainerLowest,
+  },
   errorField: { borderColor: Colors.error },
   prefix: {
     fontFamily: Fonts.manropeMedium,
@@ -115,9 +119,8 @@ const styles = StyleSheet.create({
     outlineStyle: 'none',
   } as TextStyle & { outlineStyle: string },
   errorText: {
-    fontFamily: Fonts.manropeMedium,
-    fontSize: 12,
+    ...Type.bodySm,
     color: Colors.error,
-    marginTop: 4,
+    marginTop: 5,
   },
 });

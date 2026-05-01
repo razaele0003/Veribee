@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View, ViewStyle } from 'react-native';
 import { Colors } from '@/constants/colors';
-import { Type } from '@/constants/typography';
+import { Fonts } from '@/constants/typography';
 import { Radii } from '@/constants/radii';
 
 export type BadgeType = 'verified' | 'pending' | 'rejected' | 'elite';
@@ -46,12 +46,16 @@ export function Badge({ type, label, style }: Props) {
 
 const styles = StyleSheet.create({
   badge: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: Radii.full,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: Radii.sm,
     alignSelf: 'flex-start',
   },
   text: {
-    ...Type.labelCaps,
+    fontFamily: Fonts.manropeBold,
+    fontSize: 11,
+    lineHeight: 15,
+    letterSpacing: 0.4,
+    textTransform: 'uppercase',
   },
 });

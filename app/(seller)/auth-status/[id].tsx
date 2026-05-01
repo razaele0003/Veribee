@@ -1,4 +1,4 @@
-import { Alert, Image, Pressable, ScrollView, Share, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, ScrollView, Share, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -91,14 +91,14 @@ export default function AuthStatus() {
 
   const removeListing = () => {
     removeProduct(product.id);
-    router.replace('/(seller)/dashboard');
+    router.replace('/(seller)/(tabs)/dashboard');
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Pressable
-          onPress={() => router.replace('/(seller)/dashboard')}
+          onPress={() => router.replace('/(seller)/(tabs)/dashboard')}
           hitSlop={12}
           style={({ pressed }) => [styles.iconButton, pressed && styles.pressed]}
           accessibilityRole="button"
@@ -108,13 +108,18 @@ export default function AuthStatus() {
         </Pressable>
         <Text style={styles.headerTitle}>Verification Status</Text>
         <Pressable
-          onPress={() => Alert.alert('Options', 'More listing actions come next.')}
+          onPress={() =>
+            Share.share({
+              title: product.title || 'Veribee listing',
+              message: `${product.title || 'This listing'} is Veribee verified with auth score ${product.authScore}.`,
+            })
+          }
           hitSlop={12}
           style={({ pressed }) => [styles.iconButton, pressed && styles.pressed]}
           accessibilityRole="button"
-          accessibilityLabel="More options"
+          accessibilityLabel="Share listing"
         >
-          <MaterialIcons name="more-vert" size={24} color={Colors.onSurfaceVariant} />
+          <MaterialIcons name="ios-share" size={22} color={Colors.onSurfaceVariant} />
         </Pressable>
       </View>
 
@@ -199,7 +204,7 @@ export default function AuthStatus() {
               <Button
                 title="View Live Listing"
                 variant="outlined"
-                onPress={() => router.replace('/(seller)/products')}
+                onPress={() => router.push({ pathname: '/(buyer)/product/[id]', params: { id: product.id } })}
               />
               <Button
                 title="Share Listing"

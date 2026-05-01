@@ -1,8 +1,9 @@
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { Redirect, useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Button } from '@/components/ui/Button';
+import { supabase } from '@/lib/supabase';
 import { useRiderStore } from '@/store/riderStore';
 import { Colors, Shadow } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
@@ -16,13 +17,15 @@ export default function PickupConfirm() {
   const updateActiveStatus = useRiderStore((s) => s.updateActiveStatus);
   const [checked, setChecked] = useState([false, false, false]);
 
-  if (!activeDelivery) {
-    router.replace('/(rider)/job-feed');
-    return null;
-  }
 
-  const onConfirm = () => {
+  if (!activeDelivery) return <Redirect href="/(rider)/(tabs)/job-feed" />;
+
+  const onConfirm = async () => {
     updateActiveStatus('heading_to_buyer');
+    await supabase
+      .from('deliveries')
+      .update({ status: 'heading_to_buyer', picked_up_at: new Date().toISOString() })
+      .eq('id', activeDelivery.deliveryId);
     router.replace('/(rider)/navigation-delivery');
   };
 

@@ -27,6 +27,7 @@ type SellerState = {
   clearProductDraft: () => void;
   addProductFromDraft: (status?: LocalProduct['authStatus']) => LocalProduct;
   removeProduct: (id: string) => void;
+  updateProduct: (id: string, patch: Partial<ProductDraft>) => void;
 };
 
 const emptyProductDraft: ProductDraft = {
@@ -41,7 +42,7 @@ const emptyProductDraft: ProductDraft = {
   evidencePhotos: [],
 };
 
-export const useSellerStore = create<SellerState>((set) => ({
+export const useSellerStore = create<SellerState>((set, get) => ({
   productDraft: emptyProductDraft,
   products: [],
   updateProductDraft: (patch) =>
@@ -52,6 +53,7 @@ export const useSellerStore = create<SellerState>((set) => ({
   addProductFromDraft: (status = 'verified') => {
     const product: LocalProduct = {
       ...emptyProductDraft,
+      ...get().productDraft,
       id: `local-product-${Date.now()}`,
       submittedAt: new Date().toISOString(),
       authStatus: status,
@@ -62,22 +64,21 @@ export const useSellerStore = create<SellerState>((set) => ({
           : undefined,
     };
 
-    set((state) => {
-      const nextProduct = {
-        ...product,
-        ...state.productDraft,
-      };
-
-      return {
-        products: [nextProduct, ...state.products],
-        productDraft: emptyProductDraft,
-      };
-    });
+    set((state) => ({
+      products: [product, ...state.products],
+      productDraft: emptyProductDraft,
+    }));
 
     return product;
   },
   removeProduct: (id) =>
     set((state) => ({
       products: state.products.filter((product) => product.id !== id),
+    })),
+  updateProduct: (id, patch) =>
+    set((state) => ({
+      products: state.products.map((product) =>
+        product.id === id ? { ...product, ...patch } : product,
+      ),
     })),
 }));

@@ -1,0 +1,375 @@
+import { useEffect, useMemo, useState } from 'react';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
+import { MaterialIcons } from '@expo/vector-icons';
+import { BUYER_ORDERS, BuyerOrder, formatPHP } from '@/lib/buyerData';
+import { isLocalUserId } from '@/lib/localAuth';
+import { supabase } from '@/lib/supabase';
+import { useAuthStore } from '@/store/authStore';
+import { useBuyerOrderStore } from '@/store/buyerOrderStore';
+import { Colors, Shadow } from '@/constants/colors';
+import { Fonts, Type } from '@/constants/typography';
+import { Spacing } from '@/constants/spacing';
+import { Radii } from '@/constants/radii';
+
+type OrderTab = 'all' | 'processing' | 'in_transit' | 'delivered' | 'disputed';
+
+const tabs: Array<{ key: OrderTab; label: string }> = [
+  { key: 'all', label: 'All' },
+  { key: 'processing', label: 'To Ship' },
+  { key: 'in_transit', label: 'Shipping' },
+  { key: 'delivered', label: 'Completed' },
+  { key: 'disputed', label: 'Disputed' },
+];
+
+export default function BuyerOrders() {
+  const router = useRouter();
+  const userId = useAuthStore((s) => s.userId);
+  const localOrders = useBuyerOrderStore((s) => s.orders);
+  const [liveOrders, setLiveOrders] = useState<BuyerOrder[]>([]);
+  const [activeTab, setActiveTab] = useState<OrderTab>('all');
+
+  useEffect(() => {
+    let cancelled = false;
+    async function loadOrders() {
+      if (!userId || isLocalUserId(userId)) {
+        setLiveOrders([]);
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('orders')
+        .select('id, product_id, total_price, status, created_at')
+        .eq('buyer_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(20);
+
+      if (cancelled) return;
+      if (error || !data) {
+        setLiveOrders([]);
+        return;
+      }
+
+      setLiveOrders(
+        data.map((row: any) => ({
+          id: String(row.id),
+          productId: String(row.product_id ?? row.id),
+          productTitle: `Order ${row.id}`,
+          sellerName: 'Veribee Seller',
+          orderedAt: row.created_at
+            ? new Date(row.created_at).toLocaleDateString('en-PH', {
+                month: 'long',
+                day: 'numeric',
+                year: 'numeric',
+              })
+            : 'Today',
+          price: Number(row.total_price ?? 0),
+          status: String(row.status ?? 'processing') as BuyerOrder['status'],
+        })),
+      );
+    }
+
+    loadOrders();
+    return () => {
+      cancelled = true;
+    };
+  }, [userId]);
+
+  const allOrders = useMemo(
+    () => [...localOrders, ...(liveOrders.length > 0 ? liveOrders : BUYER_ORDERS)],
+    [liveOrders, localOrders],
+  );
+
+  const orders = useMemo(
+    () =>
+      allOrders.filter((order) => {
+        if (activeTab === 'all') return true;
+        return order.status === activeTab;
+      }),
+    [activeTab, allOrders],
+  );
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <Text style={styles.title}>My Orders</Text>
+      
+      <View style={styles.tabsWrapper}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabs}>
+          {tabs.map((tab) => {
+            const isActive = tab.key === activeTab;
+            return (
+              <Pressable
+                key={tab.key}
+                onPress={() => setActiveTab(tab.key)}
+                style={styles.tab}
+                accessibilityRole="button"
+                accessibilityState={{ selected: isActive }}
+              >
+                <Text style={[styles.tabText, isActive && styles.tabTextActive]}>
+                  {tab.label}
+                </Text>
+                <View style={[styles.tabLine, isActive && styles.tabLineActive]} />
+              </Pressable>
+            );
+          })}
+        </ScrollView>
+      </View>
+
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        {orders.map((order) => (
+          <OrderCard
+            key={order.id}
+            order={order}
+            onPress={() =>
+              router.push({
+                pathname: '/(buyer)/order-tracking/[id]',
+                params: { id: order.id },
+              })
+            }
+          />
+        ))}
+        {orders.length === 0 && (
+          <View style={styles.emptyState}>
+            <Text style={styles.emptyTitle}>No orders</Text>
+            <Text style={styles.emptyBody}>Matching buyer orders will appear here.</Text>
+          </View>
+        )}
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+
+function OrderCard({ order, onPress }: { order: BuyerOrder; onPress: () => void }) {
+  const getStatusLabel = (status: string) => {
+    switch(status) {
+      case 'processing': return 'To Ship';
+      case 'in_transit': return 'Shipping';
+      case 'delivered': return 'Completed';
+      case 'disputed': return 'Disputed';
+      default: return status;
+    }
+  };
+
+  return (
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => [styles.orderCard, pressed && styles.pressed]}
+      accessibilityRole="button"
+      accessibilityLabel={`Open order ${order.id}`}
+    >
+      <View style={styles.cardHeader}>
+        <View style={styles.sellerInfo}>
+          <MaterialIcons name="person" size={16} color={Colors.onSurfaceVariant} />
+          <Text style={styles.sellerName}>{order.sellerName}</Text>
+        </View>
+        <Text style={styles.statusLabel}>{getStatusLabel(order.status)}</Text>
+      </View>
+
+      <View style={styles.divider} />
+
+      <View style={styles.cardBody}>
+        <View style={styles.thumb}>
+          <MaterialIcons name="inventory-2" size={32} color={Colors.primary} />
+        </View>
+        <View style={styles.productInfo}>
+          <Text style={styles.orderTitle} numberOfLines={2}>
+            {order.productTitle}
+          </Text>
+          <View style={styles.qtyPriceRow}>
+            <Text style={styles.itemQty}>x 1</Text>
+            <Text style={styles.orderPrice}>{formatPHP(order.price)}</Text>
+          </View>
+        </View>
+      </View>
+
+      <View style={styles.divider} />
+
+      <View style={styles.cardFooter}>
+        <Text style={styles.itemCount}>1 item</Text>
+        <View style={styles.totalPaymentRow}>
+          <MaterialIcons name="security" size={14} color={Colors.primary} />
+          <Text style={styles.totalLabel}>Total Payment: </Text>
+          <Text style={styles.totalPriceValue}>{formatPHP(order.price)}</Text>
+        </View>
+      </View>
+
+      <View style={styles.divider} />
+
+      <View style={styles.actionRow}>
+        <Text style={styles.orderIdText}>Order ID {order.id}</Text>
+        <Pressable style={styles.actionButton} onPress={onPress}>
+          <Text style={styles.actionButtonText}>View Details</Text>
+        </Pressable>
+      </View>
+    </Pressable>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: Colors.surfaceContainerLowest },
+  title: {
+    ...Type.h2,
+    color: Colors.onSurface,
+    paddingHorizontal: Spacing.containerMargin,
+    paddingTop: Spacing.lg,
+  },
+  tabsWrapper: {
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: Colors.outlineVariant,
+  },
+  tabs: {
+    paddingHorizontal: Spacing.containerMargin,
+    paddingTop: Spacing.md,
+    flexDirection: 'row',
+  },
+  tab: { paddingHorizontal: Spacing.md, alignItems: 'center' },
+  tabText: {
+    fontFamily: Fonts.manropeBold,
+    fontSize: 14,
+    color: Colors.onSurfaceVariant,
+  },
+  tabTextActive: { color: Colors.primary },
+  tabLine: {
+    marginTop: Spacing.sm,
+    height: 2,
+    alignSelf: 'stretch',
+    backgroundColor: 'transparent',
+  },
+  tabLineActive: { backgroundColor: Colors.primary },
+  content: {
+    padding: Spacing.containerMargin,
+    paddingBottom: 112,
+    gap: Spacing.md,
+    backgroundColor: Colors.surfaceContainer,
+  },
+  orderCard: {
+    backgroundColor: Colors.surfaceContainerLowest,
+    borderWidth: 1,
+    borderColor: Colors.surfaceVariant,
+    paddingTop: Spacing.sm,
+    paddingHorizontal: Spacing.sm,
+  },
+  pressed: { opacity: 0.8 },
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingBottom: Spacing.sm,
+  },
+  sellerInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  sellerName: {
+    fontFamily: Fonts.manropeBold,
+    fontSize: 13,
+    color: Colors.onSurface,
+  },
+  statusLabel: {
+    fontFamily: Fonts.manropeRegular,
+    fontSize: 13,
+    color: Colors.primary,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: Colors.surfaceVariant,
+    marginHorizontal: -Spacing.sm,
+  },
+  cardBody: {
+    flexDirection: 'row',
+    paddingVertical: Spacing.sm,
+    gap: Spacing.sm,
+  },
+  thumb: {
+    width: 80,
+    height: 80,
+    backgroundColor: Colors.surfaceContainerHighest,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: Colors.outlineVariant,
+  },
+  productInfo: {
+    flex: 1,
+    justifyContent: 'space-between',
+  },
+  orderTitle: {
+    fontFamily: Fonts.manropeRegular,
+    fontSize: 14,
+    color: Colors.onSurface,
+  },
+  qtyPriceRow: {
+    alignItems: 'flex-end',
+  },
+  itemQty: {
+    fontFamily: Fonts.manropeRegular,
+    fontSize: 12,
+    color: Colors.onSurfaceVariant,
+    marginBottom: 4,
+  },
+  orderPrice: {
+    fontFamily: Fonts.manropeRegular,
+    fontSize: 14,
+    color: Colors.onSurface,
+  },
+  cardFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: Spacing.sm,
+  },
+  itemCount: {
+    fontFamily: Fonts.manropeRegular,
+    fontSize: 12,
+    color: Colors.onSurfaceVariant,
+  },
+  totalPaymentRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  totalLabel: {
+    fontFamily: Fonts.manropeRegular,
+    fontSize: 13,
+    color: Colors.onSurface,
+  },
+  totalPriceValue: {
+    fontFamily: Fonts.manropeBold,
+    fontSize: 16,
+    color: Colors.primary,
+  },
+  actionRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: Spacing.sm,
+  },
+  orderIdText: {
+    fontFamily: Fonts.manropeRegular,
+    fontSize: 12,
+    color: Colors.onSurfaceVariant,
+  },
+  actionButton: {
+    backgroundColor: Colors.primary,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: 8,
+    borderRadius: Radii.sm,
+  },
+  actionButtonText: {
+    fontFamily: Fonts.manropeBold,
+    fontSize: 13,
+    color: Colors.surfaceContainerLowest,
+  },
+  emptyState: {
+    backgroundColor: Colors.surfaceContainerLowest,
+    borderWidth: 1,
+    borderColor: Colors.surfaceVariant,
+    padding: Spacing.xl,
+    gap: Spacing.xs,
+    alignItems: 'center',
+  },
+  emptyTitle: { ...Type.h3, color: Colors.onSurface },
+  emptyBody: { ...Type.bodyMd, color: Colors.onSurfaceVariant },
+});

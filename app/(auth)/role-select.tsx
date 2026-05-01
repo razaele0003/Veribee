@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import {
-  Alert,
   ImageBackground,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
   View,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -29,7 +29,7 @@ type RoleOption = {
 const roles: RoleOption[] = [
   {
     id: 'buyer',
-    label: 'Buyer',
+    label: 'Customer',
     description: 'Purchase premium artisan goods.',
     icon: 'shopping-bag',
     available: true,
@@ -37,7 +37,7 @@ const roles: RoleOption[] = [
   {
     id: 'seller',
     label: 'Seller',
-    description: 'Manage inventory and artisan shop.',
+    description: 'Manage your inventory and shop.',
     icon: 'storefront',
     available: true,
   },
@@ -62,7 +62,7 @@ export default function RoleSelect() {
     if (!r.available) {
       Alert.alert(
         `${r.id[0].toUpperCase() + r.id.slice(1)} coming soon`,
-        'Rider is not available yet. Buyer and Seller are active for now.',
+        'Rider is not available yet. Customer and Seller are active for now.',
       );
       return;
     }
@@ -75,11 +75,11 @@ export default function RoleSelect() {
     setActiveRole(selected);
     setSaving(false);
     if (selected === 'buyer') {
-      router.replace('/(buyer)/home');
+      router.replace('/(buyer)/(tabs)/home');
     } else if (selected === 'seller') {
-      router.replace('/(seller)/dashboard');
+      router.replace('/(seller)/(tabs)/dashboard');
     } else {
-      router.replace('/(rider)/job-feed');
+      router.replace('/(rider)/(tabs)/job-feed');
     }
   };
 
@@ -95,7 +95,7 @@ export default function RoleSelect() {
               pressed && styles.pressed,
             ]}
           >
-            <MaterialIcons name="arrow-back" size={28} color={Colors.primary} />
+            <MaterialIcons name="arrow-back" size={24} color={Colors.primary} />
           </Pressable>
           <Text style={styles.brand}>Veribee</Text>
         </View>
@@ -119,10 +119,11 @@ export default function RoleSelect() {
               <Pressable
                 key={r.id}
                 onPress={() => onTapRole(r)}
-                style={[
+                style={({ pressed }) => [
                   styles.card,
                   isActive && styles.cardActive,
                   dim && styles.cardDisabled,
+                  pressed && !isActive && styles.cardPressed,
                 ]}
               >
                 <View
@@ -133,7 +134,7 @@ export default function RoleSelect() {
                 >
                   <MaterialIcons
                     name={r.icon}
-                    size={24}
+                    size={26}
                     color={
                       isActive ? Colors.primary : Colors.onSurfaceVariant
                     }
@@ -144,7 +145,7 @@ export default function RoleSelect() {
                     <Text style={styles.cardTitle}>{r.label}</Text>
                     {dim && (
                       <View style={styles.soonPill}>
-                        <Text style={styles.soonText}>Coming Soon</Text>
+                        <Text style={styles.soonText}>Soon</Text>
                       </View>
                     )}
                   </View>
@@ -197,22 +198,24 @@ const styles = StyleSheet.create({
   brandRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: Spacing.lg,
+    gap: Spacing.md,
   },
   backButton: {
-    width: 32,
-    height: 32,
+    width: 36,
+    height: 36,
+    borderRadius: Radii.full,
+    backgroundColor: Colors.surfaceContainerLow,
     alignItems: 'center',
     justifyContent: 'center',
   },
   pressed: { opacity: 0.7 },
   brand: {
     fontFamily: Fonts.epilogueBold,
-    fontSize: 26,
-    lineHeight: 32,
+    fontSize: 24,
+    lineHeight: 30,
     color: Colors.primary,
   },
-  appBarSpacer: { width: 32 },
+  appBarSpacer: { width: 36 },
   content: {
     flexGrow: 1,
     paddingHorizontal: Spacing.containerMargin,
@@ -222,7 +225,7 @@ const styles = StyleSheet.create({
   title: {
     ...Type.h2,
     color: Colors.primary,
-    marginBottom: Spacing.md,
+    marginBottom: Spacing.sm,
   },
   subtitle: {
     ...Type.bodyMd,
@@ -232,9 +235,9 @@ const styles = StyleSheet.create({
   cards: { gap: Spacing.md },
   card: {
     backgroundColor: Colors.surfaceContainerLow,
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: Colors.outlineVariant,
-    borderRadius: Radii.lg,
+    borderRadius: Radii.card,
     padding: Spacing.md,
     flexDirection: 'row',
     alignItems: 'center',
@@ -243,8 +246,10 @@ const styles = StyleSheet.create({
   cardActive: {
     backgroundColor: Colors.surfaceContainerLowest,
     borderColor: Colors.primary,
-    borderWidth: 2,
     ...Shadow.card,
+  },
+  cardPressed: {
+    backgroundColor: Colors.surfaceContainer,
   },
   cardDisabled: { opacity: 0.5 },
   iconCircle: {
@@ -272,22 +277,22 @@ const styles = StyleSheet.create({
     color: Colors.onSurface,
   },
   cardDesc: {
-    fontFamily: Fonts.manropeRegular,
+    ...Type.bodySm,
     color: Colors.onSurfaceVariant,
-    fontSize: 15,
-    lineHeight: 22,
-    marginTop: 2,
+    marginTop: 3,
   },
   soonPill: {
     backgroundColor: Colors.surfaceContainerHighest,
     paddingHorizontal: Spacing.base,
     paddingVertical: 2,
-    borderRadius: Radii.full,
+    borderRadius: Radii.sm,
   },
   soonText: {
-    ...Type.labelCaps,
+    fontFamily: Fonts.manropeBold,
     fontSize: 10,
-    lineHeight: 12,
+    lineHeight: 14,
+    letterSpacing: 0.3,
+    textTransform: 'uppercase',
     color: Colors.onSurfaceVariant,
   },
   radio: {
@@ -308,24 +313,24 @@ const styles = StyleSheet.create({
   },
   hero: {
     minHeight: 190,
-    marginTop: 'auto',
-    borderRadius: Radii.lg,
+    marginTop: Spacing.xl,
+    borderRadius: Radii.card,
     overflow: 'hidden',
     justifyContent: 'flex-end',
   },
-  heroImage: { borderRadius: Radii.lg },
+  heroImage: { borderRadius: Radii.card },
   heroTint: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: Colors.primary,
-    opacity: 0.44,
+    opacity: 0.30,
   },
   heroText: {
     fontFamily: Fonts.epilogueBold,
-    fontSize: 22,
-    lineHeight: 32,
+    fontSize: 20,
+    lineHeight: 28,
     color: Colors.onPrimary,
     paddingHorizontal: Spacing.md,
     paddingBottom: Spacing.md,
   },
-  actions: { marginTop: Spacing.xl },
+  actions: { marginTop: Spacing.lg },
 });

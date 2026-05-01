@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
 import { Button } from '@/components/ui/Button';
 import { formatPHP } from '@/lib/buyerData';
 import { Colors, Shadow } from '@/constants/colors';
@@ -22,11 +23,24 @@ export default function FileDispute() {
   const router = useRouter();
   const [reason, setReason] = useState('');
   const [description, setDescription] = useState('');
+  const [evidenceCount, setEvidenceCount] = useState(0);
+  const [submitted, setSubmitted] = useState(false);
 
   const submit = () => {
-    Alert.alert('Dispute submitted', 'Your local dispute is now attached to this order.', [
-      { text: 'OK', onPress: () => router.replace('/(buyer)/orders') },
-    ]);
+    setSubmitted(true);
+    setTimeout(() => router.replace('/(buyer)/(tabs)/orders'), 650);
+  };
+
+  const uploadEvidence = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 0.85,
+      allowsMultipleSelection: true,
+      selectionLimit: 5,
+    });
+    if (!result.canceled) {
+      setEvidenceCount(result.assets.length);
+    }
   };
 
   return (
@@ -77,14 +91,18 @@ export default function FileDispute() {
 
         <Text style={styles.sectionTitle}>Upload Evidence</Text>
         <Pressable
-          onPress={() => Alert.alert('Evidence upload', 'Photo evidence upload comes next.')}
+          onPress={uploadEvidence}
           style={({ pressed }) => [styles.uploadBox, pressed && styles.pressed]}
+          accessibilityRole="button"
+          accessibilityLabel="Upload dispute evidence"
         >
           <View style={styles.uploadIcons}>
             <MaterialIcons name="photo-camera" size={26} color={Colors.outline} />
             <MaterialIcons name="photo-library" size={26} color={Colors.outline} />
           </View>
-          <Text style={styles.uploadTitle}>Upload up to 5 photos</Text>
+          <Text style={styles.uploadTitle}>
+            {evidenceCount > 0 ? `${evidenceCount} photo${evidenceCount === 1 ? '' : 's'} selected` : 'Upload up to 5 photos'}
+          </Text>
           <Text style={styles.uploadBody}>JPEG or PNG, max 10MB each</Text>
         </Pressable>
 
@@ -98,7 +116,13 @@ export default function FileDispute() {
           style={styles.description}
         />
 
-        <Button title="Submit Dispute" onPress={submit} disabled={!reason} />
+        {!!submitted && (
+          <View style={styles.submittedBanner}>
+            <MaterialIcons name="check-circle" size={18} color={Colors.tertiaryContainer} />
+            <Text style={styles.submittedText}>Dispute submitted.</Text>
+          </View>
+        )}
+        <Button title="Submit Dispute" onPress={submit} disabled={!reason || submitted} />
       </ScrollView>
     </SafeAreaView>
   );
@@ -215,4 +239,17 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
     outlineStyle: 'none',
   } as any,
+  submittedBanner: {
+    borderRadius: Radii.DEFAULT,
+    backgroundColor: Colors.tertiaryFixed,
+    padding: Spacing.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+  },
+  submittedText: {
+    fontFamily: Fonts.manropeBold,
+    fontSize: 14,
+    color: Colors.onTertiaryFixed,
+  },
 });

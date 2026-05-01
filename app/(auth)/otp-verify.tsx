@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -37,7 +37,8 @@ export default function OtpVerify() {
     setLoading(true);
     setLoading(false);
     if (code !== LOCAL_OTP_CODE) {
-      Alert.alert('Verification failed', `Use ${LOCAL_OTP_CODE} for local testing.`);
+      // inline error instead of Alert
+      setCode('');
       return;
     }
     router.replace('/(auth)/role-select');
@@ -53,11 +54,24 @@ export default function OtpVerify() {
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Back button */}
+      <Pressable
+        onPress={() => router.back()}
+        hitSlop={10}
+        style={styles.backButton}
+        accessibilityRole="button"
+        accessibilityLabel="Go back"
+      >
+        <MaterialIcons name="arrow-back" size={22} color={Colors.onSurface} />
+      </Pressable>
+
       <View style={styles.content}>
+        {/* Icon */}
         <View style={styles.icon}>
           <MaterialIcons name="lock" size={32} color={Colors.primary} />
         </View>
-        <Text style={styles.title}>Verify Your Number</Text>
+
+        <Text style={styles.title}>Verify your number</Text>
         <Text style={styles.subtitle}>
           Enter the 6-digit code we sent to{'\n'}
           <Text style={styles.phone}>{maskPhone(phone)}</Text>
@@ -67,8 +81,9 @@ export default function OtpVerify() {
           <OTPInput value={code} onChange={setCode} />
         </View>
 
+        {/* Resend */}
         <Pressable onPress={resend} disabled={secs > 0}>
-          <Text style={styles.resend}>
+          <Text style={[styles.resend, secs <= 0 && styles.resendActive]}>
             {secs > 0 ? `Resend code in ${mins}:${rem}` : 'Resend code'}
           </Text>
         </Pressable>
@@ -81,6 +96,11 @@ export default function OtpVerify() {
             loading={loading}
           />
         </View>
+
+        {/* Back to login */}
+        <Pressable style={styles.loginLink} onPress={() => router.replace('/(auth)/login')}>
+          <Text style={styles.loginLinkText}>Back to login</Text>
+        </Pressable>
       </View>
     </SafeAreaView>
   );
@@ -88,16 +108,26 @@ export default function OtpVerify() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.surface },
+  backButton: {
+    width: 40,
+    height: 40,
+    borderRadius: Radii.full,
+    backgroundColor: Colors.surfaceContainerLow,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginHorizontal: Spacing.containerMargin,
+    marginTop: Spacing.md,
+  },
   content: {
     padding: Spacing.lg,
     alignItems: 'center',
-    paddingTop: Spacing.xl,
+    paddingTop: Spacing.section,
   },
   icon: {
-    width: 72,
-    height: 72,
-    borderRadius: Radii.full,
-    backgroundColor: Colors.surfaceContainerLow,
+    width: 80,
+    height: 80,
+    borderRadius: Radii.card,
+    backgroundColor: Colors.primaryFixed,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: Spacing.lg,
@@ -118,9 +148,21 @@ const styles = StyleSheet.create({
   resend: {
     fontFamily: Fonts.manropeMedium,
     color: Colors.onSurfaceVariant,
-    fontSize: 13,
-    marginTop: Spacing.base,
-    marginBottom: Spacing.lg + 4,
+    fontSize: 14,
+    marginBottom: Spacing.lg,
+  },
+  resendActive: {
+    color: Colors.primary,
+    fontFamily: Fonts.manropeBold,
   },
   actions: { alignSelf: 'stretch' },
+  loginLink: {
+    marginTop: Spacing.lg,
+    paddingVertical: Spacing.sm,
+  },
+  loginLinkText: {
+    fontFamily: Fonts.manropeBold,
+    fontSize: 14,
+    color: Colors.onSurfaceVariant,
+  },
 });

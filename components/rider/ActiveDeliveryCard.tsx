@@ -1,4 +1,4 @@
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Image, Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { ActiveDelivery, formatRiderMoney } from '@/store/riderStore';
 import { Colors, Shadow } from '@/constants/colors';
@@ -21,6 +21,11 @@ export function ActiveDeliveryCard({
   actionLabel,
   onAction,
 }: Props) {
+  const contactPhone =
+    delivery.status === 'heading_to_pickup' || delivery.status === 'arrived_pickup'
+      ? delivery.sellerPhone
+      : delivery.buyerPhone;
+
   return (
     <View style={styles.sheet}>
       <View style={styles.handle} />
@@ -48,7 +53,13 @@ export function ActiveDeliveryCard({
             <Text style={styles.verifiedText}>Veribee Verified</Text>
           </View>
         </View>
-        <Pressable style={styles.callButton} accessibilityRole="button" accessibilityLabel="Call contact">
+        <Pressable
+          onPress={() => Linking.openURL(`tel:${contactPhone}`)}
+          style={({ pressed }) => [styles.callButton, pressed && styles.pressed]}
+          accessibilityRole="button"
+          accessibilityLabel="Call contact"
+          hitSlop={8}
+        >
           <MaterialIcons name="call" size={20} color={Colors.onSurfaceVariant} />
         </Pressable>
       </View>

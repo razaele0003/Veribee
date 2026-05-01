@@ -1,7 +1,5 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useCallback } from 'react';
 import {
-  NativeScrollEvent,
-  NativeSyntheticEvent,
   FlatList,
   Pressable,
   StyleSheet,
@@ -28,19 +26,19 @@ type Slide = {
 const slides: Slide[] = [
   {
     key: '1',
-    title: "Know What You're Buying",
+    title: "Know what you're buying",
     subtitle: 'Every product on Veribee is verified before it reaches you.',
     illustration: 'gold',
   },
   {
     key: '2',
-    title: 'Safe Delivery, Guaranteed',
+    title: 'Safe delivery, guaranteed',
     subtitle: 'Receive your package only after verifying with OTP or biometrics.',
     illustration: 'tertiary',
   },
   {
     key: '3',
-    title: 'Trust Scores, Not Just Stars',
+    title: 'Trust scores, not just stars',
     subtitle: 'Our Verified Seller Index scores sellers on real transactions.',
     illustration: 'score',
   },
@@ -60,7 +58,7 @@ function Illustration({
       <View style={[frameStyle, styles.scoreFrame]}>
         <View style={styles.scoreCircle}>
           <Text style={styles.scoreNum}>92</Text>
-          <Text style={styles.scoreLabel}>TRUST SCORE</Text>
+          <Text style={styles.scoreLabel}>Trust score</Text>
         </View>
       </View>
     );
@@ -75,7 +73,7 @@ function Illustration({
         </View>
         <View style={styles.packageCard}>
           <MaterialIcons name="inventory-2" size={48} color={Colors.onTertiary} />
-          <Text style={styles.packageText}>OTP Ready</Text>
+          <Text style={styles.packageText}>OTP ready</Text>
         </View>
         <View style={[styles.routeDot, styles.routeDotEnd]}>
           <MaterialIcons name="person-pin-circle" size={24} color={Colors.tertiary} />
@@ -122,12 +120,12 @@ export default function Onboarding() {
     setIndex(clampedIndex);
   };
 
-  const updateIndexFromOffset = (
-    event: NativeSyntheticEvent<NativeScrollEvent>,
-  ) => {
-    const nextIndex = Math.round(event.nativeEvent.contentOffset.x / width);
-    setActiveIndex(nextIndex);
-  };
+  const viewabilityConfig = useRef({ viewAreaCoveragePercentThreshold: 50 }).current;
+  const onViewableItemsChanged = useCallback(({ viewableItems }: any) => {
+    if (viewableItems.length > 0) {
+      setActiveIndex(viewableItems[0].index);
+    }
+  }, []);
 
   const goNext = () => {
     if (index < slides.length - 1) {
@@ -164,10 +162,12 @@ export default function Onboarding() {
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
-        onScroll={updateIndexFromOffset}
-        scrollEventThrottle={16}
-        onMomentumScrollEnd={updateIndexFromOffset}
-        onScrollEndDrag={updateIndexFromOffset}
+        snapToInterval={width}
+        snapToAlignment="center"
+        decelerationRate="fast"
+        disableIntervalMomentum={true}
+        onViewableItemsChanged={onViewableItemsChanged}
+        viewabilityConfig={viewabilityConfig}
         getItemLayout={(_, itemIndex) => ({
           length: width,
           offset: width * itemIndex,
@@ -183,14 +183,21 @@ export default function Onboarding() {
         )}
       />
 
+      {/* Progress pill indicators */}
       <View style={styles.dots}>
         {slides.map((_, i) => (
-          <View key={i} style={[styles.dot, i === index && styles.dotActive]} />
+          <View
+            key={i}
+            style={[
+              styles.dot,
+              i === index && styles.dotActive,
+            ]}
+          />
         ))}
       </View>
 
       <View style={styles.actions}>
-        <Button title={isLast ? 'Get Started' : 'Next'} onPress={goNext} />
+        <Button title={isLast ? 'Get started' : 'Next'} onPress={goNext} />
       </View>
     </SafeAreaView>
   );
@@ -199,34 +206,33 @@ export default function Onboarding() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.surface },
   header: {
-    minHeight: 44,
+    minHeight: 52,
     paddingHorizontal: Spacing.containerMargin,
     alignItems: 'flex-end',
     justifyContent: 'center',
   },
   skip: {
     paddingVertical: Spacing.base,
+    paddingHorizontal: Spacing.sm,
   },
   skipText: {
     fontFamily: Fonts.manropeBold,
-    fontSize: 16,
-    color: Colors.onSurfaceVariant,
+    fontSize: 15,
+    color: Colors.primary,
   },
   skipSpacer: { height: 36 },
   slide: {
     paddingHorizontal: Spacing.containerMargin,
-    paddingTop: Spacing.lg,
+    paddingTop: Spacing.md,
     alignItems: 'center',
   },
   illustration: {
-    height: 300,
+    height: 296,
     borderRadius: Radii.xl,
     marginBottom: Spacing.xl,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: Colors.outlineVariant,
   },
   verifyFrame: {
     backgroundColor: Colors.secondaryContainer,
@@ -312,7 +318,9 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
   },
   packageText: {
-    ...Type.labelCaps,
+    fontFamily: Fonts.manropeBold,
+    fontSize: 12,
+    letterSpacing: 0.3,
     color: Colors.onTertiary,
   },
   scoreFrame: {
@@ -332,12 +340,15 @@ const styles = StyleSheet.create({
     color: Colors.onPrimary,
   },
   scoreLabel: {
-    ...Type.labelCaps,
+    fontFamily: Fonts.manropeBold,
+    fontSize: 12,
+    letterSpacing: 0.4,
     color: Colors.onPrimary,
     marginTop: 4,
+    opacity: 0.85,
   },
   title: {
-    ...Type.h3,
+    ...Type.h2,
     color: Colors.onSurface,
     textAlign: 'center',
     marginBottom: Spacing.sm,
@@ -355,14 +366,14 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.md,
   },
   dot: {
-    width: 8,
     height: 8,
+    width: 8,
     borderRadius: Radii.full,
     backgroundColor: Colors.outlineVariant,
   },
   dotActive: {
     backgroundColor: Colors.primary,
-    width: 24,
+    width: 28,
   },
   actions: {
     paddingHorizontal: Spacing.lg,

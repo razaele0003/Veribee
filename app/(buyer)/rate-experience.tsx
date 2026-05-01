@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -13,10 +13,11 @@ const chips = ['On Time', 'Friendly', 'Handled Carefully', 'Verified Properly'];
 
 export default function RateExperience() {
   const router = useRouter();
-  const [productRating, setProductRating] = useState(0);
-  const [deliveryRating, setDeliveryRating] = useState(0);
+  const [productRating, setProductRating] = useState(5);
+  const [deliveryRating, setDeliveryRating] = useState(5);
   const [selected, setSelected] = useState<string[]>([]);
   const [comment, setComment] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
   const toggleChip = (chip: string) => {
     setSelected((current) =>
@@ -26,10 +27,17 @@ export default function RateExperience() {
     );
   };
 
-  const submit = () => {
-    Alert.alert('Rating submitted', 'Thanks for helping improve Veribee.', [
-      { text: 'OK', onPress: () => router.replace('/(buyer)/orders') },
-    ]);
+  const submit = async () => {
+    if (submitting) return;
+    setSubmitting(true);
+    try {
+      // In production: save to Supabase here
+      // await supabase.from('ratings').insert({ ... });
+    } catch {
+      // non-blocking — navigate regardless
+    } finally {
+      router.replace('/(buyer)/(tabs)/orders');
+    }
   };
 
   return (
@@ -89,9 +97,10 @@ export default function RateExperience() {
         />
 
         <Button
-          title="Submit Rating"
+          title={submitting ? 'Submitting…' : 'Submit Rating'}
           onPress={submit}
-          disabled={productRating === 0 || deliveryRating === 0}
+          loading={submitting}
+          disabled={productRating === 0 || deliveryRating === 0 || submitting}
         />
       </ScrollView>
     </SafeAreaView>

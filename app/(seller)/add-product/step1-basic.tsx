@@ -25,7 +25,7 @@ import { Fonts, Type } from '@/constants/typography';
 import { Spacing } from '@/constants/spacing';
 import { Radii } from '@/constants/radii';
 
-const categories = ['Electronics', 'Bags', 'Shoes', 'Jewelry', 'Other'];
+const categories = ['Electronics', 'Bags', 'Shoes', 'Clothes', 'Jewelry', 'Other'];
 
 const schema = z.object({
   title: z.string().min(2, 'Enter the product name'),

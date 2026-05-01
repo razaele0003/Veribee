@@ -1,10 +1,14 @@
-import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Button } from '@/components/ui/Button';
 import { formatPHP } from '@/lib/buyerData';
-import { useCartStore } from '@/store/cartStore';
+import { supabase } from '@/lib/supabase';
+import { useAuthStore } from '@/store/authStore';
+import { useBuyerOrderStore } from '@/store/buyerOrderStore';
+import { CartItem, useCartStore } from '@/store/cartStore';
+import { useRiderStore } from '@/store/riderStore';
 import { Colors, Shadow } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
 import { Spacing } from '@/constants/spacing';
@@ -15,150 +19,486 @@ export default function Checkout() {
   const items = useCartStore((s) => s.items);
   const clearCart = useCartStore((s) => s.clearCart);
   const grandTotal = useCartStore((s) => s.grandTotal());
+  const deliveryFee = useCartStore((s) => s.deliveryFee());
+  const authFee = useCartStore((s) => s.authFee());
+  const userId = useAuthStore((s) => s.userId);
+  const placeLocalOrder = useBuyerOrderStore((s) => s.placeLocalOrder);
 
-  const placeOrder = () => {
+  const groupedItems = items.reduce((acc, item) => {
+    if (!acc[item.sellerName]) {
+      acc[item.sellerName] = [];
+    }
+    acc[item.sellerName].push(item);
+    return acc;
+  }, {} as Record<string, CartItem[]>);
+
+  const placeOrder = async () => {
     if (items.length === 0) {
-      router.replace('/(buyer)/home');
+      router.replace('/(buyer)/(tabs)/home');
       return;
     }
+    const orderItems = [...items];
+    const total = grandTotal;
+    const first = orderItems[0];
+    const localOrder = placeLocalOrder(orderItems, total);
+
+    if (localOrder && first) {
+      useRiderStore.getState().addJob({
+        id: `job-${localOrder.id.toLowerCase()}`,
+        orderId: localOrder.id,
+        productName: localOrder.productTitle,
+        productImage: first.imageUrl ?? '',
+        category: 'Verified order',
+        pickupAddress: 'Seller pickup point, Metro Manila',
+        deliveryAddress: 'Buyer delivery address, Metro Manila',
+        buyerName: 'Buyer Test',
+        buyerPhone: '+639171234500',
+        sellerName: first.sellerName,
+        sellerPhone: '+639171234501',
+        distanceKm: 2.4,
+        etaMinutes: 11,
+        jobFee: 85,
+        otpCode: '123456',
+      });
+    }
+
+    if (userId && first) {
+      const { data } = await supabase
+        .from('orders')
+        .insert({
+          buyer_id: userId,
+          seller_id: first.sellerId,
+          product_id: first.productId,
+          total_price: total,
+          status: 'processing',
+        })
+        .select('id')
+        .maybeSingle();
+
+      if (data?.id) {
+        await supabase.from('deliveries').insert({
+          order_id: data.id,
+          status: 'pending',
+          rider_id: null,
+        });
+      }
+    }
+
     clearCart();
-    Alert.alert('Order placed', 'Your local buyer order is now processing.', [
-      { text: 'Track Order', onPress: () => router.replace('/(buyer)/orders') },
-    ]);
+    router.replace('/(buyer)/(tabs)/orders');
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Pressable onPress={() => router.back()} hitSlop={12} style={styles.iconButton}>
-          <MaterialIcons name="arrow-back" size={26} color={Colors.primary} />
-        </Pressable>
-        <Text style={styles.headerTitle}>Checkout</Text>
-        <View style={styles.iconButton} />
+        <View style={styles.headerTop}>
+          <Pressable
+            onPress={() => router.back()}
+            hitSlop={12}
+            style={styles.iconButton}
+            accessibilityRole="button"
+            accessibilityLabel="Go back"
+          >
+            <MaterialIcons name="arrow-back" size={24} color={Colors.onSurface} />
+          </Pressable>
+          <Text style={styles.headerTitle}>Secure Checkout</Text>
+          <View style={styles.iconButton}>
+            <MaterialIcons name="help-outline" size={24} color={Colors.secondary} />
+          </View>
+        </View>
       </View>
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <Section title="Delivery Address">
-          <View style={styles.rowCard}>
+        <Section>
+          <Pressable 
+            style={({ pressed }) => [styles.addressRow, pressed && { opacity: 0.7 }]}
+            onPress={() => {}}
+          >
             <MaterialIcons name="location-on" size={24} color={Colors.primary} />
-            <View style={styles.rowCopy}>
-              <Text style={styles.rowTitle}>Home</Text>
-              <Text style={styles.rowBody}>Makati City, Metro Manila</Text>
-            </View>
-          </View>
-        </Section>
-
-        <Section title="Payment Method">
-          <View style={[styles.rowCard, styles.rowCardSelected]}>
-            <MaterialIcons name="payments" size={24} color={Colors.primary} />
-            <View style={styles.rowCopy}>
-              <Text style={styles.rowTitle}>Cash on Delivery</Text>
-              <Text style={styles.rowBody}>Pay after OTP handover verification</Text>
-            </View>
-            <MaterialIcons name="radio-button-checked" size={22} color={Colors.primary} />
-          </View>
-        </Section>
-
-        <Section title="Order Summary">
-          {items.map((item) => (
-            <View key={item.productId} style={styles.summaryItem}>
-              <Text style={styles.summaryName} numberOfLines={1}>
-                {item.title}
+            <View style={styles.addressCopy}>
+              <View style={styles.addressTitleRow}>
+                <Text style={styles.addressTitle}>Delivery Address</Text>
+                <View style={styles.defaultBadge}>
+                  <Text style={styles.defaultBadgeText}>DEFAULT</Text>
+                </View>
+              </View>
+              <Text style={styles.addressName}>Eleanor Vance | (+1) 555-0198</Text>
+              <Text style={styles.addressDetail}>
+                123 Logistics Way, Suite 400{'\n'}Manhattan, New York, NY 10001
               </Text>
-              <Text style={styles.summaryPrice}>{formatPHP(item.price * item.quantity)}</Text>
             </View>
-          ))}
-          <View style={styles.totalLine} />
-          <View style={styles.summaryItem}>
-            <Text style={styles.totalLabel}>Total</Text>
+            <MaterialIcons name="chevron-right" size={24} color={Colors.secondary} />
+          </Pressable>
+        </Section>
+
+        {Object.entries(groupedItems).map(([sellerName, sellerItems]) => (
+          <Section key={sellerName}>
+            <View style={styles.storeHeader}>
+              <MaterialIcons name="store" size={20} color={Colors.onSurface} />
+              <Text style={styles.storeName}>{sellerName}</Text>
+            </View>
+            
+            {sellerItems.map((item) => (
+              <View key={item.productId} style={styles.orderItemRow}>
+                <View style={styles.itemThumb}>
+                  {item.imageUrl ? (
+                    <Image source={{ uri: item.imageUrl }} style={styles.thumbImage} resizeMode="cover" />
+                  ) : (
+                    <MaterialIcons name="inventory-2" size={24} color={Colors.secondary} />
+                  )}
+                </View>
+                <View style={styles.itemCopy}>
+                  <Text style={styles.itemTitle} numberOfLines={2}>{item.title}</Text>
+                  <View style={styles.itemPriceRow}>
+                    <Text style={styles.itemPrice}>{formatPHP(item.price)}</Text>
+                    <Text style={styles.itemQty}>x{item.quantity}</Text>
+                  </View>
+                </View>
+              </View>
+            ))}
+
+            <View style={styles.storeSubtotal}>
+              <Text style={styles.subtotalLabel}>Subtotal ({sellerItems.length} item{sellerItems.length > 1 ? 's' : ''})</Text>
+              <Text style={styles.subtotalValue}>
+                {formatPHP(sellerItems.reduce((acc, it) => acc + it.price * it.quantity, 0))}
+              </Text>
+            </View>
+          </Section>
+        ))}
+
+        <Section>
+          <View style={styles.addressRow}>
+            <MaterialIcons name="local-shipping" size={24} color={Colors.primary} />
+            <View style={styles.addressCopy}>
+              <Text style={styles.addressTitle}>Shipping Option</Text>
+              <Text style={styles.addressName}>Standard Logistics</Text>
+              <Text style={styles.shippingEta}>Estimated Delivery: Oct 25 - Oct 27</Text>
+            </View>
+            <View style={styles.shippingRight}>
+              <Text style={styles.shippingFee}>{formatPHP(deliveryFee)}</Text>
+              <MaterialIcons name="chevron-right" size={24} color={Colors.secondary} />
+            </View>
+          </View>
+        </Section>
+
+        {authFee > 0 && (
+          <Section>
+            <View style={styles.addressRow}>
+              <MaterialIcons name="verified-user" size={24} color={Colors.primary} />
+              <View style={styles.addressCopy}>
+                <Text style={styles.addressTitle}>Platform Services</Text>
+                <Text style={styles.addressName}>Authentication Fee</Text>
+                <Text style={styles.shippingEta}>Guarantees item legitimacy and quality</Text>
+              </View>
+              <View style={styles.shippingRight}>
+                <Text style={styles.shippingFee}>{formatPHP(authFee)}</Text>
+              </View>
+            </View>
+          </Section>
+        )}
+
+        <Section>
+          <Pressable 
+            style={({ pressed }) => [styles.addressRow, pressed && { opacity: 0.7 }]}
+            onPress={() => {}}
+          >
+            <MaterialIcons name="credit-card" size={24} color={Colors.primary} />
+            <View style={styles.addressCopy}>
+              <Text style={styles.addressTitle}>Payment Method</Text>
+              <View style={styles.paymentMethodRow}>
+                <View style={styles.paymentIcon} />
+                <Text style={styles.addressName}>Cash on Delivery</Text>
+              </View>
+            </View>
+            <MaterialIcons name="chevron-right" size={24} color={Colors.secondary} />
+          </Pressable>
+        </Section>
+      </ScrollView>
+
+      <View style={styles.bottomBar}>
+        <View style={styles.bottomContent}>
+          <View style={styles.totalBlock}>
+            <Text style={styles.totalLabel}>Total Payment</Text>
             <Text style={styles.totalValue}>{formatPHP(grandTotal)}</Text>
           </View>
-        </Section>
-
-        <Button title="Place Order" onPress={placeOrder} />
-      </ScrollView>
+          <Pressable
+            style={styles.checkoutButton}
+            onPress={placeOrder}
+          >
+            <Text style={styles.checkoutButtonText}>Place Order</Text>
+          </Pressable>
+        </View>
+      </View>
     </SafeAreaView>
   );
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({ children }: { children: React.ReactNode }) {
   return (
-    <View style={styles.section}>
-      <Text style={styles.sectionTitle}>{title}</Text>
-      <View style={styles.sectionCard}>{children}</View>
+    <View style={styles.sectionCard}>
+      {children}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.background },
+  container: { flex: 1, backgroundColor: Colors.surface },
   header: {
-    height: 64,
-    paddingHorizontal: Spacing.containerMargin,
+    backgroundColor: Colors.surfaceContainerLowest,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: Colors.outlineVariant,
-    backgroundColor: Colors.surface,
+    borderBottomColor: Colors.surfaceDim,
+  },
+  headerTop: {
+    height: 56,
+    paddingHorizontal: Spacing.containerMargin,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
   iconButton: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
-  headerTitle: { ...Type.h3, color: Colors.primary },
+  headerTitle: { 
+    fontFamily: Fonts.epilogueSemiBold,
+    fontSize: 20,
+    color: Colors.onSurface 
+  },
+  headerTabs: {
+    flexDirection: 'row',
+    paddingHorizontal: Spacing.containerMargin,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.surfaceDim,
+  },
+  tabItem: {
+    flex: 1,
+    alignItems: 'center',
+    paddingBottom: Spacing.sm,
+  },
+  tabItemActive: {
+    flex: 1,
+    alignItems: 'center',
+    paddingBottom: Spacing.sm,
+    borderBottomWidth: 3,
+    borderBottomColor: Colors.primary,
+  },
+  tabTextInactive: {
+    fontFamily: Fonts.epilogueBold,
+    fontSize: 12,
+    letterSpacing: 0.05 * 12,
+    color: Colors.secondary,
+  },
+  tabTextActive: {
+    fontFamily: Fonts.epilogueBold,
+    fontSize: 12,
+    letterSpacing: 0.05 * 12,
+    color: Colors.primary,
+  },
   content: {
     padding: Spacing.containerMargin,
-    paddingBottom: Spacing.xl,
-    gap: Spacing.lg,
+    paddingBottom: 120,
+    gap: Spacing.containerMargin,
   },
-  section: { gap: Spacing.sm },
-  sectionTitle: { ...Type.h3, color: Colors.onSurface },
   sectionCard: {
-    borderRadius: Radii.lg,
-    borderWidth: 1,
-    borderColor: Colors.surfaceVariant,
+    borderRadius: Radii.xl,
     backgroundColor: Colors.surfaceContainerLowest,
-    overflow: 'hidden',
     ...Shadow.card,
+    padding: Spacing.sm,
   },
-  rowCard: {
-    minHeight: 78,
-    padding: Spacing.md,
+  addressRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: Spacing.sm,
+  },
+  addressCopy: {
+    flex: 1,
+  },
+  addressTitleRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: Spacing.md,
+    gap: Spacing.xs,
+    marginBottom: Spacing.base,
   },
-  rowCardSelected: {
-    borderLeftWidth: 4,
-    borderLeftColor: Colors.primary,
+  addressTitle: {
+    fontFamily: Fonts.epilogueBold,
+    fontSize: 12,
+    letterSpacing: 0.05 * 12,
+    color: Colors.onSurface,
+    textTransform: 'uppercase',
   },
-  rowCopy: { flex: 1 },
-  rowTitle: {
-    fontFamily: Fonts.manropeBold,
-    fontSize: 16,
+  defaultBadge: {
+    backgroundColor: Colors.surfaceContainerLow,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: Radii.full,
+  },
+  defaultBadgeText: {
+    fontFamily: Fonts.epilogueBold,
+    fontSize: 10,
+    letterSpacing: 0.05 * 10,
+    color: Colors.primary,
+  },
+  addressName: {
+    fontFamily: Fonts.manropeMedium,
+    fontSize: 14,
     color: Colors.onSurface,
   },
-  rowBody: { ...Type.bodyMd, fontSize: 14, color: Colors.onSurfaceVariant },
-  summaryItem: {
-    padding: Spacing.md,
+  addressDetail: {
+    fontFamily: Fonts.manropeRegular,
+    fontSize: 14,
+    lineHeight: 21,
+    color: Colors.secondary,
+    marginTop: Spacing.base,
+  },
+  storeHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+    paddingBottom: Spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.surfaceDim,
+  },
+  storeName: {
+    fontFamily: Fonts.epilogueBold,
+    fontSize: 12,
+    letterSpacing: 0.05 * 12,
+    color: Colors.onSurface,
+    textTransform: 'uppercase',
+  },
+  orderItemRow: {
+    flexDirection: 'row',
+    paddingVertical: Spacing.sm,
+    gap: Spacing.sm,
+  },
+  itemThumb: {
+    width: 80,
+    height: 80,
+    borderRadius: Radii.lg,
+    backgroundColor: Colors.surfaceContainer,
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  thumbImage: { width: '100%', height: '100%' },
+  itemCopy: {
+    flex: 1,
+    justifyContent: 'space-between',
+  },
+  itemTitle: {
+    fontFamily: Fonts.manropeRegular,
+    fontSize: 14,
+    color: Colors.onSurface,
+  },
+  itemPriceRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+    marginTop: Spacing.xs,
+  },
+  itemPrice: {
+    fontFamily: Fonts.epilogueBold,
+    fontSize: 12,
+    letterSpacing: 0.05 * 12,
+    color: Colors.onSurface,
+  },
+  itemQty: {
+    fontFamily: Fonts.manropeRegular,
+    fontSize: 14,
+    color: Colors.secondary,
+  },
+  storeSubtotal: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingTop: Spacing.sm,
+    borderTopWidth: 1,
+    borderTopColor: Colors.surfaceDim,
+  },
+  subtotalLabel: {
+    fontFamily: Fonts.manropeRegular,
+    fontSize: 14,
+    color: Colors.secondary,
+  },
+  subtotalValue: {
+    fontFamily: Fonts.manropeRegular,
+    fontSize: 14,
+    color: Colors.onSurface,
+  },
+  shippingEta: {
+    fontFamily: Fonts.manropeMedium,
+    fontSize: 12,
+    color: Colors.secondary,
+    marginTop: Spacing.base,
+  },
+  shippingRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+  },
+  shippingFee: {
+    fontFamily: Fonts.epilogueBold,
+    fontSize: 12,
+    letterSpacing: 0.05 * 12,
+    color: Colors.onSurface,
+  },
+  paymentMethodRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+  },
+  paymentIcon: {
+    width: 32,
+    height: 20,
+    backgroundColor: Colors.surfaceContainer,
+    borderRadius: Radii.DEFAULT,
+    borderWidth: 1,
+    borderColor: Colors.surfaceDim,
+  },
+  bottomBar: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: Colors.surfaceContainerLowest,
+    borderTopWidth: 1,
+    borderTopColor: Colors.surfaceDim,
+    ...Shadow.card,
+  },
+  bottomContent: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    gap: Spacing.md,
+    paddingHorizontal: Spacing.containerMargin,
+    paddingVertical: Spacing.sm,
+    paddingBottom: Spacing.lg,
   },
-  summaryName: {
-    flex: 1,
+  totalBlock: {
+    flexDirection: 'column',
+  },
+  totalLabel: {
     fontFamily: Fonts.manropeMedium,
-    fontSize: 15,
-    color: Colors.onSurface,
+    fontSize: 12,
+    letterSpacing: 0.05 * 12,
+    textTransform: 'uppercase',
+    color: Colors.secondary,
+    marginBottom: Spacing.base,
   },
-  summaryPrice: {
-    fontFamily: Fonts.manropeBold,
-    fontSize: 15,
+  totalValue: {
+    fontFamily: Fonts.epilogueBold,
+    fontSize: 28,
     color: Colors.primary,
   },
-  totalLine: {
-    height: StyleSheet.hairlineWidth,
-    backgroundColor: Colors.surfaceVariant,
+  checkoutButton: {
+    backgroundColor: Colors.primary,
+    paddingHorizontal: Spacing.lg,
+    height: 48,
+    borderRadius: Radii.lg,
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...Shadow.card,
   },
-  totalLabel: { ...Type.h3, color: Colors.onSurface },
-  totalValue: { ...Type.h3, color: Colors.primary },
+  checkoutButtonText: {
+    fontFamily: Fonts.epilogueBold,
+    fontSize: 12,
+    letterSpacing: 0.05 * 12,
+    color: Colors.onPrimary,
+    textTransform: 'uppercase',
+  },
 });

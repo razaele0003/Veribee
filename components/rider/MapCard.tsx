@@ -26,9 +26,14 @@ export function MapCard({ label = 'Makati CBD', height = 176 }: Props) {
           <MaterialIcons name="location-on" size={20} color={Colors.onPrimary} />
         </View>
       </View>
-      <View style={styles.mapLabel}>
-        <MaterialIcons name="my-location" size={15} color={Colors.primary} />
-        <Text style={styles.mapLabelText}>{label}</Text>
+      
+      <View style={styles.topLabel}>
+        <View style={styles.pulseDot} />
+        <Text style={styles.topLabelText}>{label}</Text>
+      </View>
+
+      <View style={styles.locationButton}>
+        <MaterialIcons name="my-location" size={20} color={Colors.onSurface} />
       </View>
     </View>
   );
@@ -36,12 +41,16 @@ export function MapCard({ label = 'Makati CBD', height = 176 }: Props) {
 
 const styles = StyleSheet.create({
   map: {
-    borderRadius: Radii.lg,
+    borderRadius: Radii.card,
     borderWidth: 1,
-    borderColor: Colors.outlineVariant,
-    backgroundColor: Colors.surfaceContainerHigh,
+    borderColor: 'rgba(211, 218, 234, 0.4)',
+    backgroundColor: Colors.surfaceContainerHighest,
     overflow: 'hidden',
-    ...Shadow.card,
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.02,
+    shadowRadius: 8,
+    elevation: 2,
   },
   gridLayer: {
     flex: 1,
@@ -117,21 +126,45 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  mapLabel: {
+  topLabel: {
     position: 'absolute',
-    left: Spacing.sm,
-    bottom: Spacing.sm,
-    borderRadius: Radii.DEFAULT,
-    backgroundColor: Colors.surfaceContainerLowest,
+    right: Spacing.sm,
+    top: Spacing.sm,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: Radii.full,
     paddingHorizontal: Spacing.sm,
-    paddingVertical: Spacing.xs,
+    paddingVertical: 6,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: Spacing.xs,
+    gap: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(211, 218, 234, 0.5)',
   },
-  mapLabelText: {
-    ...Type.labelCaps,
-    fontFamily: Fonts.manropeBold,
+  pulseDot: {
+    width: 8,
+    height: 8,
+    borderRadius: Radii.full,
+    backgroundColor: Colors.primary,
+  },
+  topLabelText: {
+    fontFamily: Fonts.manropeMedium,
+    fontSize: 12,
     color: Colors.onSurface,
+  },
+  locationButton: {
+    position: 'absolute',
+    right: Spacing.sm,
+    bottom: Spacing.sm,
+    width: 40,
+    height: 40,
+    backgroundColor: Colors.surfaceContainerLowest,
+    borderRadius: Radii.full,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: Colors.onSurface,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
 });

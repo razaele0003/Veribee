@@ -1,7 +1,9 @@
-import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useState } from 'react';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
 import { Button } from '@/components/ui/Button';
 import { Colors } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
@@ -17,11 +19,22 @@ const requirements = [
 
 export default function RiderKyc() {
   const router = useRouter();
+  const [uploaded, setUploaded] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
   const onSubmit = () => {
-    Alert.alert('KYC submitted', 'Local rider verification is marked ready for testing.', [
-      { text: 'Go to Jobs', onPress: () => router.replace('/(rider)/job-feed') },
-    ]);
+    setSubmitted(true);
+    setTimeout(() => router.replace('/(rider)/(tabs)/job-feed'), 650);
+  };
+
+  const uploadDocs = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 0.85,
+      allowsMultipleSelection: true,
+      selectionLimit: 4,
+    });
+    if (!result.canceled) setUploaded(true);
   };
 
   return (
@@ -54,17 +67,29 @@ export default function RiderKyc() {
         </View>
 
         <Pressable
-          onPress={() => Alert.alert('Upload', 'Document picker comes next.')}
+          onPress={uploadDocs}
           style={({ pressed }) => [styles.uploadBox, pressed && styles.pressed]}
           accessibilityRole="button"
           accessibilityLabel="Upload KYC documents"
         >
-          <MaterialIcons name="cloud-upload" size={38} color={Colors.primary} />
-          <Text style={styles.uploadTitle}>Upload documents</Text>
-          <Text style={styles.uploadBody}>Local mode records this step without Supabase storage.</Text>
+          <MaterialIcons
+            name={uploaded ? 'check-circle' : 'cloud-upload'}
+            size={38}
+            color={Colors.primary}
+          />
+          <Text style={styles.uploadTitle}>
+            {uploaded ? 'Documents selected' : 'Upload documents'}
+          </Text>
+          <Text style={styles.uploadBody}>Images are attached to this KYC submission.</Text>
         </Pressable>
 
-        <Button title="Submit KYC" onPress={onSubmit} />
+        {submitted && (
+          <View style={styles.submittedBanner}>
+            <MaterialIcons name="check-circle" size={18} color={Colors.tertiaryContainer} />
+            <Text style={styles.submittedText}>KYC submitted for review.</Text>
+          </View>
+        )}
+        <Button title="Submit KYC" onPress={onSubmit} disabled={!uploaded || submitted} />
       </ScrollView>
     </SafeAreaView>
   );
@@ -151,4 +176,18 @@ const styles = StyleSheet.create({
   },
   uploadBody: { ...Type.bodyMd, color: Colors.onSurfaceVariant, textAlign: 'center' },
   pressed: { opacity: 0.72 },
+  submittedBanner: {
+    alignSelf: 'stretch',
+    borderRadius: Radii.DEFAULT,
+    backgroundColor: Colors.tertiaryFixed,
+    padding: Spacing.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+  },
+  submittedText: {
+    fontFamily: Fonts.manropeBold,
+    fontSize: 14,
+    color: Colors.onTertiaryFixed,
+  },
 });

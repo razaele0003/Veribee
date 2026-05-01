@@ -16,7 +16,7 @@ export default function DeliveryConfirmed() {
   return (
     <SafeAreaView style={styles.container}>
       <Pressable
-        onPress={() => router.replace('/(buyer)/orders')}
+        onPress={() => router.replace('/(buyer)/(tabs)/orders')}
         style={styles.closeButton}
         hitSlop={12}
       >

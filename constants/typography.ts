@@ -9,7 +9,7 @@ export const Fonts = {
 } as const;
 
 export const Type: Record<
-  'h1' | 'h2' | 'h3' | 'bodyLg' | 'bodyMd' | 'labelCaps',
+  'h1' | 'h2' | 'h3' | 'bodyLg' | 'bodyMd' | 'bodySm' | 'labelCaps' | 'labelMd',
   TextStyle
 > = {
   h1: {
@@ -39,11 +39,21 @@ export const Type: Record<
     fontSize: 16,
     lineHeight: 24,
   },
+  bodySm: {
+    fontFamily: Fonts.manropeRegular,
+    fontSize: 13,
+    lineHeight: 20,
+  },
   labelCaps: {
     fontFamily: Fonts.manropeBold,
     fontSize: 12,
     lineHeight: 14,
     letterSpacing: 0.6,
     textTransform: 'uppercase',
+  },
+  labelMd: {
+    fontFamily: Fonts.manropeMedium,
+    fontSize: 14,
+    lineHeight: 18,
   },
 };

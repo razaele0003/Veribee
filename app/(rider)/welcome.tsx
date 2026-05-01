@@ -24,7 +24,7 @@ export default function RiderWelcome() {
           <Step icon="qr-code-scanner" title="Confirm secure pickup" />
           <Step icon="pin" title="Complete OTP handover" />
         </View>
-        <Button title="Start Delivering" onPress={() => router.replace('/(rider)/job-feed')} />
+        <Button title="Start Delivering" onPress={() => router.replace('/(rider)/(tabs)/job-feed')} />
       </ScrollView>
     </SafeAreaView>
   );

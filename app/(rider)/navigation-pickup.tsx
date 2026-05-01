@@ -1,9 +1,10 @@
-import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { Redirect, useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { ActiveDeliveryCard } from '@/components/rider/ActiveDeliveryCard';
 import { MapCard } from '@/components/rider/MapCard';
+import { supabase } from '@/lib/supabase';
 import { useRiderStore } from '@/store/riderStore';
 import { Colors } from '@/constants/colors';
 import { Fonts } from '@/constants/typography';
@@ -14,14 +15,16 @@ export default function NavigationPickup() {
   const activeDelivery = useRiderStore((s) => s.activeDelivery);
   const updateActiveStatus = useRiderStore((s) => s.updateActiveStatus);
 
-  if (!activeDelivery) {
-    router.replace('/(rider)/job-feed');
-    return null;
-  }
 
-  const onArrived = () => {
+  if (!activeDelivery) return <Redirect href="/(rider)/(tabs)/job-feed" />;
+
+  const onArrived = async () => {
     updateActiveStatus('arrived_pickup');
-    router.push('/(rider)/pickup-confirm');
+    await supabase
+      .from('deliveries')
+      .update({ status: 'arrived_pickup' })
+      .eq('id', activeDelivery.deliveryId);
+    router.replace('/(rider)/pickup-confirm');
   };
 
   return (
@@ -31,13 +34,7 @@ export default function NavigationPickup() {
           <MaterialIcons name="arrow-back" size={26} color={Colors.primary} />
         </Pressable>
         <Text style={styles.headerTitle}>Pickup Navigation</Text>
-        <Pressable
-          onPress={() => Alert.alert('Map layers', 'Live map layers come with Supabase GPS.')}
-          hitSlop={12}
-          style={styles.iconButton}
-        >
-          <MaterialIcons name="layers" size={24} color={Colors.onSurfaceVariant} />
-        </Pressable>
+        <View style={styles.iconButton} />
       </View>
       <View style={styles.mapWrap}>
         <MapCard label={activeDelivery.pickupAddress} height={360} />

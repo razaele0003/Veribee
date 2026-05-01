@@ -57,7 +57,7 @@ export default function KycScreen() {
       return;
     }
     Alert.alert('Verification submitted', 'Your local KYC status is now pending review.', [
-      { text: 'OK', onPress: () => router.replace('/(seller)/profile') },
+      { text: 'OK', onPress: () => router.replace('/(seller)/(tabs)/profile') },
     ]);
   };
 

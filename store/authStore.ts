@@ -1,4 +1,6 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
+import { createJSONStorage, persist } from 'zustand/middleware';
 
 export type Role = 'buyer' | 'seller' | 'rider';
 
@@ -12,12 +14,20 @@ type AuthState = {
   reset: () => void;
 };
 
-export const useAuthStore = create<AuthState>((set) => ({
-  userId: null,
-  activeRole: null,
-  roles: [],
-  setUser: (userId) => set({ userId }),
-  setActiveRole: (activeRole) => set({ activeRole }),
-  setRoles: (roles) => set({ roles }),
-  reset: () => set({ userId: null, activeRole: null, roles: [] }),
-}));
+export const useAuthStore = create<AuthState>()(
+  persist(
+    (set) => ({
+      userId: null,
+      activeRole: null,
+      roles: [],
+      setUser: (userId) => set({ userId }),
+      setActiveRole: (activeRole) => set({ activeRole }),
+      setRoles: (roles) => set({ roles }),
+      reset: () => set({ userId: null, activeRole: null, roles: [] }),
+    }),
+    {
+      name: 'veribee-auth',
+      storage: createJSONStorage(() => AsyncStorage),
+    },
+  ),
+);
