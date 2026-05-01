@@ -27,7 +27,7 @@ const transactions: Transaction[] = [
   {
     id: 'VB-9982',
     product: 'Leather Satchel',
-    buyer: 'David K.',
+    buyer: 'Nico V.',
     date: 'Apr 20',
     amount: 345,
     status: 'Completed',
@@ -131,7 +131,7 @@ export default function EarningsScreen() {
         </View>
         {payoutRequested && (
           <View style={styles.savedBanner}>
-            <MaterialIcons name="check-circle" size={18} color={Colors.tertiaryContainer} />
+            <MaterialIcons name="check-circle" size={18} color={Colors.onTertiaryFixedVariant} />
             <Text style={styles.savedText}>Payout request queued for review.</Text>
           </View>
         )}
@@ -404,7 +404,7 @@ const styles = StyleSheet.create({
   amount: {
     fontFamily: Fonts.epilogueBold,
     fontSize: 16,
-    color: Colors.tertiaryContainer,
+    color: Colors.success,
   },
   emptyState: {
     borderRadius: Radii.lg,

@@ -80,7 +80,7 @@ export default function RiderAccount() {
               <Text style={styles.statusText}>ACTIVE RIDER</Text>
             </View>
             <View style={styles.ratingPill}>
-              <MaterialIcons name="star" size={14} color={Colors.secondaryContainer} />
+              <MaterialIcons name="star" size={14} color={Colors.secondary} />
               <Text style={styles.ratingText}>4.9</Text>
             </View>
           </View>
@@ -240,7 +240,7 @@ export default function RiderAccount() {
               </View>
               <View style={styles.docInfo}>
                 <Text style={styles.docTitle}>Vehicle Registration (OR/CR)</Text>
-                <Text style={styles.docSubtitle}>Valid until: 12/2024</Text>
+                <Text style={styles.docSubtitle}>Valid until: 12/2026</Text>
                 <View style={styles.docStatusRow}>
                   <MaterialIcons name="check-circle" size={14} color={Colors.primary} />
                   <Text style={styles.docStatusText}>Verified</Text>
@@ -250,14 +250,14 @@ export default function RiderAccount() {
 
             <View style={styles.docCardPending}>
               <View style={styles.docIconWrapPending}>
-                <MaterialIcons name="health-and-safety" size={20} color={Colors.tertiaryContainer} />
+                <MaterialIcons name="health-and-safety" size={20} color={Colors.onWarningContainer} />
               </View>
               <View style={styles.docInfo}>
                 <Text style={styles.docTitle}>Health Certificate</Text>
                 <Text style={styles.docSubtitle}>Annual requirement</Text>
                 <View style={styles.docStatusRow}>
-                  <MaterialIcons name="schedule" size={14} color={Colors.tertiaryContainer} />
-                  <Text style={[styles.docStatusText, { color: Colors.tertiaryContainer }]}>Update Needed Soon</Text>
+                  <MaterialIcons name="schedule" size={14} color={Colors.onWarningContainer} />
+                  <Text style={[styles.docStatusText, { color: Colors.onWarningContainer }]}>Update Needed Soon</Text>
                 </View>
               </View>
             </View>
@@ -732,8 +732,8 @@ const styles = StyleSheet.create({
     padding: Spacing.sm,
     borderRadius: Radii.md,
     borderWidth: 1,
-    borderColor: Colors.tertiaryFixedDim,
-    backgroundColor: Colors.tertiaryFixed,
+    borderColor: Colors.warning,
+    backgroundColor: Colors.warningContainer,
   },
   docIconWrapPending: {
     width: 40,

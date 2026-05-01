@@ -9,6 +9,7 @@ import { Colors, Shadow } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
 import { Spacing } from '@/constants/spacing';
 import { Radii } from '@/constants/radii';
+import { DEMO_ACCOUNTS } from '@/lib/demoProfiles';
 
 const docs = [
   { label: 'Driver License', status: 'Verified' },
@@ -16,6 +17,12 @@ const docs = [
   { label: 'OR/CR Document', status: 'Pending Review' },
   { label: 'Vehicle Photo', status: 'Verified' },
 ];
+
+function statusColor(status: string) {
+  if (status === 'Ready to submit' || status === 'Verified') return Colors.onSuccessContainer;
+  if (status === 'Pending Review') return Colors.onWarningContainer;
+  return Colors.onSurfaceVariant;
+}
 
 export default function VehicleDocs() {
   const router = useRouter();
@@ -47,7 +54,7 @@ export default function VehicleDocs() {
           <MaterialIcons name="two-wheeler" size={40} color={Colors.primary} />
           <View style={styles.vehicleCopy}>
             <Text style={styles.vehicleName}>Honda Click 125i</Text>
-            <Text style={styles.vehicleMeta}>Plate ABX 1234</Text>
+            <Text style={styles.vehicleMeta}>Plate {DEMO_ACCOUNTS.rider.plate}</Text>
           </View>
         </View>
 
@@ -64,21 +71,26 @@ export default function VehicleDocs() {
             </View>
             <View style={styles.docCopy}>
               <Text style={styles.docLabel}>{doc.label}</Text>
-              <Text style={styles.docStatus}>
+              <Text
+                style={[
+                  styles.docStatus,
+                  { color: statusColor(selectedDocs[doc.label] ? 'Ready to submit' : doc.status) },
+                ]}
+              >
                 {selectedDocs[doc.label] ? 'Ready to submit' : doc.status}
               </Text>
             </View>
             <MaterialIcons
               name={selectedDocs[doc.label] ? 'check-circle' : 'upload-file'}
               size={22}
-              color={selectedDocs[doc.label] ? Colors.tertiaryContainer : Colors.onSurfaceVariant}
+              color={selectedDocs[doc.label] ? Colors.success : Colors.onSurfaceVariant}
             />
           </Pressable>
         ))}
 
         {!!saved && (
           <View style={styles.savedBanner}>
-            <MaterialIcons name="check-circle" size={18} color={Colors.tertiaryContainer} />
+            <MaterialIcons name="check-circle" size={18} color={Colors.onTertiaryFixedVariant} />
             <Text style={styles.savedText}>Vehicle documents saved.</Text>
           </View>
         )}
@@ -149,7 +161,7 @@ const styles = StyleSheet.create({
   docStatus: {
     fontFamily: Fonts.manropeMedium,
     fontSize: 13,
-    color: Colors.tertiaryContainer,
+    color: Colors.onSurfaceVariant,
     marginTop: 2,
   },
   pressed: { opacity: 0.72 },

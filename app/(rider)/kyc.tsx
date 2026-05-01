@@ -59,7 +59,7 @@ export default function RiderKyc() {
           {requirements.map((item) => (
             <View key={item} style={styles.row}>
               <View style={styles.rowIcon}>
-                <MaterialIcons name="check" size={18} color={Colors.onTertiary} />
+                <MaterialIcons name="check" size={18} color={Colors.success} />
               </View>
               <Text style={styles.rowText}>{item}</Text>
             </View>
@@ -85,7 +85,7 @@ export default function RiderKyc() {
 
         {submitted && (
           <View style={styles.submittedBanner}>
-            <MaterialIcons name="check-circle" size={18} color={Colors.tertiaryContainer} />
+            <MaterialIcons name="check-circle" size={18} color={Colors.onTertiaryFixedVariant} />
             <Text style={styles.submittedText}>KYC submitted for review.</Text>
           </View>
         )}
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: Radii.full,
-    backgroundColor: Colors.tertiaryContainer,
+    backgroundColor: Colors.successContainer,
     alignItems: 'center',
     justifyContent: 'center',
   },

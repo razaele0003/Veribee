@@ -42,7 +42,7 @@ const tabs: Array<{ key: OrderStatus; label: string }> = [
 const fallbackOrders: SellerOrder[] = [
   {
     id: 'VB-9982',
-    buyerName: 'David K.',
+    buyerName: 'Nico V.',
     productTitle: 'Artisan Honey',
     price: 1200,
     status: 'new',

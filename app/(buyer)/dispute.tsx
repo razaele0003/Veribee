@@ -119,7 +119,7 @@ export default function FileDispute() {
 
         {!!submitted && (
           <View style={styles.submittedBanner}>
-            <MaterialIcons name="check-circle" size={18} color={Colors.tertiaryContainer} />
+            <MaterialIcons name="check-circle" size={18} color={Colors.onTertiaryFixedVariant} />
             <Text style={styles.submittedText}>Dispute submitted.</Text>
           </View>
         )}

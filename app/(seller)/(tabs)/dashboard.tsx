@@ -20,6 +20,7 @@ import { isLocalUserId } from '@/lib/localAuth';
 import { useAuthStore } from '@/store/authStore';
 import { useSellerStore } from '@/store/sellerStore';
 import { calculateSellerVsiFromProducts } from '@/lib/veribeeScoring';
+import { DEMO_ACCOUNTS } from '@/lib/demoProfiles';
 import { Colors, Shadow } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
 import { Spacing } from '@/constants/spacing';
@@ -45,7 +46,7 @@ type SellerNotification = {
 const fallbackOrders: OrderItemData[] = [
   {
     id: 'preview-1',
-    buyerName: 'David K.',
+    buyerName: 'Nico V.',
     productTitle: 'Artisan Honey x2',
     price: 1200,
     status: 'processing',
@@ -60,7 +61,7 @@ const fallbackOrders: OrderItemData[] = [
 ];
 
 const fallbackDashboard: DashboardState = {
-  displayName: 'Maria',
+  displayName: DEMO_ACCOUNTS.seller.fullName.split(' ')[0],
   vsiScore: 87,
   ordersToday: 3,
   pendingAuth: 2,

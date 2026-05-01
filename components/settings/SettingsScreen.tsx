@@ -113,7 +113,7 @@ export function SettingsScreen({ role, kind, title }: Props) {
         {body}
         {!!savedMessage && (
           <View style={styles.savedBanner}>
-            <MaterialIcons name="check-circle" size={18} color={Colors.tertiaryContainer} />
+          <MaterialIcons name="check-circle" size={18} color={Colors.onTertiaryFixedVariant} />
             <Text style={styles.savedText}>{savedMessage}</Text>
           </View>
         )}

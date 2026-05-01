@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
   status: {
     ...Type.labelCaps,
     fontSize: 10,
-    color: Colors.tertiaryContainer,
+    color: Colors.success,
     marginTop: Spacing.xs,
   },
   fee: {
