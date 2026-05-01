@@ -3,6 +3,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { VSIGauge } from '@/components/ui/VSIGauge';
+import { calculateSellerVsiFromProducts, getVsiBreakdown } from '@/lib/veribeeScoring';
+import { useSellerStore } from '@/store/sellerStore';
 import { Colors, Shadow } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
 import { Spacing } from '@/constants/spacing';
@@ -14,23 +16,28 @@ type BreakdownItem = {
   score: number;
 };
 
-const score = 87;
-
-const breakdown: BreakdownItem[] = [
-  { label: 'Successful Deliveries', weight: 30, score: 90 },
-  { label: 'Authentication Pass Rate', weight: 25, score: 88 },
-  { label: 'Buyer Satisfaction', weight: 20, score: 85 },
-  { label: 'Low Dispute Rate', weight: 15, score: 92 },
-  { label: 'Account History', weight: 10, score: 78 },
-];
-
 const tips = [
   'Dispatch orders within 24 hours to reduce delivery delays.',
-  'Respond to buyer messages faster to lift satisfaction metrics.',
+  'Upload complete label, serial, receipt, and full-product evidence.',
+  'Keep disputes low by using OTP or biometric handover for high-value orders.',
 ];
 
 export default function VSIScoreScreen() {
   const router = useRouter();
+  const products = useSellerStore((s) => s.products);
+  const score = calculateSellerVsiFromProducts(products);
+  const breakdown: BreakdownItem[] = getVsiBreakdown({
+    successfulDeliveries: 94,
+    totalDeliveries: 99,
+    verifiedProducts: products.filter((product) => product.authStatus === 'verified').length,
+    totalProducts: products.length,
+    satisfiedOrders: 91,
+    reviewedOrders: 96,
+    disputes: 2 + products.filter((product) => product.authStatus === 'failed').length,
+    totalOrders: 112,
+    accountAgeDays: 438,
+    kycApproved: true,
+  });
 
   return (
     <SafeAreaView style={styles.container}>

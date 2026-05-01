@@ -13,6 +13,18 @@ This is based on `4ECED-Market Research-G1.pdf`. The core user pain is trust for
 | Verified Delivery Workflow | Rider route is tied to pickup confirmation, buyer handover, and final proof of delivery. | Use Expo Router screens plus local state/Supabase rows for delivery status. Use OpenStreetMap/Nominatim only for user-triggered geocoding, with caching and attribution. |
 | Buyer Confidence Layer | Product card and detail pages show auth status, seller VSI, handover method, and evidence summary. | Already represented in demo product data through auth score, AI scanner result, evidence array, and warranty note. |
 
+## Implementation Status
+
+| Capability | Current status in app | Files |
+|---|---|---|
+| VSI calculation | Implemented as a free local scoring engine. The score is computed from successful delivery rate, authentication pass rate, buyer satisfaction, dispute rate, account age, and KYC status. Seller profile, dashboard, and VSI score pages read from this engine. | `lib/veribeeScoring.ts`, `app/(seller)/vsi-score.tsx`, `app/(seller)/(tabs)/dashboard.tsx`, `app/(seller)/(tabs)/profile.tsx` |
+| AI Scanner MVP | Implemented as a free local rules-based scanner. It scores serial quality, photo presence, evidence completeness, brand/category details, and high-value handover risk. It does not call paid APIs. | `lib/veribeeScoring.ts`, `store/sellerStore.ts`, `app/(seller)/add-product/step3-review.tsx` |
+| Tesseract OCR | Planned, not installed yet. Current scanner uses serial format rules, not OCR extraction from images. | Future: add Tesseract.js inside the scanner flow. |
+| Transformers.js image model | Planned, not installed yet. Current scanner does not run a real image embedding/classification model. | Future: add browser/on-device model inference. |
+| OpenStreetMap/Nominatim | Planned for production geocoding. Current maps are demo UI cards/static route states. | Future: add cached user-triggered geocoding. |
+| Biometric handover | Implemented for the buyer biometric handover flow using Expo LocalAuthentication. | `app/(buyer)/biometric-handover.tsx` |
+| OTP handover | Implemented as local demo OTP flow. | `app/(buyer)/otp-handover.tsx`, `app/(rider)/otp-entry.tsx` |
+
 ## Recommended Free AI/API Choices
 
 | Need | Recommended free option | Notes |

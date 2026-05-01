@@ -18,6 +18,8 @@ import { OrderItem, OrderItemData } from '@/components/seller/OrderItem';
 import { supabase } from '@/lib/supabase';
 import { isLocalUserId } from '@/lib/localAuth';
 import { useAuthStore } from '@/store/authStore';
+import { useSellerStore } from '@/store/sellerStore';
+import { calculateSellerVsiFromProducts } from '@/lib/veribeeScoring';
 import { Colors, Shadow } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
 import { Spacing } from '@/constants/spacing';
@@ -120,6 +122,7 @@ export default function SellerDashboard() {
   const router = useRouter();
   const { width } = useWindowDimensions();
   const storeUserId = useAuthStore((s) => s.userId);
+  const localProducts = useSellerStore((s) => s.products);
   const [data, setData] = useState<DashboardState>(fallbackDashboard);
   const [refreshing, setRefreshing] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
@@ -135,7 +138,11 @@ export default function SellerDashboard() {
     let userId = storeUserId;
 
     if (isLocalUserId(userId)) {
-      setData(fallbackDashboard);
+      setData({
+        ...fallbackDashboard,
+        vsiScore: calculateSellerVsiFromProducts(localProducts),
+        pendingAuth: localProducts.filter((product) => product.authStatus === 'pending').length,
+      });
       setRefreshing(false);
       return;
     }
@@ -206,7 +213,7 @@ export default function SellerDashboard() {
       recentOrders: recentRows.length > 0 ? recentRows : fallbackOrders,
     });
     setRefreshing(false);
-  }, [storeUserId]);
+  }, [localProducts, storeUserId]);
 
   useEffect(() => {
     loadDashboard();

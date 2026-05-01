@@ -11,6 +11,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRootNavigationState, useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useAuthStore } from '@/store/authStore';
+import { useSellerStore } from '@/store/sellerStore';
+import { calculateSellerVsiFromProducts } from '@/lib/veribeeScoring';
 import { Colors, Shadow } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
 import { Spacing } from '@/constants/spacing';
@@ -18,10 +20,8 @@ import { Radii } from '@/constants/radii';
 import { useEffect, useState } from 'react';
 
 // VSI score (87/100) → circumference = 2π×40 ≈ 251.2 → offset = 251.2 × (1 - 0.87) ≈ 32.7
-const VSI_SCORE = 87;
 const GAUGE_R = 40;
 const GAUGE_C = 2 * Math.PI * GAUGE_R;
-const GAUGE_OFFSET = GAUGE_C * (1 - VSI_SCORE / 100);
 
 type SettingsRow = {
   label: string;
@@ -56,6 +56,9 @@ export default function Profile() {
   const activeRole = useAuthStore((s) => s.activeRole);
   const setActiveRole = useAuthStore((s) => s.setActiveRole);
   const roles = useAuthStore((s) => s.roles);
+  const products = useSellerStore((s) => s.products);
+  const vsiScore = calculateSellerVsiFromProducts(products);
+  const gaugeOffset = GAUGE_C * (1 - vsiScore / 100);
 
   useEffect(() => {
     if (!navState?.key) return;
@@ -138,7 +141,7 @@ export default function Profile() {
           <View style={styles.vsiLeft}>
             <Text style={styles.vsiLabel}>VERIBEE TRUST INDEX</Text>
             <View style={styles.vsiScoreRow}>
-              <Text style={styles.vsiScore}>{VSI_SCORE}</Text>
+              <Text style={styles.vsiScore}>{vsiScore}</Text>
               <Text style={styles.vsiOf}>/100</Text>
             </View>
             <View style={styles.vsiLinkRow}>
@@ -166,7 +169,7 @@ export default function Profile() {
                 stroke={Colors.primary}
                 strokeWidth={8}
                 strokeDasharray={GAUGE_C}
-                strokeDashoffset={GAUGE_OFFSET}
+                strokeDashoffset={gaugeOffset}
                 strokeLinecap="round"
               />
             </Svg>

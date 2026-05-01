@@ -32,7 +32,7 @@ export default function AddProductStep3() {
   const addProductFromDraft = useSellerStore((s) => s.addProductFromDraft);
 
   const submit = async () => {
-    const product = addProductFromDraft('pending');
+    const product = addProductFromDraft();
     if (userId) {
       await supabase.from('products').insert({
         id: product.id,

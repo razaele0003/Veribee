@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { ProductImages } from '@/constants/productImages';
+import { runLocalAiScanner } from '@/lib/veribeeScoring';
 
 export type ProductDraft = {
   photos: string[];
@@ -138,18 +139,17 @@ export const useSellerStore = create<SellerState>((set, get) => ({
       productDraft: { ...state.productDraft, ...patch },
     })),
   clearProductDraft: () => set({ productDraft: emptyProductDraft }),
-  addProductFromDraft: (status = 'verified') => {
+  addProductFromDraft: (status) => {
+    const scanner = runLocalAiScanner(get().productDraft);
+    const authStatus = status ?? scanner.status;
     const product: LocalProduct = {
       ...emptyProductDraft,
       ...get().productDraft,
       id: `local-product-${Date.now()}`,
       submittedAt: new Date().toISOString(),
-      authStatus: status,
-      authScore: status === 'verified' ? 96 : 42,
-      reviewerNotes:
-        status === 'failed'
-          ? 'The serial number provided does not match the submitted brand. Please verify and resubmit.'
-          : undefined,
+      authStatus,
+      authScore: scanner.score,
+      reviewerNotes: scanner.reviewerNotes,
     };
 
     set((state) => ({
