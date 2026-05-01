@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { ProductImages } from '@/constants/productImages';
+import { DEMO_ACCOUNTS, DEMO_ROUTE } from '@/lib/demoProfiles';
 
 export type RiderJobStatus =
   | 'accepted'
@@ -18,6 +19,12 @@ export type RiderJob = {
   category: string;
   pickupAddress: string;
   deliveryAddress: string;
+  pickupLatitude?: number;
+  pickupLongitude?: number;
+  deliveryLatitude?: number;
+  deliveryLongitude?: number;
+  riderStartLatitude?: number;
+  riderStartLongitude?: number;
   buyerName: string;
   buyerPhone: string;
   sellerName: string;
@@ -52,20 +59,26 @@ type RiderState = {
 const initialJobs: RiderJob[] = [
   {
     id: 'job-8924',
-    orderId: 'VB-8924',
-    productName: 'Series 9 Chronograph Smartwatch',
-    productImage: ProductImages.watch,
-    category: 'Electronics',
-    pickupAddress: '123 Bee St, Makati',
-    deliveryAddress: '45 Hive Ave, BGC',
-    buyerName: 'David Kim',
-    buyerPhone: '+639171234502',
-    sellerName: 'TechHaven PH',
-    sellerPhone: '+639171234501',
-    distanceKm: 3.2,
-    etaMinutes: 12,
-    jobFee: 85,
-    otpCode: '123456',
+    orderId: DEMO_ROUTE.orderId,
+    productName: DEMO_ROUTE.productName,
+    productImage: ProductImages.tote,
+    category: DEMO_ROUTE.category,
+    pickupAddress: DEMO_ROUTE.pickup.address,
+    deliveryAddress: DEMO_ROUTE.dropoff.address,
+    pickupLatitude: DEMO_ROUTE.pickup.latitude,
+    pickupLongitude: DEMO_ROUTE.pickup.longitude,
+    deliveryLatitude: DEMO_ROUTE.dropoff.latitude,
+    deliveryLongitude: DEMO_ROUTE.dropoff.longitude,
+    riderStartLatitude: DEMO_ROUTE.riderStart.latitude,
+    riderStartLongitude: DEMO_ROUTE.riderStart.longitude,
+    buyerName: DEMO_ACCOUNTS.buyer.fullName,
+    buyerPhone: DEMO_ACCOUNTS.buyer.phone,
+    sellerName: DEMO_ACCOUNTS.seller.storeName,
+    sellerPhone: DEMO_ACCOUNTS.seller.phone,
+    distanceKm: DEMO_ROUTE.distanceKm,
+    etaMinutes: DEMO_ROUTE.etaMinutes,
+    jobFee: DEMO_ROUTE.jobFee,
+    otpCode: DEMO_ROUTE.otpCode,
   },
   {
     id: 'job-8925',

@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Button } from '@/components/ui/Button';
+import { DEMO_ACCOUNTS, DEMO_ROUTE, makeGoogleMapsDirectionsUrl } from '@/lib/demoProfiles';
 import { supabase } from '@/lib/supabase';
 import { Colors, Shadow } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
@@ -17,6 +18,10 @@ export default function OrderTracking() {
   const { id } = useLocalSearchParams<{ id?: string }>();
   const [deliveryStatus, setDeliveryStatus] = useState('heading_to_buyer');
   const [otpReady, setOtpReady] = useState(false);
+  const mapsUrl = useMemo(
+    () => makeGoogleMapsDirectionsUrl(DEMO_ROUTE.pickup, DEMO_ROUTE.dropoff),
+    [],
+  );
   const activeStep = useMemo(() => {
     if (deliveryStatus === 'delivered') return 3;
     if (deliveryStatus === 'heading_to_buyer' || deliveryStatus === 'arrived_buyer') return 2;
@@ -74,6 +79,15 @@ export default function OrderTracking() {
         <View style={styles.homeMarker}>
           <MaterialIcons name="home" size={26} color={Colors.onSecondaryContainer} />
         </View>
+        <Pressable
+          onPress={() => Linking.openURL(mapsUrl)}
+          style={({ pressed }) => [styles.mapsButton, pressed && styles.pressed]}
+          accessibilityRole="button"
+          accessibilityLabel="Open delivery route in Google Maps"
+        >
+          <MaterialIcons name="map" size={16} color={Colors.onPrimary} />
+          <Text style={styles.mapsButtonText}>Google Maps</Text>
+        </Pressable>
       </View>
 
       <View style={styles.sheet}>
@@ -120,15 +134,17 @@ export default function OrderTracking() {
 
         <View style={styles.riderCard}>
           <View style={styles.avatar}>
-            <Text style={styles.avatarText}>J</Text>
+            <Text style={styles.avatarText}>A</Text>
           </View>
           <View style={styles.riderCopy}>
-            <Text style={styles.riderName}>Juan dela Cruz</Text>
-            <Text style={styles.riderMeta}>Plate AB 1234</Text>
+            <Text style={styles.riderName}>{DEMO_ACCOUNTS.rider.fullName}</Text>
+            <Text style={styles.riderMeta}>
+              {DEMO_ACCOUNTS.rider.vehicle} - Plate {DEMO_ACCOUNTS.rider.plate}
+            </Text>
           </View>
           <View style={styles.rating}>
             <MaterialIcons name="star" size={16} color={Colors.secondary} />
-            <Text style={styles.ratingText}>4.9</Text>
+            <Text style={styles.ratingText}>{DEMO_ACCOUNTS.rider.rating}</Text>
           </View>
           <Pressable style={styles.chatButton}>
             <MaterialIcons name="chat" size={20} color={Colors.onPrimary} />
@@ -197,6 +213,28 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.secondaryContainer,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  mapsButton: {
+    position: 'absolute',
+    left: Spacing.containerMargin,
+    bottom: Spacing.lg,
+    minHeight: 42,
+    borderRadius: Radii.full,
+    backgroundColor: Colors.primary,
+    paddingHorizontal: Spacing.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    ...Shadow.card,
+  },
+  mapsButtonText: {
+    fontFamily: Fonts.manropeBold,
+    fontSize: 12,
+    color: Colors.onPrimary,
+  },
+  pressed: {
+    opacity: 0.74,
   },
   sheet: {
     borderTopLeftRadius: Radii.xl,

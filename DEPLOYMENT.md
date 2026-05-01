@@ -110,6 +110,8 @@ Use these for local/demo validation:
 
 OTP for demo flows: `123456`.
 
+For a three-device role demo, use `THREE_DEVICE_DEMO_PROFILES.md`. It keeps the buyer, seller, rider, order, route, OTP, coordinates, and map behavior aligned around order `VB-9982`.
+
 ## Deployment Caveats
 
 - The current AI Scanner is represented as demo-ready data and scoring logic, not a production ML service yet.

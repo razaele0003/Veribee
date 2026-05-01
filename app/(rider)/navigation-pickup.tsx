@@ -1,9 +1,12 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useEffect, useMemo } from 'react';
+import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Redirect, useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { ActiveDeliveryCard } from '@/components/rider/ActiveDeliveryCard';
 import { MapCard } from '@/components/rider/MapCard';
+import { DEMO_ROUTE, makeGoogleMapsDirectionsUrl } from '@/lib/demoProfiles';
+import { publishCurrentRiderLocation, startRiderLocationTracking } from '@/lib/locationTracking';
 import { supabase } from '@/lib/supabase';
 import { useRiderStore } from '@/store/riderStore';
 import { Colors } from '@/constants/colors';
@@ -15,10 +18,33 @@ export default function NavigationPickup() {
   const activeDelivery = useRiderStore((s) => s.activeDelivery);
   const updateActiveStatus = useRiderStore((s) => s.updateActiveStatus);
 
+  const mapsUrl = useMemo(
+    () => makeGoogleMapsDirectionsUrl(DEMO_ROUTE.riderStart, DEMO_ROUTE.pickup),
+    [],
+  );
+
+  useEffect(() => {
+    if (!activeDelivery) return;
+    let subscription: { remove: () => void } | null = null;
+    let cancelled = false;
+    startRiderLocationTracking(activeDelivery.deliveryId).then((next) => {
+      if (cancelled) {
+        next?.remove();
+        return;
+      }
+      subscription = next;
+    });
+
+    return () => {
+      cancelled = true;
+      subscription?.remove();
+    };
+  }, [activeDelivery?.deliveryId]);
 
   if (!activeDelivery) return <Redirect href="/(rider)/(tabs)/job-feed" />;
 
   const onArrived = async () => {
+    await publishCurrentRiderLocation(activeDelivery.deliveryId);
     updateActiveStatus('arrived_pickup');
     await supabase
       .from('deliveries')
@@ -37,7 +63,11 @@ export default function NavigationPickup() {
         <View style={styles.iconButton} />
       </View>
       <View style={styles.mapWrap}>
-        <MapCard label={activeDelivery.pickupAddress} height={360} />
+        <MapCard
+          label={activeDelivery.pickupAddress}
+          height={360}
+          onOpenMaps={() => Linking.openURL(mapsUrl)}
+        />
       </View>
       <ActiveDeliveryCard
         delivery={activeDelivery}

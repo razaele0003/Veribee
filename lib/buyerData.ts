@@ -1,4 +1,5 @@
 import { ProductImages } from '@/constants/productImages';
+import { DEMO_ACCOUNTS, DEMO_ROUTE } from '@/lib/demoProfiles';
 
 export type BuyerProduct = {
   id: string;
@@ -65,19 +66,19 @@ export const BUYER_PRODUCTS: BuyerProduct[] = [
   },
   {
     id: 'bag-001',
-    title: 'Classic Artisan Leather Tote',
+    title: DEMO_ROUTE.productName,
     category: 'Bags',
-    price: 12990,
-    sellerId: 'seller-luxegoods',
-    sellerName: 'LuxeGoods Manila',
-    sellerVsi: 95,
+    price: DEMO_ROUTE.price,
+    sellerId: DEMO_ACCOUNTS.seller.id,
+    sellerName: DEMO_ACCOUNTS.seller.storeName,
+    sellerVsi: DEMO_ACCOUNTS.seller.vsiScore,
     imageUrl: ProductImages.tote,
     authStatus: 'verified',
     brand: 'Maison Aurelia',
     model: 'Classic Artisan Tote MM',
     condition: 'Like New',
     serialNumber: 'MA-TOTE-MM-042026-77',
-    authScore: 96,
+    authScore: DEMO_ROUTE.authScore,
     authenticatedAt: 'April 21, 2026',
     aiScannerResult:
       'Stitch spacing, heat stamp, material grain, and seller history are consistent with authentic references.',
@@ -87,7 +88,7 @@ export const BUYER_PRODUCTS: BuyerProduct[] = [
       'Dust bag photo',
       'Original receipt upload',
     ],
-    handoverMethod: 'OTP',
+    handoverMethod: DEMO_ROUTE.handoverMethod,
     warrantyNote: 'Eligible for Veribee assisted return if authenticity evidence is disputed.',
     description:
       'A structured artisan leather tote with warm tone, careful stitching, and Veribee authentication evidence.',
@@ -182,10 +183,10 @@ export const BUYER_PRODUCTS: BuyerProduct[] = [
 
 export const BUYER_ORDERS: BuyerOrder[] = [
   {
-    id: 'VB-9982',
-    productId: 'bag-001',
-    productTitle: 'Classic Artisan Leather Tote',
-    sellerName: 'LuxeGoods Manila',
+    id: DEMO_ROUTE.orderId,
+    productId: DEMO_ROUTE.productId,
+    productTitle: DEMO_ROUTE.productName,
+    sellerName: DEMO_ACCOUNTS.seller.storeName,
     orderedAt: 'April 20, 2026',
     price: 12990,
     status: 'in_transit',

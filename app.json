@@ -16,11 +16,18 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.veribee.delivery",
-      "buildNumber": "1.0.0"
+      "buildNumber": "1.0.0",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Veribee uses your location during active deliveries so buyers can see secure rider progress."
+      }
     },
     "android": {
       "package": "com.veribee.delivery",
       "versionCode": 1,
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION"
+      ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/veribee-logo.png",
         "backgroundColor": "#fcf9f8"
@@ -34,7 +41,13 @@
     "plugins": [
       "expo-router",
       "expo-font",
-      "expo-asset"
+      "expo-asset",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Veribee uses your location during active deliveries so buyers can see secure rider progress."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

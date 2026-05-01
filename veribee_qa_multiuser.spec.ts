@@ -16,9 +16,9 @@ const BASE_URL = 'http://localhost:8084';
 
 // Test account credentials (from workflow)
 const TEST_ACCOUNTS = {
-  seller: { phone: '9170000001', password: 'Test@12345', role: 'seller' },
-  buyer: { phone: '9170000002', password: 'Test@12345', role: 'buyer' },
-  rider: { phone: '9170000003', password: 'Test@12345', role: 'rider' },
+  seller: { phone: '9171234501', password: 'VeribeeTest123!', role: 'seller' },
+  buyer: { phone: '9171234502', password: 'VeribeeTest123!', role: 'buyer' },
+  rider: { phone: '9171234503', password: 'VeribeeTest123!', role: 'rider' },
 };
 
 interface TestResult {

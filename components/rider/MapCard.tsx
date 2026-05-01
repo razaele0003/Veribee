@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Colors, Shadow } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
@@ -8,9 +8,10 @@ import { Spacing } from '@/constants/spacing';
 type Props = {
   label?: string;
   height?: number;
+  onOpenMaps?: () => void;
 };
 
-export function MapCard({ label = 'Makati CBD', height = 176 }: Props) {
+export function MapCard({ label = 'Makati CBD', height = 176, onOpenMaps }: Props) {
   return (
     <View style={[styles.map, { height }]}>
       <View style={styles.gridLayer}>
@@ -32,9 +33,31 @@ export function MapCard({ label = 'Makati CBD', height = 176 }: Props) {
         <Text style={styles.topLabelText}>{label}</Text>
       </View>
 
-      <View style={styles.locationButton}>
+      <Pressable
+        onPress={onOpenMaps}
+        disabled={!onOpenMaps}
+        style={({ pressed }) => [
+          styles.locationButton,
+          !onOpenMaps && styles.locationButtonDisabled,
+          pressed && styles.pressed,
+        ]}
+        accessibilityRole="button"
+        accessibilityLabel="Open route in Google Maps"
+      >
         <MaterialIcons name="my-location" size={20} color={Colors.onSurface} />
-      </View>
+      </Pressable>
+
+      {onOpenMaps && (
+        <Pressable
+          onPress={onOpenMaps}
+          style={({ pressed }) => [styles.mapsButton, pressed && styles.pressed]}
+          accessibilityRole="button"
+          accessibilityLabel="Open Google Maps directions"
+        >
+          <MaterialIcons name="map" size={16} color={Colors.onPrimary} />
+          <Text style={styles.mapsButtonText}>Google Maps</Text>
+        </Pressable>
+      )}
     </View>
   );
 }
@@ -166,5 +189,30 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
+  },
+  locationButtonDisabled: {
+    opacity: 0.72,
+  },
+  mapsButton: {
+    position: 'absolute',
+    left: Spacing.sm,
+    bottom: Spacing.sm,
+    minHeight: 40,
+    borderRadius: Radii.full,
+    backgroundColor: Colors.primary,
+    paddingHorizontal: Spacing.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    ...Shadow.card,
+  },
+  mapsButtonText: {
+    fontFamily: Fonts.manropeBold,
+    fontSize: 12,
+    color: Colors.onPrimary,
+  },
+  pressed: {
+    opacity: 0.74,
   },
 });

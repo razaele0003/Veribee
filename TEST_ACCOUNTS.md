@@ -2,6 +2,8 @@
 
 These are local QA account identities for testing screen flows only. Do not create or seed these in Supabase yet.
 
+For the full three-device demo script with coordinates, shared order details, and free maps/location tracking notes, use `THREE_DEVICE_DEMO_PROFILES.md`.
+
 | Role | Demo Name | Phone | Password | Demo Profile | Expected Local Behavior |
 |---|---|---|---|---|---|
 | Seller | Maria Santos | +639171234501 | VeribeeTest123! | LuxeGoods Manila, Makati, VSI 96, KYC complete | Can enter the seller dashboard and manage preloaded sample products. |

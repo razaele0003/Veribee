@@ -105,9 +105,11 @@ The suite uses three pre-configured test accounts (seed these in Supabase before
 
 | Role | Phone | Password | Active Role |
 |---|---|---|---|
-| Seller | 9170000001 | Test@12345 | seller |
-| Buyer | 9170000002 | Test@12345 | buyer |
-| Rider | 9170000003 | Test@12345 | rider |
+| Seller | 9171234501 | VeribeeTest123! | seller |
+| Buyer | 9171234502 | VeribeeTest123! | buyer |
+| Rider | 9171234503 | VeribeeTest123! | rider |
+
+For manual three-device demos, use `THREE_DEVICE_DEMO_PROFILES.md`; it contains the shared order, coordinates, OTP, profile details, and maps/tracking setup.
 
 **Setup:**
 1. Go to Supabase dashboard

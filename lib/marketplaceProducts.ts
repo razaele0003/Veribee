@@ -1,4 +1,5 @@
 import { BuyerProduct } from '@/lib/buyerData';
+import { DEMO_ACCOUNTS } from '@/lib/demoProfiles';
 import { LocalProduct } from '@/store/sellerStore';
 
 export function sellerProductToBuyerProduct(product: LocalProduct): BuyerProduct {
@@ -7,9 +8,9 @@ export function sellerProductToBuyerProduct(product: LocalProduct): BuyerProduct
     title: product.title || 'Untitled product',
     category: product.category || 'Other',
     price: Number(product.price || 0),
-    sellerId: 'local-seller',
-    sellerName: "Maria's Boutique",
-    sellerVsi: 87,
+    sellerId: DEMO_ACCOUNTS.seller.id,
+    sellerName: DEMO_ACCOUNTS.seller.storeName,
+    sellerVsi: DEMO_ACCOUNTS.seller.vsiScore,
     imageUrl: product.photos[0],
     authStatus: product.authStatus === 'verified' ? 'verified' : 'pending',
     description: product.description || 'Seller-submitted Veribee listing.',

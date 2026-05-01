@@ -3,6 +3,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Button } from '@/components/ui/Button';
+import { DEMO_ACCOUNTS, DEMO_ROUTE } from '@/lib/demoProfiles';
 import { formatPHP } from '@/lib/buyerData';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/authStore';
@@ -49,16 +50,22 @@ export default function Checkout() {
         productName: localOrder.productTitle,
         productImage: first.imageUrl ?? '',
         category: 'Verified order',
-        pickupAddress: 'Seller pickup point, Metro Manila',
-        deliveryAddress: 'Buyer delivery address, Metro Manila',
-        buyerName: 'Buyer Test',
-        buyerPhone: '+639171234500',
+        pickupAddress: DEMO_ROUTE.pickup.address,
+        deliveryAddress: DEMO_ROUTE.dropoff.address,
+        pickupLatitude: DEMO_ROUTE.pickup.latitude,
+        pickupLongitude: DEMO_ROUTE.pickup.longitude,
+        deliveryLatitude: DEMO_ROUTE.dropoff.latitude,
+        deliveryLongitude: DEMO_ROUTE.dropoff.longitude,
+        riderStartLatitude: DEMO_ROUTE.riderStart.latitude,
+        riderStartLongitude: DEMO_ROUTE.riderStart.longitude,
+        buyerName: DEMO_ACCOUNTS.buyer.fullName,
+        buyerPhone: DEMO_ACCOUNTS.buyer.phone,
         sellerName: first.sellerName,
-        sellerPhone: '+639171234501',
-        distanceKm: 2.4,
-        etaMinutes: 11,
-        jobFee: 85,
-        otpCode: '123456',
+        sellerPhone: DEMO_ACCOUNTS.seller.phone,
+        distanceKm: DEMO_ROUTE.distanceKm,
+        etaMinutes: DEMO_ROUTE.etaMinutes,
+        jobFee: DEMO_ROUTE.jobFee,
+        otpCode: DEMO_ROUTE.otpCode,
       });
     }
 
@@ -122,9 +129,11 @@ export default function Checkout() {
                   <Text style={styles.defaultBadgeText}>DEFAULT</Text>
                 </View>
               </View>
-              <Text style={styles.addressName}>Eleanor Vance | (+1) 555-0198</Text>
+              <Text style={styles.addressName}>
+                {DEMO_ACCOUNTS.buyer.fullName} | {DEMO_ACCOUNTS.buyer.phone}
+              </Text>
               <Text style={styles.addressDetail}>
-                123 Logistics Way, Suite 400{'\n'}Manhattan, New York, NY 10001
+                {DEMO_ROUTE.dropoff.address}
               </Text>
             </View>
             <MaterialIcons name="chevron-right" size={24} color={Colors.secondary} />
