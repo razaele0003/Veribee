@@ -1,7 +1,6 @@
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { MaterialIcons } from '@expo/vector-icons';
 import {
   useFonts,
   Epilogue_600SemiBold,
@@ -23,10 +22,9 @@ export default function RootLayout() {
     Manrope_500Medium,
     Manrope_600SemiBold,
     Manrope_700Bold,
-    ...MaterialIcons.font,
   });
 
-  if (!loaded) return null;
+  void loaded;
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>

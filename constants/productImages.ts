@@ -8,16 +8,18 @@ export function resolveImageSource(source?: ProductImageSource) {
 }
 
 export const ProductImages = {
-  watch: require('../assets/images/product-watch.png'),
-  tote: require('../assets/images/product-tote.png'),
-  sneakers: require('../assets/images/product-sneakers.png'),
-  pendant: require('../assets/images/product-pendant.png'),
-  headphones: require('../assets/images/product-headphones.png'),
+  watch: require('../assets/images/product-watch-photo.jpg'),
+  tote: require('../assets/images/product-tote-photo.jpg'),
+  sneakers: require('../assets/images/product-sneakers-photo.jpg'),
+  pendant: require('../assets/images/product-pendant-photo.jpg'),
+  marketWatch: require('../assets/images/product-market-watch-photo.jpg'),
+  headphones: require('../assets/images/product-headphones-photo.jpg'),
+  chronograph: require('../assets/images/product-chronograph-photo.jpg'),
 } as const satisfies Record<string, ProductImageSource>;
 
 export const CategoryImages = {
-  electronics: require('../assets/images/category-electronics.png'),
-  bags: require('../assets/images/category-bags.png'),
-  shoes: require('../assets/images/category-shoes.png'),
-  jewelry: require('../assets/images/category-jewelry.png'),
+  electronics: require('../assets/images/category-electronics-photo.jpg'),
+  bags: require('../assets/images/category-bags-photo.jpg'),
+  shoes: require('../assets/images/category-shoes-photo.jpg'),
+  jewelry: require('../assets/images/category-jewelry-photo.jpg'),
 } as const satisfies Record<string, ProductImageSource>;

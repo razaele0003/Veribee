@@ -23,7 +23,7 @@
     },
     "android": {
       "package": "com.veribee.delivery",
-      "versionCode": 4,
+      "versionCode": 5,
       "permissions": [
         "ACCESS_COARSE_LOCATION",
         "ACCESS_FINE_LOCATION"
@@ -40,7 +40,14 @@
     },
     "plugins": [
       "expo-router",
-      "expo-font",
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "./node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/MaterialIcons.ttf"
+          ]
+        }
+      ],
       "expo-asset",
       [
         "expo-location",

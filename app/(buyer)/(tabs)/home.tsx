@@ -69,7 +69,7 @@ const stitchProducts: StitchProduct[] = [
     price: '$249.00',
     msrp: '$295.00',
     discount: '15% OFF',
-    imageUrl: ProductImages.watch,
+    imageUrl: ProductImages.marketWatch,
   },
   {
     product: BUYER_PRODUCTS[0],
@@ -84,7 +84,7 @@ const stitchProducts: StitchProduct[] = [
     seller: 'TimePiece Co.',
     price: '$590.00',
     discount: 'NEW',
-    imageUrl: ProductImages.watch,
+    imageUrl: ProductImages.chronograph,
   },
 ];
 
