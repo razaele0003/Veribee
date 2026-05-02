@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons } from '@/components/ui/MaterialIcons';
 import { BUYER_ORDERS, BuyerOrder, formatPHP } from '@/lib/buyerData';
 import { isLocalUserId } from '@/lib/localAuth';
 import { supabase } from '@/lib/supabase';

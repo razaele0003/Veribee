@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Redirect, useRouter } from 'expo-router';
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons } from '@/components/ui/MaterialIcons';
 import { ActiveDeliveryCard } from '@/components/rider/ActiveDeliveryCard';
 import { MapCard } from '@/components/rider/MapCard';
 import { DEMO_ROUTE } from '@/lib/demoProfiles';

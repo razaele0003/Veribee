@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons } from '@/components/ui/MaterialIcons';
 import { BUYER_PRODUCTS, BuyerProduct, formatPHP } from '@/lib/buyerData';
 import { sellerProductToBuyerProduct, supabaseProductToBuyerProduct } from '@/lib/marketplaceProducts';
 import { supabase } from '@/lib/supabase';

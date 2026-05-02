@@ -11,7 +11,7 @@ import {
 import Constants from 'expo-constants';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons } from '@/components/ui/MaterialIcons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button } from '@/components/ui/Button';
 import { Input, PasswordInput } from '@/components/ui/Input';

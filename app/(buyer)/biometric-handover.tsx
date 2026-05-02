@@ -3,7 +3,7 @@ import { Animated, Easing, Pressable, StyleSheet, Text, View } from 'react-nativ
 import * as LocalAuthentication from 'expo-local-authentication';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons } from '@/components/ui/MaterialIcons';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/authStore';
 import { Colors, Shadow } from '@/constants/colors';

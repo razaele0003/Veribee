@@ -1,7 +1,7 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons } from '@/components/ui/MaterialIcons';
 import { useAuthStore } from '@/store/authStore';
 import { useRiderStore } from '@/store/riderStore';
 import { Colors, Shadow } from '@/constants/colors';

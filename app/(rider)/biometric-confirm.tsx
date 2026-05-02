@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Animated, Easing, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Redirect, useRouter } from 'expo-router';
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons } from '@/components/ui/MaterialIcons';
 import { isLocalUserId } from '@/lib/localAuth';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/authStore';

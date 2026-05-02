@@ -9,7 +9,7 @@ import {
 import Svg, { Circle } from 'react-native-svg';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRootNavigationState, useRouter } from 'expo-router';
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons } from '@/components/ui/MaterialIcons';
 import { useAuthStore } from '@/store/authStore';
 import { useSellerStore } from '@/store/sellerStore';
 import { calculateSellerVsiFromProducts } from '@/lib/veribeeScoring';

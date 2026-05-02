@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { Alert, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons } from '@/components/ui/MaterialIcons';
 import { ProductListItem } from '@/components/seller/ProductListItem';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { LocalProduct, useSellerStore } from '@/store/sellerStore';

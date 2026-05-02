@@ -1,7 +1,7 @@
 import { Image, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons } from '@/components/ui/MaterialIcons';
 import { Button } from '@/components/ui/Button';
 import { findBuyerProduct, formatPHP } from '@/lib/buyerData';
 import { sellerProductToBuyerProduct } from '@/lib/marketplaceProducts';

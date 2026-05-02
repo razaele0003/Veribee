@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons } from '@/components/ui/MaterialIcons';
 import { BUYER_PRODUCTS, BuyerProduct } from '@/lib/buyerData';
 import { BUYER_LOCATIONS, BuyerLocation, useBuyerPrefsStore } from '@/store/buyerPrefsStore';
 import { useCartStore } from '@/store/cartStore';

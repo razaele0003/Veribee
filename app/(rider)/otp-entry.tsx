@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Redirect, useRouter } from 'expo-router';
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons } from '@/components/ui/MaterialIcons';
 import { Button } from '@/components/ui/Button';
 import { OTPInput } from '@/components/ui/OTPInput';
 import { isLocalUserId } from '@/lib/localAuth';

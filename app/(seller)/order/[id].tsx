@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons } from '@/components/ui/MaterialIcons';
 import { supabase } from '@/lib/supabase';
 import { Colors, Shadow } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';

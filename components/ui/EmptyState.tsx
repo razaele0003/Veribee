@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons } from '@/components/ui/MaterialIcons';
 import { Button } from '@/components/ui/Button';
 import { Colors } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';

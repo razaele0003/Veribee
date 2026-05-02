@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
 import { Tabs } from 'expo-router';
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons } from '@/components/ui/MaterialIcons';
 import { Colors } from '@/constants/colors';
 import { Fonts } from '@/constants/typography';
 import { Radii } from '@/constants/radii';

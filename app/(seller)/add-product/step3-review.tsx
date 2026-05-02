@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons } from '@/components/ui/MaterialIcons';
 import { Button } from '@/components/ui/Button';
 import { StepIndicator } from '@/components/ui/StepIndicator';
 import { supabase } from '@/lib/supabase';

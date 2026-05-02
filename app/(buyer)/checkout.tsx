@@ -1,7 +1,7 @@
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons } from '@/components/ui/MaterialIcons';
 import { Button } from '@/components/ui/Button';
 import { DEMO_ACCOUNTS, DEMO_ROUTE } from '@/lib/demoProfiles';
 import { formatPHP } from '@/lib/buyerData';

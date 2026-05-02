@@ -3,7 +3,7 @@ import { Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-nat
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons } from '@/components/ui/MaterialIcons';
 import { JobCard } from '@/components/rider/JobCard';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { isLocalUserId } from '@/lib/localAuth';

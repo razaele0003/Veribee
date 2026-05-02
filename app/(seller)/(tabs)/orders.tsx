@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons } from '@/components/ui/MaterialIcons';
 import { supabase } from '@/lib/supabase';
 import { isLocalUserId } from '@/lib/localAuth';
 import { useAuthStore } from '@/store/authStore';

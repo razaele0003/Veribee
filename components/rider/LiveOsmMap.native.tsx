@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons } from '@/components/ui/MaterialIcons';
 import * as MapLibre from '@maplibre/maplibre-react-native';
 import { RouteFallbackMap } from '@/components/rider/RouteFallbackMap';
 import { Colors } from '@/constants/colors';

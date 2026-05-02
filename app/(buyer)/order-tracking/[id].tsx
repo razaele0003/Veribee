@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons } from '@/components/ui/MaterialIcons';
 import { Button } from '@/components/ui/Button';
 import { LiveOsmMap } from '@/components/rider/LiveOsmMap';
 import { DEMO_ACCOUNTS, DEMO_ROUTE } from '@/lib/demoProfiles';

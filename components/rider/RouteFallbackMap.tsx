@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { LayoutChangeEvent, StyleSheet, Text, View } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons } from '@/components/ui/MaterialIcons';
 import { Colors } from '@/constants/colors';
 import { Fonts } from '@/constants/typography';
 import { Radii } from '@/constants/radii';

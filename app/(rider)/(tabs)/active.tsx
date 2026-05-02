@@ -1,7 +1,7 @@
 import { Pressable, ScrollView, StyleSheet, Text, View, Image, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons } from '@/components/ui/MaterialIcons';
 import { Button } from '@/components/ui/Button';
 import { ActiveDeliveryCard } from '@/components/rider/ActiveDeliveryCard';
 import { MapCard } from '@/components/rider/MapCard';

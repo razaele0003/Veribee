@@ -1,5 +1,5 @@
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons } from '@/components/ui/MaterialIcons';
 import { BuyerProduct, formatPHP } from '@/lib/buyerData';
 import { resolveImageSource } from '@/constants/productImages';
 import { Colors, Shadow } from '@/constants/colors';
