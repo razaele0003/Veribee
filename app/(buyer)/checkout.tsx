@@ -33,6 +33,38 @@ export default function Checkout() {
     return acc;
   }, {} as Record<string, CartItem[]>);
 
+  if (items.length === 0) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+          <View style={styles.headerTop}>
+            <Pressable
+              onPress={() => router.back()}
+              hitSlop={12}
+              style={styles.iconButton}
+              accessibilityRole="button"
+              accessibilityLabel="Go back"
+            >
+              <MaterialIcons name="arrow-back" size={24} color={Colors.onSurface} />
+            </Pressable>
+            <Text style={styles.headerTitle}>Secure Checkout</Text>
+            <View style={styles.iconButton} />
+          </View>
+        </View>
+        <View style={styles.emptyCheckout}>
+          <View style={styles.emptyCheckoutIcon}>
+            <MaterialIcons name="shopping-cart" size={34} color={Colors.primary} />
+          </View>
+          <Text style={styles.emptyCheckoutTitle}>No items ready for checkout</Text>
+          <Text style={styles.emptyCheckoutBody}>
+            Add a verified product first so Veribee can prepare authentication, delivery, and handover.
+          </Text>
+          <Button title="Browse Verified Products" onPress={() => router.replace('/(buyer)/(tabs)/home')} />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   const placeOrder = async () => {
     if (items.length === 0) {
       router.replace('/(buyer)/(tabs)/home');
@@ -108,7 +140,10 @@ export default function Checkout() {
           >
             <MaterialIcons name="arrow-back" size={24} color={Colors.onSurface} />
           </Pressable>
-          <Text style={styles.headerTitle}>Secure Checkout</Text>
+          <View style={styles.headerCopy}>
+            <Text style={styles.headerKicker}>VERIBEE PROTECTED</Text>
+            <Text style={styles.headerTitle}>Secure Checkout</Text>
+          </View>
           <View style={styles.iconButton}>
             <MaterialIcons name="help-outline" size={24} color={Colors.secondary} />
           </View>
@@ -181,7 +216,7 @@ export default function Checkout() {
             <View style={styles.addressCopy}>
               <Text style={styles.addressTitle}>Shipping Option</Text>
               <Text style={styles.addressName}>Standard Logistics</Text>
-              <Text style={styles.shippingEta}>Estimated Delivery: Oct 25 - Oct 27</Text>
+              <Text style={styles.shippingEta}>Metro Manila route - live rider tracking after pickup</Text>
             </View>
             <View style={styles.shippingRight}>
               <Text style={styles.shippingFee}>{formatPHP(deliveryFee)}</Text>
@@ -258,16 +293,27 @@ const styles = StyleSheet.create({
     borderBottomColor: Colors.surfaceDim,
   },
   headerTop: {
-    height: 56,
+    minHeight: 62,
     paddingHorizontal: Spacing.containerMargin,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
   iconButton: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
+  headerCopy: {
+    flex: 1,
+    alignItems: 'center',
+    gap: 2,
+  },
+  headerKicker: {
+    fontFamily: Fonts.manropeBold,
+    fontSize: 10,
+    color: Colors.primary,
+    textTransform: 'uppercase',
+  },
   headerTitle: { 
     fontFamily: Fonts.epilogueSemiBold,
-    fontSize: 20,
+    fontSize: 19,
     color: Colors.onSurface 
   },
   headerTabs: {
@@ -301,15 +347,17 @@ const styles = StyleSheet.create({
     color: Colors.primary,
   },
   content: {
-    padding: Spacing.containerMargin,
+    padding: Spacing.md,
     paddingBottom: 120,
-    gap: Spacing.containerMargin,
+    gap: Spacing.sm,
   },
   sectionCard: {
-    borderRadius: Radii.xl,
+    borderRadius: Radii.card,
     backgroundColor: Colors.surfaceContainerLowest,
     ...Shadow.card,
-    padding: Spacing.sm,
+    padding: Spacing.md,
+    borderWidth: 1,
+    borderColor: Colors.outlineVariant,
   },
   addressRow: {
     flexDirection: 'row',
@@ -328,7 +376,7 @@ const styles = StyleSheet.create({
   addressTitle: {
     fontFamily: Fonts.epilogueBold,
     fontSize: 12,
-    letterSpacing: 0.05 * 12,
+    letterSpacing: 0,
     color: Colors.onSurface,
     textTransform: 'uppercase',
   },
@@ -377,9 +425,9 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
   },
   itemThumb: {
-    width: 80,
-    height: 80,
-    borderRadius: Radii.lg,
+    width: 76,
+    height: 76,
+    borderRadius: Radii.DEFAULT,
     backgroundColor: Colors.surfaceContainer,
     alignItems: 'center',
     justifyContent: 'center',
@@ -403,9 +451,9 @@ const styles = StyleSheet.create({
   },
   itemPrice: {
     fontFamily: Fonts.epilogueBold,
-    fontSize: 12,
-    letterSpacing: 0.05 * 12,
-    color: Colors.onSurface,
+    fontSize: 15,
+    letterSpacing: 0,
+    color: Colors.primary,
   },
   itemQty: {
     fontFamily: Fonts.manropeRegular,
@@ -491,17 +539,42 @@ const styles = StyleSheet.create({
   },
   totalValue: {
     fontFamily: Fonts.epilogueBold,
-    fontSize: 28,
+    fontSize: 24,
     color: Colors.primary,
   },
   checkoutButton: {
     backgroundColor: Colors.primary,
-    paddingHorizontal: Spacing.lg,
+    paddingHorizontal: Spacing.md,
     height: 48,
     borderRadius: Radii.lg,
     alignItems: 'center',
     justifyContent: 'center',
     ...Shadow.card,
+  },
+  emptyCheckout: {
+    flex: 1,
+    paddingHorizontal: Spacing.containerMargin,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.md,
+  },
+  emptyCheckoutIcon: {
+    width: 74,
+    height: 74,
+    borderRadius: Radii.full,
+    backgroundColor: Colors.primaryFixed,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emptyCheckoutTitle: {
+    ...Type.h3,
+    color: Colors.onSurface,
+    textAlign: 'center',
+  },
+  emptyCheckoutBody: {
+    ...Type.bodyMd,
+    color: Colors.onSurfaceVariant,
+    textAlign: 'center',
   },
   checkoutButtonText: {
     fontFamily: Fonts.epilogueBold,

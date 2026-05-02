@@ -82,7 +82,7 @@ export default function OrderTracking() {
         <View style={styles.liveBadge}>
           <View style={styles.liveDot} />
           <Text style={styles.liveBadgeText}>
-            Live rider GPS {riderCoordinate.latitude.toFixed(4)}, {riderCoordinate.longitude.toFixed(4)}
+            Live rider GPS active
           </Text>
         </View>
       </View>
@@ -194,8 +194,8 @@ const styles = StyleSheet.create({
     top: Spacing.xl + 54,
     left: Spacing.containerMargin,
     right: Spacing.containerMargin,
-    minHeight: 42,
-    borderRadius: Radii.full,
+    minHeight: 40,
+    borderRadius: Radii.DEFAULT,
     backgroundColor: 'rgba(255,255,255,0.92)',
     borderWidth: 1,
     borderColor: Colors.outlineVariant,
@@ -277,8 +277,10 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: Radii.xl,
     borderTopRightRadius: Radii.xl,
     backgroundColor: Colors.surfaceContainerLowest,
-    padding: Spacing.containerMargin,
-    gap: Spacing.md,
+    paddingHorizontal: Spacing.containerMargin,
+    paddingTop: Spacing.sm,
+    paddingBottom: Spacing.md,
+    gap: Spacing.sm,
     ...Shadow.card,
   },
   handle: {
@@ -293,7 +295,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  title: { ...Type.h3, color: Colors.onSurface },
+  title: {
+    fontFamily: Fonts.epilogueBold,
+    fontSize: 24,
+    lineHeight: 30,
+    color: Colors.onSurface,
+  },
   stepper: { flexDirection: 'row', justifyContent: 'space-between', gap: Spacing.xs },
   stepItem: { flex: 1, alignItems: 'center', gap: Spacing.xs },
   stepCircle: {
@@ -313,9 +320,9 @@ const styles = StyleSheet.create({
   },
   stepLabelActive: { color: Colors.primary, fontFamily: Fonts.manropeBold },
   estimate: {
-    borderRadius: Radii.lg,
+    borderRadius: Radii.DEFAULT,
     backgroundColor: Colors.surfaceContainerLow,
-    padding: Spacing.md,
+    padding: Spacing.sm,
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.sm,
@@ -330,7 +337,7 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: Colors.surfaceVariant,
-    paddingTop: Spacing.md,
+    paddingTop: Spacing.sm,
   },
   avatar: {
     width: 42,
@@ -356,7 +363,7 @@ const styles = StyleSheet.create({
   },
   devFab: {
     position: 'absolute',
-    bottom: Spacing.xl * 2,
+    bottom: Spacing.xl + Spacing.sm,
     right: Spacing.containerMargin,
     backgroundColor: '#333',
     flexDirection: 'row',

@@ -10,10 +10,11 @@ type Props = {
 
 export function VSIGauge({ score }: Props) {
   const width = 240;
-  const height = 146;
+  const height = 132;
   const centerX = 120;
   const centerY = 118;
   const radius = 96;
+  const needleLength = 62;
   const arcLength = Math.PI * radius;
   const normalizedScore = Math.min(Math.max(score, 0), 100);
   const rotation = normalizedScore * 1.8 - 90;
@@ -56,7 +57,7 @@ export function VSIGauge({ score }: Props) {
         />
         <G rotation={rotation} origin={`${centerX}, ${centerY}`}>
           <Path
-            d={`M ${centerX - 5},${centerY} L ${centerX + 5},${centerY} L ${centerX},${centerY - 82} Z`}
+            d={`M ${centerX - 5},${centerY} L ${centerX + 5},${centerY} L ${centerX},${centerY - needleLength} Z`}
             fill={Colors.surfaceTint}
           />
           <Circle cx={centerX} cy={centerY} r={8} fill={Colors.surfaceTint} />
@@ -74,10 +75,11 @@ const styles = StyleSheet.create({
   wrap: {
     alignItems: 'center',
     paddingTop: Spacing.sm,
+    paddingBottom: Spacing.sm,
   },
   scoreBlock: {
     alignItems: 'center',
-    marginTop: -Spacing.xl,
+    marginTop: Spacing.sm,
   },
   score: {
     fontFamily: Fonts.epilogueBold,

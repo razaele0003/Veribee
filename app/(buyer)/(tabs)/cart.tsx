@@ -15,8 +15,6 @@ export default function BuyerCart() {
   const items = useCartStore((s) => s.items);
   const selectedItems = items.filter((i) => i.selected !== false);
   const totalPrice = useCartStore((s) => s.totalPrice());
-  const authFee = useCartStore((s) => s.authFee());
-  const deliveryFee = useCartStore((s) => s.deliveryFee());
   const grandTotal = useCartStore((s) => s.grandTotal());
 
   // Group items by seller
@@ -31,39 +29,17 @@ export default function BuyerCart() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <View style={styles.iconButton} />
-        <Text style={styles.headerTitle}>Shopping Cart</Text>
-        <View style={styles.iconButton} />
+        <View>
+          <Text style={styles.headerKicker}>SECURE BUYER CART</Text>
+          <Text style={styles.headerTitle}>Shopping Cart</Text>
+        </View>
+        <View style={styles.headerCount}>
+          <Text style={styles.headerCountValue}>{items.length}</Text>
+          <Text style={styles.headerCountLabel}>items</Text>
+        </View>
       </View>
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <View style={styles.cartHero}>
-          <View>
-            <Text style={styles.heroKicker}>VERIFIED CHECKOUT</Text>
-            <Text style={styles.heroTitle}>Cart ready for Veribee checks</Text>
-          </View>
-          <View style={styles.heroStats}>
-            <View style={styles.heroStat}>
-              <Text style={styles.heroStatValue}>{selectedItems.length}</Text>
-              <Text style={styles.heroStatLabel}>Selected</Text>
-            </View>
-            <View style={styles.heroDivider} />
-            <View style={styles.heroStat}>
-              <Text style={styles.heroStatValue}>{formatPHP(authFee)}</Text>
-              <Text style={styles.heroStatLabel}>Auth fee</Text>
-            </View>
-            <View style={styles.heroDivider} />
-            <View style={styles.heroStat}>
-              <Text style={styles.heroStatValue}>{formatPHP(deliveryFee)}</Text>
-              <Text style={styles.heroStatLabel}>Delivery</Text>
-            </View>
-          </View>
-          <View style={styles.voucherStrip}>
-            <MaterialIcons name="local-offer" size={18} color={Colors.onSecondaryContainer} />
-            <Text style={styles.voucherText}>Free demo voucher applied to verified Metro Manila routes</Text>
-          </View>
-        </View>
-
         {items.length > 0 ? (
           Object.entries(groupedItems).map(([sellerName, sellerItems]) => (
             <View key={sellerName} style={styles.storeGroup}>
@@ -106,7 +82,7 @@ export default function BuyerCart() {
               disabled={selectedItems.length === 0}
               onPress={() => router.push('/(buyer)/checkout')}
             >
-              <Text style={styles.checkoutButtonText}>Check Out ({selectedItems.length})</Text>
+              <Text style={styles.checkoutButtonText}>Checkout ({selectedItems.length})</Text>
             </Pressable>
           </View>
         </View>
@@ -153,14 +129,14 @@ function CartRow({ item }: { item: CartItem }) {
               style={styles.qtyBtn}
               onPress={() => updateQuantity(item.productId, item.quantity - 1)}
             >
-              <Text style={styles.qtyText}>−</Text>
+              <MaterialIcons name="remove" size={17} color={Colors.onSurfaceVariant} />
             </Pressable>
             <Text style={styles.quantityText}>{item.quantity}</Text>
             <Pressable 
               style={[styles.qtyBtn, styles.qtyBtnRight]}
               onPress={() => updateQuantity(item.productId, item.quantity + 1)}
             >
-              <Text style={styles.qtyText}>+</Text>
+              <MaterialIcons name="add" size={17} color={Colors.onSurfaceVariant} />
             </Pressable>
           </View>
         </View>
@@ -172,91 +148,52 @@ function CartRow({ item }: { item: CartItem }) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },
   header: {
-    height: 64,
+    minHeight: 72,
     paddingHorizontal: Spacing.containerMargin,
     backgroundColor: Colors.primaryContainer,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  iconButton: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
+  headerKicker: {
+    fontFamily: Fonts.manropeBold,
+    fontSize: 11,
+    color: Colors.secondaryContainer,
+    textTransform: 'uppercase',
+    marginBottom: 3,
+  },
   headerTitle: { 
     fontFamily: Fonts.epilogueBold,
-    fontSize: 18,
+    fontSize: 25,
     color: Colors.onPrimary 
+  },
+  headerCount: {
+    minWidth: 64,
+    minHeight: 44,
+    borderRadius: Radii.full,
+    backgroundColor: Colors.secondaryContainer,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: Spacing.sm,
+  },
+  headerCountValue: {
+    fontFamily: Fonts.epilogueBold,
+    fontSize: 16,
+    color: Colors.onSecondaryContainer,
+  },
+  headerCountLabel: {
+    fontFamily: Fonts.manropeBold,
+    fontSize: 10,
+    color: Colors.onSecondaryContainer,
   },
   content: {
     padding: Spacing.containerMargin,
     paddingBottom: 120,
     gap: Spacing.sm,
   },
-  cartHero: {
-    backgroundColor: Colors.primaryContainer,
-    borderRadius: Radii.xl,
-    padding: Spacing.md,
-    gap: Spacing.md,
-    marginBottom: Spacing.sm,
-    ...Shadow.fab,
-  },
-  heroKicker: {
-    ...Type.labelCaps,
-    color: Colors.secondaryContainer,
-    marginBottom: 6,
-  },
-  heroTitle: {
-    fontFamily: Fonts.epilogueBold,
-    fontSize: 24,
-    lineHeight: 30,
-    color: Colors.onPrimary,
-  },
-  heroStats: {
-    minHeight: 66,
-    borderRadius: Radii.DEFAULT,
-    backgroundColor: 'rgba(255,255,255,0.14)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.24)',
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  heroStat: {
-    flex: 1,
-    alignItems: 'center',
-    gap: 2,
-    paddingHorizontal: 4,
-  },
-  heroStatValue: {
-    fontFamily: Fonts.epilogueBold,
-    fontSize: 16,
-    color: Colors.onPrimary,
-  },
-  heroStatLabel: {
-    fontFamily: Fonts.manropeBold,
-    fontSize: 11,
-    color: Colors.onPrimaryContainer,
-  },
-  heroDivider: {
-    width: StyleSheet.hairlineWidth,
-    height: 34,
-    backgroundColor: 'rgba(255,255,255,0.24)',
-  },
-  voucherStrip: {
-    minHeight: 44,
-    borderRadius: Radii.DEFAULT,
-    backgroundColor: Colors.secondaryContainer,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.xs,
-    paddingHorizontal: Spacing.sm,
-  },
-  voucherText: {
-    flex: 1,
-    fontFamily: Fonts.manropeBold,
-    fontSize: 12,
-    color: Colors.onSecondaryContainer,
-  },
   storeGroup: {
     backgroundColor: Colors.surfaceContainerLowest,
-    borderRadius: Radii.xl,
+    borderRadius: Radii.card,
     overflow: 'hidden',
     ...Shadow.card,
     marginBottom: Spacing.sm,
@@ -264,7 +201,8 @@ const styles = StyleSheet.create({
   storeHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: Spacing.sm,
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: Colors.outlineVariant,
     gap: Spacing.sm,
@@ -291,16 +229,16 @@ const styles = StyleSheet.create({
     marginLeft: 16,
   },
   thumb: {
-    width: 96,
-    height: 96,
-    borderRadius: Radii.lg,
+    width: 82,
+    height: 82,
+    borderRadius: Radii.DEFAULT,
     backgroundColor: Colors.surfaceContainerHighest,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
   },
   thumbImage: { width: '100%', height: '100%' },
-  cartCopy: { flex: 1, minHeight: 96, justifyContent: 'space-between' },
+  cartCopy: { flex: 1, minHeight: 82, justifyContent: 'space-between' },
   titleRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -322,7 +260,7 @@ const styles = StyleSheet.create({
   },
   itemPrice: {
     fontFamily: Fonts.epilogueSemiBold,
-    fontSize: 20,
+    fontSize: 18,
     color: Colors.primary,
   },
   quantityControl: {
@@ -333,16 +271,10 @@ const styles = StyleSheet.create({
     borderRadius: Radii.DEFAULT,
   },
   qtyBtn: {
-    width: 32,
-    height: 32,
+    width: 34,
+    height: 34,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  qtyText: {
-    fontFamily: Fonts.manropeRegular,
-    fontSize: 18,
-    color: Colors.onSurfaceVariant,
-    lineHeight: 22,
   },
   qtyBtnRight: {
     borderLeftWidth: 1,
@@ -369,11 +301,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    gap: Spacing.sm,
     paddingHorizontal: Spacing.containerMargin,
     paddingVertical: Spacing.sm,
     paddingBottom: Spacing.lg,
   },
   totalBlock: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     flexWrap: 'wrap',
@@ -386,7 +320,7 @@ const styles = StyleSheet.create({
   },
   totalValue: {
     fontFamily: Fonts.epilogueSemiBold,
-    fontSize: 20,
+    fontSize: 18,
     color: Colors.primary,
   },
   totalSub: {
@@ -397,7 +331,8 @@ const styles = StyleSheet.create({
   },
   checkoutButton: {
     backgroundColor: Colors.primary,
-    paddingHorizontal: Spacing.xl,
+    width: 132,
+    paddingHorizontal: 0,
     minHeight: 48,
     borderRadius: Radii.lg,
     alignItems: 'center',

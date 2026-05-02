@@ -98,6 +98,16 @@ export default function ProductDetail() {
         </View>
 
         <View style={styles.titleBlock}>
+          <View style={styles.productMetaRow}>
+            <View style={styles.productMetaPill}>
+              <MaterialIcons name="verified-user" size={14} color={Colors.primary} />
+              <Text style={styles.productMetaText}>VSI {product.sellerVsi}</Text>
+            </View>
+            <View style={styles.productMetaPill}>
+              <MaterialIcons name="local-shipping" size={14} color={Colors.deal} />
+              <Text style={styles.productMetaText}>Metro Manila</Text>
+            </View>
+          </View>
           <Text style={styles.title}>{product.title}</Text>
           <Text style={styles.price}>{formatPHP(product.price)}</Text>
         </View>
@@ -235,7 +245,7 @@ function Spec({ label, value }: { label: string; value: string }) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },
   header: {
-    height: 64,
+    height: 58,
     paddingHorizontal: Spacing.containerMargin,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: Colors.outlineVariant,
@@ -258,7 +268,7 @@ const styles = StyleSheet.create({
   },
   content: { paddingBottom: 112 },
   heroImage: {
-    aspectRatio: 1,
+    aspectRatio: 1.35,
     backgroundColor: Colors.surfaceContainerHigh,
     alignItems: 'center',
     justifyContent: 'center',
@@ -269,23 +279,47 @@ const styles = StyleSheet.create({
   },
   titleBlock: {
     padding: Spacing.containerMargin,
-    gap: Spacing.sm,
+    gap: 7,
   },
-  title: { ...Type.h2, color: Colors.onSurface },
+  productMetaRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: Spacing.xs,
+  },
+  productMetaPill: {
+    minHeight: 30,
+    borderRadius: Radii.full,
+    backgroundColor: Colors.dealContainer,
+    paddingHorizontal: Spacing.sm,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+  },
+  productMetaText: {
+    fontFamily: Fonts.manropeBold,
+    fontSize: 12,
+    color: Colors.onDealContainer,
+  },
+  title: {
+    fontFamily: Fonts.epilogueBold,
+    fontSize: 28,
+    lineHeight: 34,
+    color: Colors.onSurface,
+  },
   price: {
     fontFamily: Fonts.epilogueBold,
-    fontSize: 36,
-    lineHeight: 40,
+    fontSize: 31,
+    lineHeight: 36,
     color: Colors.primary,
   },
   verifiedBanner: {
     marginHorizontal: Spacing.containerMargin,
-    marginBottom: Spacing.lg,
-    borderRadius: Radii.lg,
+    marginBottom: Spacing.md,
+    borderRadius: Radii.DEFAULT,
     backgroundColor: Colors.secondaryContainer,
     borderWidth: 1,
     borderColor: Colors.secondaryFixedDim,
-    padding: Spacing.md,
+    padding: Spacing.sm,
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.sm,
@@ -297,20 +331,20 @@ const styles = StyleSheet.create({
   },
   sellerCard: {
     marginHorizontal: Spacing.containerMargin,
-    marginBottom: Spacing.xl,
-    borderRadius: Radii.lg,
+    marginBottom: Spacing.md,
+    borderRadius: Radii.card,
     backgroundColor: Colors.surfaceContainerLowest,
     borderWidth: 1,
     borderColor: Colors.surfaceVariant,
-    padding: Spacing.md,
+    padding: Spacing.sm,
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.md,
     ...Shadow.card,
   },
   sellerAvatar: {
-    width: 64,
-    height: 64,
+    width: 54,
+    height: 54,
     borderRadius: Radii.full,
     backgroundColor: Colors.primaryFixed,
     alignItems: 'center',
@@ -318,7 +352,7 @@ const styles = StyleSheet.create({
   },
   sellerInitial: {
     fontFamily: Fonts.epilogueBold,
-    fontSize: 28,
+    fontSize: 22,
     color: Colors.primary,
   },
   vsiBadge: {
@@ -342,7 +376,7 @@ const styles = StyleSheet.create({
   sellerCopy: { flex: 1 },
   sellerName: {
     fontFamily: Fonts.epilogueSemiBold,
-    fontSize: 18,
+    fontSize: 16,
     color: Colors.onSurface,
   },
   sellerMeta: {
@@ -407,7 +441,8 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: Colors.surfaceVariant,
     backgroundColor: Colors.surfaceContainerLowest,
-    padding: Spacing.md,
+    padding: Spacing.sm,
+    paddingBottom: Spacing.md,
     flexDirection: 'row',
     gap: Spacing.sm,
   },

@@ -25,33 +25,19 @@ export function ProductCard({ product, onPress }: Props) {
     >
       <View style={styles.imageBlock}>
         {product.imageUrl ? (
-          <Image
-            source={{ uri: product.imageUrl }}
-            style={styles.productImage}
-            resizeMode="cover"
-          />
+          <Image source={{ uri: product.imageUrl }} style={styles.productImage} resizeMode="cover" />
         ) : (
-          <MaterialIcons name="inventory-2" size={42} color={Colors.primary} />
+          <MaterialIcons name="inventory-2" size={40} color={Colors.primary} />
         )}
         <View style={styles.imageShade} />
-        <View
-          style={[
-            styles.badge,
-            isVerified ? styles.badgeVerified : styles.badgePending,
-          ]}
-        >
+        <View style={[styles.statusBadge, isVerified ? styles.verifiedBadge : styles.pendingBadge]}>
           <MaterialIcons
             name={isVerified ? 'verified' : 'schedule'}
-            size={12}
-            color={isVerified ? Colors.onSecondaryContainer : Colors.onTertiaryContainer}
+            size={13}
+            color={isVerified ? Colors.onSecondaryContainer : Colors.onWarningContainer}
           />
-          <Text
-            style={[
-              styles.badgeText,
-              isVerified ? styles.badgeTextVerified : styles.badgeTextPending,
-            ]}
-          >
-            {isVerified ? 'Verified' : 'Pending'}
+          <Text style={[styles.statusText, isVerified ? styles.verifiedText : styles.pendingText]}>
+            {isVerified ? 'Verified' : 'Reviewing'}
           </Text>
         </View>
         <View style={styles.discountFlag}>
@@ -59,27 +45,36 @@ export function ProductCard({ product, onPress }: Props) {
           <Text style={styles.discountLabel}>OFF</Text>
         </View>
       </View>
+
       <View style={styles.content}>
-        <View style={styles.categoryRow}>
+        <View style={styles.metaRow}>
           <View style={styles.categoryPill}>
-            <Text style={styles.categoryText}>{product.category}</Text>
+            <Text style={styles.categoryText} numberOfLines={1}>
+              {product.category}
+            </Text>
           </View>
-          <View style={styles.authPill}>
-            <MaterialIcons name="shield" size={11} color={Colors.tertiary} />
-            <Text style={styles.authText}>{product.authScore}</Text>
+          <View style={styles.scorePill}>
+            <MaterialIcons name="shield" size={12} color={Colors.tertiary} />
+            <Text style={styles.scoreText}>{product.authScore}</Text>
           </View>
         </View>
+
         <Text style={styles.title} numberOfLines={2}>
           {product.title}
         </Text>
+
         <View style={styles.priceRow}>
           <Text style={styles.price}>{formatPHP(product.price)}</Text>
           <Text style={styles.sold}>{soldCount} sold</Text>
         </View>
-        <View style={styles.deliveryRow}>
+
+        <View style={styles.routePill}>
           <MaterialIcons name="local-shipping" size={13} color={Colors.deal} />
-          <Text style={styles.deliveryText}>Metro Manila verified route</Text>
+          <Text style={styles.routeText} numberOfLines={1}>
+            Metro Manila verified
+          </Text>
         </View>
+
         <View style={styles.sellerRow}>
           <Text style={styles.seller} numberOfLines={1}>
             {product.sellerName}
@@ -99,14 +94,14 @@ const styles = StyleSheet.create({
     minWidth: 0,
     borderRadius: Radii.card,
     borderWidth: 1,
-    borderColor: Colors.surfaceVariant,
+    borderColor: Colors.outlineVariant,
     backgroundColor: Colors.surfaceContainerLowest,
     overflow: 'hidden',
     ...Shadow.card,
   },
-  pressed: { opacity: 0.72 },
+  pressed: { opacity: 0.76 },
   imageBlock: {
-    aspectRatio: 1,
+    aspectRatio: 1.04,
     backgroundColor: Colors.surfaceContainerHigh,
     alignItems: 'center',
     justifyContent: 'center',
@@ -121,38 +116,40 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    height: 58,
-    backgroundColor: 'rgba(0,0,0,0.18)',
+    height: 48,
+    backgroundColor: 'rgba(33,27,24,0.2)',
   },
-  badge: {
+  statusBadge: {
     position: 'absolute',
     top: Spacing.sm,
     left: Spacing.sm,
+    minHeight: 28,
+    maxWidth: '72%',
     borderRadius: Radii.full,
-    paddingHorizontal: 7,
-    paddingVertical: 4,
+    paddingHorizontal: 9,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: 5,
   },
-  badgeVerified: { backgroundColor: Colors.secondaryContainer },
-  badgePending: { backgroundColor: Colors.tertiaryContainer },
-  badgeText: {
-    ...Type.labelCaps,
+  verifiedBadge: { backgroundColor: Colors.secondaryContainer },
+  pendingBadge: { backgroundColor: Colors.warningContainer },
+  statusText: {
+    fontFamily: Fonts.manropeBold,
     fontSize: 10,
     lineHeight: 12,
+    textTransform: 'uppercase',
   },
-  badgeTextVerified: { color: Colors.onSecondaryContainer },
-  badgeTextPending: { color: Colors.onTertiaryContainer },
+  verifiedText: { color: Colors.onSecondaryContainer },
+  pendingText: { color: Colors.onWarningContainer },
   discountFlag: {
     position: 'absolute',
     top: 0,
     right: Spacing.sm,
     width: 42,
-    minHeight: 48,
+    minHeight: 52,
     borderBottomLeftRadius: Radii.DEFAULT,
     borderBottomRightRadius: Radii.DEFAULT,
-    backgroundColor: Colors.warningContainer,
+    backgroundColor: Colors.surfaceContainerLowest,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
@@ -160,86 +157,88 @@ const styles = StyleSheet.create({
   },
   discountValue: {
     fontFamily: Fonts.epilogueBold,
-    fontSize: 13,
+    fontSize: 15,
+    lineHeight: 18,
     color: Colors.warning,
   },
   discountLabel: {
     fontFamily: Fonts.manropeBold,
-    fontSize: 8,
+    fontSize: 9,
     color: Colors.onWarningContainer,
   },
   content: {
     padding: Spacing.sm,
     gap: 7,
   },
-  categoryRow: {
+  metaRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
   },
   categoryPill: {
-    minHeight: 24,
+    minHeight: 26,
+    maxWidth: '64%',
     borderRadius: Radii.full,
     backgroundColor: Colors.dealContainer,
-    paddingHorizontal: 8,
+    paddingHorizontal: 9,
     justifyContent: 'center',
-    flexShrink: 1,
   },
   categoryText: {
     fontFamily: Fonts.manropeBold,
-    fontSize: 10,
+    fontSize: 11,
     color: Colors.onDealContainer,
   },
-  authPill: {
-    minHeight: 24,
+  scorePill: {
+    minHeight: 26,
     borderRadius: Radii.full,
     backgroundColor: Colors.tertiaryContainer,
-    paddingHorizontal: 7,
+    paddingHorizontal: 8,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 3,
   },
-  authText: {
+  scoreText: {
     fontFamily: Fonts.manropeBold,
-    fontSize: 10,
+    fontSize: 11,
     color: Colors.onTertiaryContainer,
   },
   title: {
-    fontFamily: Fonts.manropeBold,
-    fontSize: 14,
-    lineHeight: 19,
+    fontFamily: Fonts.epilogueSemiBold,
+    fontSize: 15,
+    lineHeight: 20,
     color: Colors.onSurface,
-  },
-  price: {
-    fontFamily: Fonts.epilogueBold,
-    fontSize: 17,
-    color: Colors.primary,
   },
   priceRow: {
     flexDirection: 'row',
     alignItems: 'flex-end',
-    justifyContent: 'space-between',
     gap: Spacing.xs,
+  },
+  price: {
+    flex: 1,
+    fontFamily: Fonts.epilogueBold,
+    fontSize: 18,
+    lineHeight: 22,
+    color: Colors.primary,
   },
   sold: {
     fontFamily: Fonts.manropeBold,
-    fontSize: 10,
+    fontSize: 11,
     color: Colors.onSurfaceVariant,
   },
-  deliveryRow: {
-    minHeight: 24,
+  routePill: {
+    minHeight: 28,
     borderRadius: Radii.DEFAULT,
-    backgroundColor: Colors.surfaceContainerLow,
-    paddingHorizontal: 7,
+    backgroundColor: Colors.warningContainer,
+    paddingHorizontal: 8,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: 5,
   },
-  deliveryText: {
+  routeText: {
     flex: 1,
     fontFamily: Fonts.manropeBold,
-    fontSize: 10,
-    color: Colors.onSurfaceVariant,
+    fontSize: 11,
+    color: Colors.onWarningContainer,
   },
   sellerRow: {
     flexDirection: 'row',
@@ -254,13 +253,13 @@ const styles = StyleSheet.create({
   },
   vsiPill: {
     borderRadius: Radii.full,
-    backgroundColor: Colors.surfaceContainer,
-    paddingHorizontal: Spacing.xs,
-    paddingVertical: 2,
+    backgroundColor: Colors.dealContainer,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
   },
   vsiText: {
     fontFamily: Fonts.manropeBold,
-    fontSize: 9,
-    color: Colors.onSurfaceVariant,
+    fontSize: 10,
+    color: Colors.onDealContainer,
   },
 });

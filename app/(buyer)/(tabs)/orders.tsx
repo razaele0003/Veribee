@@ -103,7 +103,7 @@ export default function BuyerOrders() {
     <SafeAreaView style={styles.container}>
       <View style={styles.hero}>
         <Text style={styles.heroKicker}>ORDER CONTROL CENTER</Text>
-        <Text style={styles.title}>Track every verified order</Text>
+        <Text style={styles.title}>Verified Orders</Text>
         <View style={styles.heroStats}>
           <View style={styles.heroStat}>
             <Text style={styles.heroStatValue}>{orderCounts.all}</Text>
@@ -206,6 +206,7 @@ function OrderCard({ order, onPress }: { order: BuyerOrder; onPress: () => void 
           <Text style={styles.orderTitle} numberOfLines={2}>
             {order.productTitle}
           </Text>
+          <Text style={styles.orderDate}>{order.orderedAt}</Text>
           <View style={styles.qtyPriceRow}>
             <Text style={styles.itemQty}>x 1</Text>
             <Text style={styles.orderPrice}>{formatPHP(order.price)}</Text>
@@ -244,9 +245,9 @@ const styles = StyleSheet.create({
   hero: {
     backgroundColor: Colors.primaryContainer,
     paddingHorizontal: Spacing.containerMargin,
-    paddingTop: Spacing.lg,
-    paddingBottom: Spacing.md,
-    gap: Spacing.md,
+    paddingTop: Spacing.md,
+    paddingBottom: Spacing.sm,
+    gap: Spacing.sm,
   },
   heroKicker: {
     ...Type.labelCaps,
@@ -254,12 +255,12 @@ const styles = StyleSheet.create({
   },
   title: {
     fontFamily: Fonts.epilogueBold,
-    fontSize: 30,
-    lineHeight: 36,
+    fontSize: 26,
+    lineHeight: 31,
     color: Colors.onPrimary,
   },
   heroStats: {
-    minHeight: 62,
+    minHeight: 52,
     borderRadius: Radii.DEFAULT,
     backgroundColor: 'rgba(255,255,255,0.14)',
     borderWidth: 1,
@@ -290,7 +291,7 @@ const styles = StyleSheet.create({
   },
   tabs: {
     paddingHorizontal: Spacing.containerMargin,
-    paddingTop: Spacing.md,
+    paddingTop: Spacing.sm,
     flexDirection: 'row',
   },
   tab: { paddingHorizontal: Spacing.md, alignItems: 'center' },
@@ -308,16 +309,16 @@ const styles = StyleSheet.create({
   },
   tabLineActive: { backgroundColor: Colors.primary },
   content: {
-    padding: Spacing.containerMargin,
+    padding: Spacing.md,
     paddingBottom: 112,
-    gap: Spacing.md,
+    gap: Spacing.sm,
     backgroundColor: Colors.background,
   },
   orderCard: {
     backgroundColor: Colors.surfaceContainerLowest,
     borderWidth: 1,
     borderColor: Colors.outlineVariant,
-    borderRadius: Radii.lg,
+    borderRadius: Radii.card,
     paddingTop: Spacing.sm,
     paddingHorizontal: Spacing.sm,
     overflow: 'hidden',
@@ -362,8 +363,8 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
   },
   thumb: {
-    width: 80,
-    height: 80,
+    width: 68,
+    height: 68,
     borderRadius: Radii.DEFAULT,
     backgroundColor: Colors.surfaceContainerHighest,
     alignItems: 'center',
@@ -376,9 +377,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   orderTitle: {
-    fontFamily: Fonts.manropeRegular,
+    fontFamily: Fonts.manropeBold,
     fontSize: 14,
     color: Colors.onSurface,
+  },
+  orderDate: {
+    fontFamily: Fonts.manropeMedium,
+    fontSize: 12,
+    color: Colors.onSurfaceVariant,
   },
   qtyPriceRow: {
     alignItems: 'flex-end',

@@ -1,151 +1,95 @@
-import { useEffect, useMemo, useState } from 'react';
-import { FlatList, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useState } from 'react';
+import { Image, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
-import { Logo } from '@/components/ui/Logo';
-import { ProductCard } from '@/components/buyer/ProductCard';
 import { BUYER_PRODUCTS, BuyerProduct } from '@/lib/buyerData';
-import { sellerProductToBuyerProduct, supabaseProductToBuyerProduct } from '@/lib/marketplaceProducts';
-import { supabase } from '@/lib/supabase';
 import { BUYER_LOCATIONS, BuyerLocation, useBuyerPrefsStore } from '@/store/buyerPrefsStore';
-import { useSellerStore } from '@/store/sellerStore';
-import { DEMO_ACCOUNTS } from '@/lib/demoProfiles';
+import { useCartStore } from '@/store/cartStore';
+import { useBuyerPrefsStore as useSavedStore } from '@/store/buyerPrefsStore';
 import { Colors, Shadow } from '@/constants/colors';
-import { Fonts, Type } from '@/constants/typography';
+import { Fonts } from '@/constants/typography';
 import { Spacing } from '@/constants/spacing';
 import { Radii } from '@/constants/radii';
 
-const categories = ['All', 'Electronics', 'Bags', 'Shoes', 'Jewelry'];
-
-const commerceShortcuts: Array<{
-  id: string;
+type CategoryTile = {
   label: string;
-  icon: keyof typeof MaterialIcons.glyphMap;
-  color: string;
-  bg: string;
-}> = [
-  {
-    id: 'deals',
-    label: 'Flash Deals',
-    icon: 'flash-on',
-    color: Colors.deal,
-    bg: Colors.dealContainer,
-  },
-  {
-    id: 'verified',
-    label: 'VSI 95+',
-    icon: 'verified',
-    color: Colors.tertiary,
-    bg: Colors.tertiaryContainer,
-  },
-  {
-    id: 'handover',
-    label: 'OTP Safe',
-    icon: 'pin',
-    color: Colors.accentBlue,
-    bg: Colors.accentBlueContainer,
-  },
-  {
-    id: 'local',
-    label: 'Nearby',
-    icon: 'storefront',
-    color: Colors.accentPink,
-    bg: Colors.accentPinkContainer,
-  },
-];
-
-const marketplacePerks: Array<{
-  id: string;
-  icon: keyof typeof MaterialIcons.glyphMap;
-  label: string;
-  value: string;
-}> = [
-  { id: 'voucher', icon: 'confirmation-number', label: 'Buyer perk', value: 'PHP 100 voucher' },
-  { id: 'guard', icon: 'shield', label: 'Protected', value: 'OTP handover' },
-  { id: 'route', icon: 'near-me', label: 'Metro Manila', value: 'Live rider route' },
-];
-
-type DemoNotification = {
-  id: string;
-  icon: keyof typeof MaterialIcons.glyphMap;
-  title: string;
-  body: string;
-  time: string;
+  category: string;
+  imageUrl: string;
 };
 
-const DEMO_NOTIFICATIONS: DemoNotification[] = [
+type StitchProduct = {
+  product: BuyerProduct;
+  title: string;
+  seller: string;
+  price: string;
+  msrp?: string;
+  discount?: string;
+  imageUrl: string;
+};
+
+const categories: CategoryTile[] = [
   {
-    id: 'n1',
-    icon: 'verified',
-    title: 'New verified seller nearby',
-    body: `${DEMO_ACCOUNTS.seller.storeName} just got Trusted Seller status.`,
-    time: '2m',
+    label: 'Electronics',
+    category: 'Electronics',
+    imageUrl:
+      'https://lh3.googleusercontent.com/aida-public/AB6AXuDgVMNfaVr34ZA7sN9P9olih1Qgwk1e1pO3GaHqSTyXbEFx5DFgb_uA-vVFKeIclEXYdH_JPDwnXCUcODIdWQclbOn5gW510yBl9Q-ndbCj6x5iZiwSrEOeXE_roTgEN33rxvvznPMZA9dvEsQ-Gt6N5SCZ3zII-MwiytIMKaydATT6qStX3uRjkKQeybuGMGRXx976bbYMfCPdQSoOrGyYb9YgRxShAIQiZb781zMq6KT2djhfpNsSxymhQwng56YiSATIwtX2H9yF',
   },
   {
-    id: 'n2',
-    icon: 'local-shipping',
-    title: 'Order VB-9982 is on the way',
-    body: 'Your rider is 8 minutes away.',
-    time: '14m',
+    label: 'Bags',
+    category: 'Bags',
+    imageUrl:
+      'https://lh3.googleusercontent.com/aida-public/AB6AXuDXRagxhCE2MAtbOn7LWGDO4eWhZB-Y2Juf6-2I4Sf_TB2JaeGo_xiZF72MNcJFLFumKS0q-joYQLQBthaeMt3phBALLxD55cfQw32iNyr5ydNnjLe4tnM7JqXd0vsLEvTnjhbwq5HS4VwPUT4HYdV-wX_Ktic3cIZPGF3XPx6kQbAi3ZZdvLSfofIvxf6du__2J7CacbkaP9-5rYXQjgZiAJbN0hGj7gD6gEvd7Gl1j_Wy8Y3ytyodotMHK9O1r3oyO1U35PjxTn2C',
   },
   {
-    id: 'n3',
-    icon: 'discount',
-    title: '₱100 off your next order',
-    body: 'Limited-time perk for early Veribee buyers.',
-    time: '1h',
+    label: 'Shoes',
+    category: 'Shoes',
+    imageUrl:
+      'https://lh3.googleusercontent.com/aida-public/AB6AXuAzJNhyKgSOS79hXd8bbnkeLcUahmwFe52I_HD5YvzUvQn_1-Q_UJOUy9tvU8tMO5lyKwlArUihH9-Whu4U8QVTX6SU-szSZjhWzzf0XhO4XX4jWIEMXOApVCUXXQUPXTnYBhro1n2GAGsrq6djRai9fFQv8NqjSN94jvuAznfgRRAY7OH1voBOSusgBBovUqcMVs_mrYn7tYIDaRj4P9Y7h9tGNiQ4X1HBqEU_xqdkj7dA20g-cW0Rk2cMYeTzGjLqllxHV4vSmsz-',
+  },
+  {
+    label: 'Jewelry',
+    category: 'Jewelry',
+    imageUrl:
+      'https://lh3.googleusercontent.com/aida-public/AB6AXuAPpQHwep4g-27fSJoqW8KTEoAoGAjywbMPOXZSTs6JJyN0VOLS79SzxwKRtmOHmrzw93JfiPR4b4gH3oa1jFB4OjTBVrreo1p4uY6CDazb0KKKS0pTaKXMNFiBnA0gzU3jz3tgoC8EusKM7PIMlMXYk9pXfUt8t5PU5Q4pdErsaqRzlEKHE-fk6XuB60F7fVFItVzZj0TEVut-wX6cUUtNQwFV1UzNGdlCyDv2T5T57RqGUrJRbfEXuzdHzM4SkTwKVsnrAhs0bLal',
+  },
+];
+
+const stitchProducts: StitchProduct[] = [
+  {
+    product: BUYER_PRODUCTS[0],
+    title: 'Minimalist Smartwatch',
+    seller: 'TechBrand Inc.',
+    price: '$249.00',
+    msrp: '$295.00',
+    discount: '15% OFF',
+    imageUrl:
+      'https://lh3.googleusercontent.com/aida-public/AB6AXuDO1JUBgPew03Bp6VXv2-YZCS3KrMzSkdYf6YJamtYGuNXsLsP-hPNPcjJTBot-AoHaQPNO45C2ZT-01v8QTx4FC2khCefShs0Phklu22fo_CPWsc2Rt6ntWt_qp0bxov9-HlYpThfyBsNAti85dMMHoJs2ltzjrTxCud2a--AAEEg7yJ3H8cxxczJ2IKSto_poKm7zstkLMODsL7iGdSPNW5y18BmC3Zd1hV3s2WjvAH3Vf74vXVdNJirglj6-7zILvRUcRt2oa0qq',
+  },
+  {
+    product: BUYER_PRODUCTS[0],
+    title: 'Studio Pro Headphones',
+    seller: 'AudioPhile',
+    price: '$349.00',
+    imageUrl:
+      'https://lh3.googleusercontent.com/aida-public/AB6AXuDcnBkJQ6AqwCyatIIvhhHjMwBD-OcDVWC42v6b1FaHEAtlQz6GCupMBRyxB-Y2OE6o69agI-IJHi7-JItd8wAvEMd3D_J-rbFcwdwhmUK0ELpOeve7rduH6nQLnDJpouRZNUz7SPbPwiDpZ_41rfGomRgIj-eQ64yqp2TN5PfLI58ZWRTyJNq2tzThYZ3x5p6cFZJZi6iragyYbiARj4jDQZVg8wAbJLhJpmuXCRKjycJE3bVyk3wvx-W7C1MtQ2xb7f514Ar-dA-2',
+  },
+  {
+    product: BUYER_PRODUCTS[3],
+    title: 'Heritage Chronograph',
+    seller: 'TimePiece Co.',
+    price: '$590.00',
+    discount: 'NEW',
+    imageUrl:
+      'https://lh3.googleusercontent.com/aida-public/AB6AXuCxRAOKoKjDUT4l9KpLmnvLOKiHz9wGJrDpfb-3BEMVf5rBrRrV4eOXf6CrkX0lCEbHbC9nu00Y9l-z8WoXdkI-694HrcOeg2IGsLtI9JuANEVWw070eWZ1I-7A8DukUmcd1iQpV4W_mWyY1IOsWVB2tfl4p_ViwDzpPTy7dVUc9lI1s31Lta6vP95WmD3Q3S0Ux2j8r0nQpPK9VV8J_55GeEuKo6A4DdlzyQ6jsb9p4Iol-Lu7ObrolHXfLGwIsNar3_mnZwZAWi9g',
   },
 ];
 
 export default function BuyerHome() {
   const router = useRouter();
-  const [activeCategory, setActiveCategory] = useState('All');
   const [locationOpen, setLocationOpen] = useState(false);
-  const [notificationsOpen, setNotificationsOpen] = useState(false);
-  const [liveProducts, setLiveProducts] = useState<BuyerProduct[]>([]);
   const location = useBuyerPrefsStore((s) => s.location);
   const setLocation = useBuyerPrefsStore((s) => s.setLocation);
-  const sellerProducts = useSellerStore((s) => s.products);
-  const unreadNotifications = DEMO_NOTIFICATIONS.length;
-
-  useEffect(() => {
-    let cancelled = false;
-    async function loadProducts() {
-      const { data, error } = await supabase
-        .from('products')
-        .select('id, title, category, price, description, seller_id, images, seller:seller_profiles(store_name, vsi_score)')
-        .eq('auth_status', 'verified')
-        .range(0, 19);
-
-      if (cancelled) return;
-      setLiveProducts(error || !data ? [] : data.map(supabaseProductToBuyerProduct));
-    }
-
-    loadProducts();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  const marketplaceProducts = useMemo(
-    () => [
-      ...sellerProducts
-        .filter((product) => product.authStatus === 'verified')
-        .map(sellerProductToBuyerProduct),
-      ...(liveProducts.length > 0 ? liveProducts : BUYER_PRODUCTS),
-    ],
-    [liveProducts, sellerProducts],
-  );
-
-  const products = useMemo(
-    () =>
-      activeCategory === 'All'
-        ? marketplaceProducts
-        : marketplaceProducts.filter((product) => product.category === activeCategory),
-    [activeCategory, marketplaceProducts],
-  );
 
   const chooseLocation = (next: BuyerLocation) => {
     setLocation(next);
@@ -155,187 +99,83 @@ export default function BuyerHome() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.appBar}>
-        <View style={styles.brandRow}>
-          <View style={styles.brandLogoBubble}>
-            <Logo size={30} />
-          </View>
-          <Text style={styles.brand}>Veribee</Text>
-        </View>
         <Pressable
-          onPress={() => setLocationOpen(true)}
-          style={({ pressed }) => [styles.locationPill, pressed && styles.pressed]}
+          onPress={() => router.push('/(buyer)/(tabs)/search')}
+          style={({ pressed }) => [styles.searchInput, pressed && styles.pressed]}
           accessibilityRole="button"
-          accessibilityLabel={`Change location, currently ${location}`}
+          accessibilityLabel="Search verified items"
         >
-          <MaterialIcons name="location-on" size={14} color={Colors.onPrimary} />
-          <Text style={styles.locationText}>{location}</Text>
-          <MaterialIcons name="expand-more" size={16} color={Colors.onPrimary} />
+          <MaterialIcons name="search" size={15} color={Colors.onSurfaceVariant} />
+          <Text style={styles.searchText} numberOfLines={1}>Search verified items...</Text>
+          <MaterialIcons name="photo-camera" size={16} color={Colors.onSurfaceVariant} />
         </Pressable>
         <Pressable
-          onPress={() => setNotificationsOpen(true)}
-          hitSlop={12}
-          style={({ pressed }) => [styles.iconButton, pressed && styles.pressed]}
+          onPress={() => router.push('/(buyer)/(tabs)/orders')}
+          hitSlop={10}
+          style={styles.iconButton}
           accessibilityRole="button"
-          accessibilityLabel="Notifications"
+          accessibilityLabel="Messages"
         >
-          <MaterialIcons name="notifications-none" size={24} color={Colors.onPrimary} />
-          {unreadNotifications > 0 && <View style={styles.notificationDot} />}
+          <MaterialIcons name="chat-bubble-outline" size={22} color={Colors.onSurfaceVariant} />
+        </Pressable>
+        <Pressable
+          onPress={() => router.push('/(buyer)/(tabs)/cart')}
+          hitSlop={10}
+          style={styles.iconButton}
+          accessibilityRole="button"
+          accessibilityLabel="Cart"
+        >
+          <MaterialIcons name="shopping-bag" size={22} color={Colors.onSurfaceVariant} />
         </Pressable>
       </View>
 
-      <FlatList
-        data={products}
-        keyExtractor={(product) => product.id}
-        numColumns={2}
-        columnWrapperStyle={styles.productRow}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.content}
-        ListHeaderComponent={
-          <>
-            <LinearGradient
-              colors={[Colors.primaryContainer, Colors.primary, '#d22517']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.heroCard}
-            >
-              <View style={styles.heroTopRow}>
-                <View style={styles.heroBadge}>
-                  <MaterialIcons name="verified-user" size={15} color={Colors.onSecondaryContainer} />
-                  <Text style={styles.heroBadgeText}>VERIFIED MARKETPLACE</Text>
-                </View>
-                <Text style={styles.heroLocation}>{location}</Text>
-              </View>
-              <Text style={styles.heroTitle}>Shop authenticated finds from trusted local sellers.</Text>
-              <Text style={styles.heroCopy}>
-                Every product is routed through Veribee checks before it reaches your cart.
-              </Text>
-              <View style={styles.heroDealRow}>
-                <View style={styles.heroDealPill}>
-                  <MaterialIcons name="local-fire-department" size={16} color={Colors.onWarningContainer} />
-                  <Text style={styles.heroDealText}>Launch vouchers live</Text>
-                </View>
-                <View style={styles.heroDealPillAlt}>
-                  <Text style={styles.heroDealTextAlt}>COD + OTP</Text>
-                </View>
-              </View>
-              <View style={styles.heroStats}>
-                <View style={styles.heroStat}>
-                  <Text style={styles.heroStatValue}>{marketplaceProducts.length}</Text>
-                  <Text style={styles.heroStatLabel}>Listings</Text>
-                </View>
-                <View style={styles.heroStatDivider} />
-                <View style={styles.heroStat}>
-                  <Text style={styles.heroStatValue}>98%</Text>
-                  <Text style={styles.heroStatLabel}>Seller trust</Text>
-                </View>
-                <View style={styles.heroStatDivider} />
-                <View style={styles.heroStat}>
-                  <Text style={styles.heroStatValue}>24h</Text>
-                  <Text style={styles.heroStatLabel}>Review target</Text>
-                </View>
-              </View>
-            </LinearGradient>
-
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        <View style={styles.categoryGrid}>
+          {categories.map((category) => (
             <Pressable
+              key={category.label}
               onPress={() => router.push('/(buyer)/(tabs)/search')}
-              style={({ pressed }) => [styles.searchBar, pressed && styles.pressed]}
+              style={({ pressed }) => [styles.categoryCard, pressed && styles.pressed]}
               accessibilityRole="button"
-              accessibilityLabel="Search verified products"
+              accessibilityLabel={`Browse ${category.label}`}
             >
-              <MaterialIcons name="search" size={20} color={Colors.outline} />
-              <Text style={styles.searchText}>Search verified products...</Text>
-              <View style={styles.searchHotTag}>
-                <Text style={styles.searchHotText}>Tote</Text>
-              </View>
+              <Image source={{ uri: category.imageUrl }} style={styles.categoryImage} resizeMode="cover" />
+              <View style={styles.categoryOverlay} />
+              <Text style={styles.categoryLabel}>{category.label}</Text>
             </Pressable>
+          ))}
+        </View>
 
-            <View style={styles.perkRail}>
-              {marketplacePerks.map((perk) => (
-                <View key={perk.id} style={styles.perkCard}>
-                  <View style={styles.perkIcon}>
-                    <MaterialIcons name={perk.icon} size={17} color={Colors.primary} />
-                  </View>
-                  <Text style={styles.perkLabel}>{perk.label}</Text>
-                  <Text style={styles.perkValue} numberOfLines={1}>{perk.value}</Text>
-                </View>
-              ))}
-            </View>
+        <View style={styles.sectionHeader}>
+          <View style={styles.sectionCopy}>
+            <Text style={styles.sectionTitle}>Curated for you</Text>
+            <Text style={styles.sectionSubtitle}>Authentic, verified items ready for delivery.</Text>
+          </View>
+          <Pressable
+            onPress={() => router.push('/(buyer)/(tabs)/search')}
+            hitSlop={10}
+            accessibilityRole="button"
+            accessibilityLabel="View all products"
+          >
+            <Text style={styles.viewAll}>VIEW ALL</Text>
+          </Pressable>
+        </View>
 
-            <View style={styles.shortcutGrid}>
-              {commerceShortcuts.map((item) => (
-                <Pressable
-                  key={item.id}
-                  onPress={() => {
-                    if (item.id === 'deals') setActiveCategory('All');
-                    if (item.id === 'verified') setActiveCategory('Jewelry');
-                    if (item.id === 'local') setLocationOpen(true);
-                  }}
-                  style={({ pressed }) => [styles.shortcut, pressed && styles.pressed]}
-                  accessibilityRole="button"
-                  accessibilityLabel={item.label}
-                >
-                  <View style={[styles.shortcutIcon, { backgroundColor: item.bg }]}>
-                    <MaterialIcons name={item.icon} size={22} color={item.color} />
-                  </View>
-                  <Text style={styles.shortcutLabel} numberOfLines={2}>{item.label}</Text>
-                </Pressable>
-              ))}
-            </View>
+        {stitchProducts.map((item) => (
+          <StitchProductCard key={item.title} item={item} />
+        ))}
 
-            <View style={styles.dealBand}>
-              <View style={styles.dealBandLeft}>
-                <View style={styles.dealBadge}>
-                  <MaterialIcons name="bolt" size={14} color={Colors.onDealContainer} />
-                  <Text style={styles.dealBadgeText}>HOT NOW</Text>
-                </View>
-                <Text style={styles.dealBandTitle}>Verified deals before tonight</Text>
-                <Text style={styles.dealBandBody}>Fast review, seller VSI, and secure handover in one order.</Text>
-              </View>
-              <View style={styles.dealTimer}>
-                <Text style={styles.dealTimerValue}>24h</Text>
-                <Text style={styles.dealTimerLabel}>target</Text>
-              </View>
-            </View>
-
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.chips}
-            >
-              {categories.map((category) => {
-                const isActive = activeCategory === category;
-                return (
-                  <Pressable
-                    key={category}
-                    onPress={() => setActiveCategory(category)}
-                    style={[styles.chip, isActive && styles.chipActive]}
-                    accessibilityRole="button"
-                    accessibilityState={{ selected: isActive }}
-                  >
-                    <Text style={[styles.chipText, isActive && styles.chipTextActive]}>
-                      {category}
-                    </Text>
-                  </Pressable>
-                );
-              })}
-            </ScrollView>
-
-            <View style={styles.sectionHeader}>
-              <View>
-                <Text style={styles.sectionKicker}>CURATED FOR YOU</Text>
-                <Text style={styles.sectionTitle}>Verified products</Text>
-              </View>
-              <Text style={styles.resultCount}>{products.length} items</Text>
-            </View>
-          </>
-        }
-        renderItem={({ item }) => (
-          <ProductCard
-            product={item}
-            onPress={() => router.push(`/(buyer)/product/${item.id}`)}
-          />
-        )}
-      />
+        <Pressable
+          onPress={() => setLocationOpen(true)}
+          style={({ pressed }) => [styles.locationCard, pressed && styles.pressed]}
+          accessibilityRole="button"
+          accessibilityLabel={`Change location, currently ${location}`}
+        >
+          <MaterialIcons name="location-on" size={18} color={Colors.primary} />
+          <Text style={styles.locationText}>{location}</Text>
+          <MaterialIcons name="expand-more" size={18} color={Colors.primary} />
+        </Pressable>
+      </ScrollView>
 
       <Modal
         transparent
@@ -347,9 +187,7 @@ export default function BuyerHome() {
           <Pressable style={styles.sheet}>
             <View style={styles.sheetHandle} />
             <Text style={styles.sheetTitle}>Choose your city</Text>
-            <Text style={styles.sheetBody}>
-              We'll show verified sellers and riders available in your area.
-            </Text>
+            <Text style={styles.sheetBody}>We'll show verified sellers and riders available in your area.</Text>
             <View style={styles.sheetList}>
               {BUYER_LOCATIONS.map((option) => {
                 const selected = option === location;
@@ -357,10 +195,7 @@ export default function BuyerHome() {
                   <Pressable
                     key={option}
                     onPress={() => chooseLocation(option)}
-                    style={({ pressed }) => [
-                      styles.sheetRow,
-                      pressed && styles.sheetRowPressed,
-                    ]}
+                    style={({ pressed }) => [styles.sheetRow, pressed && styles.sheetRowPressed]}
                     accessibilityRole="button"
                     accessibilityState={{ selected }}
                   >
@@ -369,55 +204,11 @@ export default function BuyerHome() {
                       size={20}
                       color={selected ? Colors.primary : Colors.onSurfaceVariant}
                     />
-                    <Text
-                      style={[styles.sheetRowLabel, selected && styles.sheetRowLabelActive]}
-                    >
-                      {option}
-                    </Text>
-                    {selected && (
-                      <MaterialIcons name="check" size={20} color={Colors.primary} />
-                    )}
+                    <Text style={[styles.sheetRowLabel, selected && styles.sheetRowLabelActive]}>{option}</Text>
+                    {selected && <MaterialIcons name="check" size={20} color={Colors.primary} />}
                   </Pressable>
                 );
               })}
-            </View>
-          </Pressable>
-        </Pressable>
-      </Modal>
-
-      <Modal
-        transparent
-        animationType="slide"
-        visible={notificationsOpen}
-        onRequestClose={() => setNotificationsOpen(false)}
-      >
-        <Pressable style={styles.sheetScrim} onPress={() => setNotificationsOpen(false)}>
-          <Pressable style={styles.sheet}>
-            <View style={styles.sheetHandle} />
-            <View style={styles.notifHeader}>
-              <Text style={styles.sheetTitle}>Notifications</Text>
-              <Pressable
-                onPress={() => setNotificationsOpen(false)}
-                hitSlop={12}
-                accessibilityRole="button"
-                accessibilityLabel="Close notifications"
-              >
-                <MaterialIcons name="close" size={22} color={Colors.onSurfaceVariant} />
-              </Pressable>
-            </View>
-            <View style={styles.sheetList}>
-              {DEMO_NOTIFICATIONS.map((item) => (
-                <View key={item.id} style={styles.notifRow}>
-                  <View style={styles.notifIconWrap}>
-                    <MaterialIcons name={item.icon} size={20} color={Colors.primary} />
-                  </View>
-                  <View style={styles.notifBody}>
-                    <Text style={styles.notifTitle}>{item.title}</Text>
-                    <Text style={styles.notifText}>{item.body}</Text>
-                  </View>
-                  <Text style={styles.notifTime}>{item.time}</Text>
-                </View>
-              ))}
             </View>
           </Pressable>
         </Pressable>
@@ -426,404 +217,308 @@ export default function BuyerHome() {
   );
 }
 
+function StitchProductCard({ item }: { item: StitchProduct }) {
+  const router = useRouter();
+  const addItem = useCartStore((s) => s.addItem);
+  const savedProductIds = useSavedStore((s) => s.savedProductIds);
+  const toggleSavedProduct = useSavedStore((s) => s.toggleSavedProduct);
+  const saved = savedProductIds.includes(item.product.id);
+
+  const addToCart = () => {
+    addItem({
+      productId: item.product.id,
+      title: item.title,
+      price: item.product.price,
+      sellerId: item.product.sellerId,
+      sellerName: item.seller,
+      imageUrl: item.imageUrl,
+      quantity: 1,
+      authStatus: item.product.authStatus,
+    });
+  };
+
+  return (
+    <Pressable
+      onPress={() => router.push(`/(buyer)/product/${item.product.id}`)}
+      style={({ pressed }) => [styles.productCard, pressed && styles.pressed]}
+      accessibilityRole="button"
+      accessibilityLabel={`Open ${item.title}`}
+    >
+      <View style={styles.productImageWrap}>
+        <Image source={{ uri: item.imageUrl }} style={styles.productImage} resizeMode="cover" />
+        <View style={styles.verifiedBadge}>
+          <MaterialIcons name="verified" size={12} color={Colors.onSecondaryContainer} />
+          <Text style={styles.verifiedText}>VERIFIED</Text>
+        </View>
+        {item.discount && (
+          <View style={styles.discountBadge}>
+            <Text style={styles.discountText}>{item.discount}</Text>
+          </View>
+        )}
+        <Pressable
+          onPress={() => toggleSavedProduct(item.product.id)}
+          hitSlop={12}
+          style={styles.favoriteButton}
+          accessibilityRole="button"
+          accessibilityLabel={saved ? 'Remove from saved' : 'Save product'}
+          accessibilityState={{ selected: saved }}
+        >
+          <MaterialIcons name={saved ? 'favorite' : 'favorite-border'} size={21} color={Colors.onSurface} />
+        </Pressable>
+      </View>
+      <View style={styles.productCopy}>
+        <Text style={styles.productTitle}>{item.title}</Text>
+        <Text style={styles.productSeller}>{item.seller}</Text>
+        <View style={styles.productFooter}>
+          <View style={styles.priceRow}>
+            <Text style={styles.productPrice}>{item.price}</Text>
+            {item.msrp && <Text style={styles.productMsrp}>{item.msrp}</Text>}
+          </View>
+          <Pressable
+            onPress={addToCart}
+            hitSlop={10}
+            style={[styles.addButton, !item.discount && styles.addButtonSecondary]}
+            accessibilityRole="button"
+            accessibilityLabel={`Add ${item.title} to cart`}
+          >
+            <MaterialIcons
+              name="add-shopping-cart"
+              size={20}
+              color={item.discount ? Colors.onPrimary : Colors.onSurface}
+            />
+          </Pressable>
+        </View>
+      </View>
+    </Pressable>
+  );
+}
+
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.background },
+  container: { flex: 1, backgroundColor: '#fcf9f8' },
   appBar: {
     minHeight: 64,
-    paddingHorizontal: Spacing.containerMargin,
-    borderBottomWidth: 0,
-    backgroundColor: Colors.primaryContainer,
+    paddingHorizontal: Spacing.md,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: '#eae7e7',
+    backgroundColor: '#fcf9f8',
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.sm,
-  },
-  brandRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.xs,
-  },
-  brandLogoBubble: {
-    width: 36,
-    height: 36,
-    borderRadius: Radii.full,
-    backgroundColor: Colors.surfaceContainerLowest,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.32)',
-  },
-  brand: {
-    fontFamily: Fonts.epilogueBold,
-    fontSize: 22,
-    color: Colors.onPrimary,
-  },
-  locationPill: {
-    flex: 1,
-    minHeight: 40,
-    borderRadius: Radii.full,
-    backgroundColor: 'rgba(255,255,255,0.16)',
-    paddingHorizontal: Spacing.sm,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 2,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.2)',
-  },
-  locationText: {
-    ...Type.labelCaps,
-    fontSize: 10,
-    color: Colors.onPrimary,
   },
   iconButton: {
-    width: 40,
-    height: 40,
-    borderRadius: Radii.full,
-    backgroundColor: 'rgba(255,255,255,0.14)',
+    width: 32,
+    height: 44,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  notificationDot: {
-    position: 'absolute',
-    top: 6,
-    right: 6,
-    width: 10,
-    height: 10,
-    borderRadius: Radii.full,
-    backgroundColor: Colors.primary,
-    borderWidth: 1.5,
-    borderColor: Colors.primaryContainer,
-  },
-  pressed: { opacity: 0.72 },
-  content: {
-    paddingHorizontal: Spacing.containerMargin,
-    paddingTop: Spacing.md,
-    paddingBottom: 112,
-    gap: Spacing.md,
-  },
-  heroCard: {
-    borderRadius: Radii.DEFAULT,
-    paddingHorizontal: Spacing.lg,
-    paddingTop: Spacing.lg,
-    paddingBottom: Spacing.lg,
-    gap: 18,
-    marginBottom: Spacing.md,
-    overflow: 'hidden',
-    ...Shadow.fab,
-  },
-  heroTopRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: Spacing.sm,
-  },
-  heroBadge: {
-    minHeight: 30,
-    borderRadius: Radii.full,
-    backgroundColor: Colors.secondaryContainer,
-    paddingHorizontal: 14,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  heroBadgeText: {
-    ...Type.labelCaps,
-    fontSize: 10,
-    color: Colors.onSecondaryContainer,
-  },
-  heroLocation: {
-    fontFamily: Fonts.manropeBold,
-    fontSize: 14,
-    lineHeight: 18,
-    color: Colors.onPrimary,
-  },
-  heroTitle: {
-    fontFamily: Fonts.epilogueBold,
-    fontSize: 30,
-    lineHeight: 36,
-    color: Colors.onPrimary,
-  },
-  heroCopy: {
-    fontFamily: Fonts.manropeMedium,
-    fontSize: 16,
-    lineHeight: 24,
-    color: Colors.onPrimaryContainer,
-  },
-  heroStats: {
-    minHeight: 68,
-    borderRadius: Radii.DEFAULT,
-    backgroundColor: 'rgba(255,255,255,0.14)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.24)',
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: Spacing.sm,
-  },
-  heroDealRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: Spacing.sm,
-  },
-  heroDealPill: {
-    minHeight: 34,
-    borderRadius: Radii.full,
-    backgroundColor: Colors.warningContainer,
-    paddingHorizontal: Spacing.sm,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  heroDealText: {
-    fontFamily: Fonts.manropeBold,
-    fontSize: 12,
-    color: Colors.onWarningContainer,
-  },
-  heroDealPillAlt: {
-    minHeight: 34,
-    borderRadius: Radii.full,
-    backgroundColor: 'rgba(255,255,255,0.16)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.26)',
-    paddingHorizontal: Spacing.sm,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  heroDealTextAlt: {
-    fontFamily: Fonts.manropeBold,
-    fontSize: 12,
-    color: Colors.onPrimary,
-  },
-  heroStat: {
+  searchInput: {
     flex: 1,
-    alignItems: 'center',
-    gap: 2,
-  },
-  heroStatValue: {
-    fontFamily: Fonts.epilogueBold,
-    fontSize: 21,
-    lineHeight: 25,
-    color: Colors.onPrimary,
-  },
-  heroStatLabel: {
-    fontFamily: Fonts.manropeBold,
-    fontSize: 11,
-    color: Colors.onPrimaryContainer,
-    textAlign: 'center',
-  },
-  heroStatDivider: {
-    width: StyleSheet.hairlineWidth,
-    height: 36,
-    backgroundColor: 'rgba(255,255,255,0.24)',
-  },
-  searchBar: {
-    minHeight: 52,
+    minHeight: 38,
     borderRadius: Radii.full,
-    borderWidth: 2,
-    borderColor: Colors.primary,
-    backgroundColor: Colors.surfaceContainerLowest,
-    paddingHorizontal: Spacing.md,
+    backgroundColor: '#f6f3f2',
+    paddingHorizontal: Spacing.sm,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: Spacing.sm,
-    marginBottom: Spacing.md,
-    ...Shadow.card,
+    gap: 7,
   },
   searchText: {
+    flex: 1,
     fontFamily: Fonts.manropeRegular,
-    fontSize: 15,
-    color: Colors.outline,
-    flex: 1,
+    fontSize: 14,
+    color: Colors.onSurfaceVariant,
   },
-  searchHotTag: {
-    minHeight: 28,
-    borderRadius: Radii.full,
-    backgroundColor: Colors.dealContainer,
-    paddingHorizontal: Spacing.sm,
-    alignItems: 'center',
-    justifyContent: 'center',
+  content: {
+    paddingHorizontal: Spacing.md,
+    paddingTop: Spacing.lg,
+    paddingBottom: 116,
+    gap: Spacing.lg,
   },
-  searchHotText: {
-    fontFamily: Fonts.manropeBold,
-    fontSize: 11,
-    color: Colors.onDealContainer,
-  },
-  perkRail: {
+  categoryGrid: {
     flexDirection: 'row',
-    gap: Spacing.sm,
-    marginBottom: Spacing.md,
-  },
-  perkCard: {
-    flex: 1,
-    minHeight: 96,
-    borderRadius: Radii.card,
-    backgroundColor: Colors.surfaceContainerLowest,
-    borderWidth: 1,
-    borderColor: Colors.outlineVariant,
-    padding: Spacing.sm,
-    gap: 3,
-    ...Shadow.card,
-  },
-  perkIcon: {
-    width: 30,
-    height: 30,
-    borderRadius: Radii.full,
-    backgroundColor: Colors.primaryFixed,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 2,
-  },
-  perkLabel: {
-    fontFamily: Fonts.manropeBold,
-    fontSize: 10,
-    color: Colors.primary,
-    textTransform: 'uppercase',
-  },
-  perkValue: {
-    fontFamily: Fonts.manropeBold,
-    fontSize: 11,
-    lineHeight: 15,
-    color: Colors.onSurface,
-  },
-  shortcutGrid: {
-    flexDirection: 'row',
-    gap: Spacing.sm,
-    marginBottom: Spacing.md,
-  },
-  shortcut: {
-    flex: 1,
-    minHeight: 86,
-    borderRadius: Radii.card,
-    backgroundColor: Colors.surfaceContainerLowest,
-    borderWidth: 1,
-    borderColor: Colors.outlineVariant,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: Spacing.xs,
-    gap: 6,
-    ...Shadow.card,
-  },
-  shortcutIcon: {
-    width: 42,
-    height: 42,
-    borderRadius: Radii.full,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  shortcutLabel: {
-    fontFamily: Fonts.manropeBold,
-    fontSize: 11,
-    lineHeight: 14,
-    color: Colors.onSurface,
-    textAlign: 'center',
-  },
-  dealBand: {
-    minHeight: 112,
-    borderRadius: Radii.card,
-    backgroundColor: Colors.deal,
-    padding: Spacing.md,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexWrap: 'wrap',
     gap: Spacing.md,
-    marginBottom: Spacing.md,
+  },
+  categoryCard: {
+    width: '47.7%',
+    aspectRatio: 4 / 3,
+    borderRadius: Radii.lg,
     overflow: 'hidden',
-    ...Shadow.fab,
+    backgroundColor: '#e5e2e1',
   },
-  dealBandLeft: {
-    flex: 1,
-    gap: 5,
+  categoryImage: {
+    width: '100%',
+    height: '100%',
   },
-  dealBadge: {
-    alignSelf: 'flex-start',
-    minHeight: 28,
-    borderRadius: Radii.full,
-    backgroundColor: Colors.warningContainer,
-    paddingHorizontal: Spacing.sm,
+  categoryOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.22)',
+  },
+  categoryLabel: {
+    position: 'absolute',
+    left: Spacing.md,
+    bottom: Spacing.md,
+    fontFamily: Fonts.epilogueSemiBold,
+    fontSize: 18,
+    color: Colors.onPrimary,
+  },
+  sectionHeader: {
+    marginTop: Spacing.md,
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    justifyContent: 'space-between',
+    gap: Spacing.md,
+  },
+  sectionCopy: { flex: 1 },
+  sectionTitle: {
+    fontFamily: Fonts.epilogueBold,
+    fontSize: 25,
+    lineHeight: 31,
+    color: '#1c1b1b',
+  },
+  sectionSubtitle: {
+    marginTop: 6,
+    fontFamily: Fonts.manropeRegular,
+    fontSize: 14,
+    lineHeight: 20,
+    color: Colors.onSurfaceVariant,
+  },
+  viewAll: {
+    fontFamily: Fonts.manropeBold,
+    fontSize: 11,
+    letterSpacing: 1.2,
+    color: Colors.primary,
+  },
+  productCard: {
+    borderRadius: Radii.lg,
+    borderWidth: 1,
+    borderColor: '#e5e2e1',
+    backgroundColor: Colors.surfaceContainerLowest,
+    overflow: 'hidden',
+    ...Shadow.card,
+  },
+  productImageWrap: {
+    aspectRatio: 1.12,
+    backgroundColor: '#f6f3f2',
+  },
+  productImage: {
+    width: '100%',
+    height: '100%',
+  },
+  verifiedBadge: {
+    position: 'absolute',
+    top: Spacing.sm,
+    left: Spacing.sm,
+    minHeight: 24,
+    borderRadius: Radii.sm,
+    backgroundColor: Colors.secondaryContainer,
+    paddingHorizontal: 8,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
   },
-  dealBadgeText: {
+  verifiedText: {
     fontFamily: Fonts.manropeBold,
     fontSize: 10,
-    color: Colors.onDealContainer,
+    letterSpacing: 1,
+    color: Colors.onSecondaryContainer,
   },
-  dealBandTitle: {
-    fontFamily: Fonts.epilogueBold,
-    fontSize: 20,
-    lineHeight: 25,
+  discountBadge: {
+    position: 'absolute',
+    top: Spacing.sm,
+    right: Spacing.sm,
+    minHeight: 30,
+    borderRadius: Radii.sm,
+    backgroundColor: Colors.primaryContainer,
+    paddingHorizontal: 9,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  discountText: {
+    fontFamily: Fonts.manropeBold,
+    fontSize: 10,
     color: Colors.onPrimary,
   },
-  dealBandBody: {
-    fontFamily: Fonts.manropeMedium,
-    fontSize: 13,
-    lineHeight: 18,
-    color: '#fff5ee',
-  },
-  dealTimer: {
-    width: 74,
-    height: 74,
+  favoriteButton: {
+    position: 'absolute',
+    right: Spacing.sm,
+    bottom: Spacing.sm,
+    width: 34,
+    height: 34,
     borderRadius: Radii.full,
     backgroundColor: Colors.surfaceContainerLowest,
     alignItems: 'center',
     justifyContent: 'center',
+    ...Shadow.card,
   },
-  dealTimerValue: {
-    fontFamily: Fonts.epilogueBold,
-    fontSize: 22,
-    color: Colors.deal,
+  productCopy: {
+    padding: Spacing.md,
+    gap: Spacing.xs,
   },
-  dealTimerLabel: {
-    fontFamily: Fonts.manropeBold,
-    fontSize: 10,
+  productTitle: {
+    fontFamily: Fonts.epilogueSemiBold,
+    fontSize: 18,
+    lineHeight: 23,
+    color: '#1c1b1b',
+  },
+  productSeller: {
+    fontFamily: Fonts.manropeRegular,
+    fontSize: 14,
     color: Colors.onSurfaceVariant,
   },
-  chips: {
-    gap: Spacing.sm,
-    paddingBottom: Spacing.md,
-  },
-  chip: {
-    minHeight: 36,
-    borderRadius: Radii.DEFAULT,
-    borderWidth: 1.5,
-    borderColor: Colors.surfaceVariant,
-    backgroundColor: Colors.surfaceContainerLowest,
-    paddingHorizontal: Spacing.md,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  chipActive: {
-    backgroundColor: Colors.primary,
-    borderColor: Colors.primary,
-  },
-  chipText: {
-    fontFamily: Fonts.manropeBold,
-    fontSize: 13,
-    color: Colors.onSurfaceVariant,
-  },
-  chipTextActive: { color: Colors.onPrimary },
-  productRow: {
-    gap: Spacing.md,
-    marginBottom: Spacing.md,
-  },
-  sectionHeader: {
-    marginBottom: Spacing.md,
+  productFooter: {
+    marginTop: Spacing.md,
     flexDirection: 'row',
     alignItems: 'flex-end',
     justifyContent: 'space-between',
+    gap: Spacing.md,
   },
-  sectionKicker: {
-    ...Type.labelCaps,
-    color: Colors.primary,
-    marginBottom: 4,
+  priceRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    gap: Spacing.sm,
+    flexWrap: 'wrap',
   },
-  sectionTitle: {
-    ...Type.h3,
-    color: Colors.onSurface,
+  productPrice: {
+    fontFamily: Fonts.epilogueBold,
+    fontSize: 20,
+    lineHeight: 25,
+    color: '#1c1b1b',
   },
-  resultCount: {
-    ...Type.labelMd,
+  productMsrp: {
+    fontFamily: Fonts.manropeRegular,
+    fontSize: 13,
     color: Colors.onSurfaceVariant,
+    textDecorationLine: 'line-through',
   },
+  addButton: {
+    width: 40,
+    height: 40,
+    borderRadius: Radii.DEFAULT,
+    backgroundColor: Colors.primaryContainer,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  addButtonSecondary: {
+    backgroundColor: Colors.surfaceContainerLowest,
+    borderWidth: 1,
+    borderColor: Colors.outlineVariant,
+  },
+  locationCard: {
+    minHeight: 44,
+    borderRadius: Radii.DEFAULT,
+    backgroundColor: Colors.primaryFixed,
+    paddingHorizontal: Spacing.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.xs,
+  },
+  locationText: {
+    fontFamily: Fonts.manropeBold,
+    fontSize: 13,
+    color: Colors.primary,
+  },
+  pressed: { opacity: 0.72 },
   sheetScrim: {
     flex: 1,
     backgroundColor: Colors.inverseSurface,
@@ -847,8 +542,18 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.outlineVariant,
     marginBottom: Spacing.sm,
   },
-  sheetTitle: { ...Type.h3, color: Colors.onSurface },
-  sheetBody: { ...Type.bodyMd, color: Colors.onSurfaceVariant },
+  sheetTitle: {
+    fontFamily: Fonts.epilogueBold,
+    fontSize: 24,
+    lineHeight: 31,
+    color: Colors.onSurface,
+  },
+  sheetBody: {
+    fontFamily: Fonts.manropeRegular,
+    fontSize: 16,
+    lineHeight: 24,
+    color: Colors.onSurfaceVariant,
+  },
   sheetList: {
     marginTop: Spacing.sm,
     borderRadius: Radii.lg,
@@ -876,43 +581,5 @@ const styles = StyleSheet.create({
   sheetRowLabelActive: {
     fontFamily: Fonts.manropeBold,
     color: Colors.primary,
-  },
-  notifHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  notifRow: {
-    minHeight: 64,
-    padding: Spacing.md,
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: Spacing.sm,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: Colors.surfaceVariant,
-  },
-  notifIconWrap: {
-    width: 36,
-    height: 36,
-    borderRadius: Radii.full,
-    backgroundColor: Colors.primaryFixed,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  notifBody: { flex: 1, gap: 2 },
-  notifTitle: {
-    fontFamily: Fonts.manropeBold,
-    fontSize: 14,
-    color: Colors.onSurface,
-  },
-  notifText: {
-    fontFamily: Fonts.manropeRegular,
-    fontSize: 13,
-    color: Colors.onSurfaceVariant,
-  },
-  notifTime: {
-    ...Type.labelCaps,
-    fontSize: 10,
-    color: Colors.onSurfaceVariant,
   },
 });

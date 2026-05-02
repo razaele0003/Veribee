@@ -56,7 +56,7 @@ export default function BuyerProfile() {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <View style={styles.headerSpacer} />
-        <Text style={styles.headerTitle}>Profile</Text>
+        <Text style={styles.headerTitle}>Buyer Profile</Text>
         <View style={styles.headerSpacer} />
       </View>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
@@ -200,7 +200,7 @@ function Stat({ value, label }: { value: string; label: string }) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },
   header: {
-    height: 64,
+    height: 58,
     paddingHorizontal: Spacing.containerMargin,
     backgroundColor: Colors.primaryContainer,
     flexDirection: 'row',
@@ -212,14 +212,14 @@ const styles = StyleSheet.create({
   iconButton: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
   pressed: { opacity: 0.72 },
   content: {
-    padding: Spacing.containerMargin,
+    padding: Spacing.md,
     paddingBottom: 112,
-    gap: Spacing.lg,
+    gap: Spacing.md,
   },
   profileBlock: {
     backgroundColor: Colors.primaryContainer,
-    borderRadius: Radii.xl,
-    padding: Spacing.xl,
+    borderRadius: Radii.DEFAULT,
+    padding: Spacing.lg,
     alignItems: 'center',
     gap: Spacing.sm,
     borderWidth: 1,
@@ -242,8 +242,8 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.xs,
   },
   avatar: {
-    width: 96,
-    height: 96,
+    width: 76,
+    height: 76,
     borderRadius: Radii.full,
     backgroundColor: Colors.secondaryContainer,
     borderWidth: 3,
@@ -279,7 +279,7 @@ const styles = StyleSheet.create({
   },
   name: {
     fontFamily: Fonts.epilogueBold,
-    fontSize: 28,
+    fontSize: 23,
     color: Colors.onPrimary,
   },
   badgeRow: {
@@ -318,7 +318,7 @@ const styles = StyleSheet.create({
   statsRow: { flexDirection: 'row', gap: Spacing.md },
   statCard: {
     flex: 1,
-    height: 80,
+    height: 68,
     borderRadius: Radii.card,
     borderWidth: 1,
     borderColor: 'rgba(211, 218, 234, 0.3)',
@@ -360,7 +360,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: Spacing.md,
+    padding: Spacing.sm,
     borderBottomWidth: 1,
     borderBottomColor: Colors.surfaceContainerHighest,
   },
@@ -378,7 +378,7 @@ const styles = StyleSheet.create({
     padding: 0,
   },
   row: {
-    minHeight: 54,
+    minHeight: 50,
     paddingHorizontal: Spacing.md,
     flexDirection: 'row',
     alignItems: 'center',
