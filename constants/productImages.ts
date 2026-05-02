@@ -1,10 +1,23 @@
+import type { ImageSourcePropType } from 'react-native';
+
+export type ProductImageSource = ImageSourcePropType | string;
+
+export function resolveImageSource(source?: ProductImageSource) {
+  if (!source) return undefined;
+  return typeof source === 'string' ? { uri: source } : source;
+}
+
 export const ProductImages = {
-  watch:
-    'https://images.unsplash.com/photo-1579586337278-3befd40fd17a?auto=format&fit=crop&w=900&q=80',
-  tote:
-    'https://images.pexels.com/photos/9869067/pexels-photo-9869067.jpeg?auto=compress&cs=tinysrgb&w=900',
-  sneakers:
-    'https://images.pexels.com/photos/19737597/pexels-photo-19737597.jpeg?auto=compress&cs=tinysrgb&w=900',
-  pendant:
-    'https://cdn.pixabay.com/photo/2025/08/22/08/43/chain-9789500_1280.jpg',
-} as const;
+  watch: require('../assets/images/product-watch.png'),
+  tote: require('../assets/images/product-tote.png'),
+  sneakers: require('../assets/images/product-sneakers.png'),
+  pendant: require('../assets/images/product-pendant.png'),
+  headphones: require('../assets/images/product-headphones.png'),
+} as const satisfies Record<string, ProductImageSource>;
+
+export const CategoryImages = {
+  electronics: require('../assets/images/category-electronics.png'),
+  bags: require('../assets/images/category-bags.png'),
+  shoes: require('../assets/images/category-shoes.png'),
+  jewelry: require('../assets/images/category-jewelry.png'),
+} as const satisfies Record<string, ProductImageSource>;

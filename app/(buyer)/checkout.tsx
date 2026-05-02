@@ -10,6 +10,7 @@ import { useAuthStore } from '@/store/authStore';
 import { useBuyerOrderStore } from '@/store/buyerOrderStore';
 import { CartItem, useCartStore } from '@/store/cartStore';
 import { useRiderStore } from '@/store/riderStore';
+import { resolveImageSource } from '@/constants/productImages';
 import { Colors, Shadow } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
 import { Spacing } from '@/constants/spacing';
@@ -186,7 +187,7 @@ export default function Checkout() {
               <View key={item.productId} style={styles.orderItemRow}>
                 <View style={styles.itemThumb}>
                   {item.imageUrl ? (
-                    <Image source={{ uri: item.imageUrl }} style={styles.thumbImage} resizeMode="cover" />
+                    <Image source={resolveImageSource(item.imageUrl)} style={styles.thumbImage} resizeMode="cover" />
                   ) : (
                     <MaterialIcons name="inventory-2" size={24} color={Colors.secondary} />
                   )}

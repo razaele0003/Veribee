@@ -5,6 +5,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { Button } from '@/components/ui/Button';
 import { formatPHP } from '@/lib/buyerData';
 import { CartItem, useCartStore } from '@/store/cartStore';
+import { resolveImageSource } from '@/constants/productImages';
 import { Colors, Shadow } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
 import { Spacing } from '@/constants/spacing';
@@ -107,7 +108,7 @@ function CartRow({ item }: { item: CartItem }) {
       </Pressable>
       <View style={styles.thumb}>
         {item.imageUrl ? (
-          <Image source={{ uri: item.imageUrl }} style={styles.thumbImage} resizeMode="cover" />
+          <Image source={resolveImageSource(item.imageUrl)} style={styles.thumbImage} resizeMode="cover" />
         ) : (
           <MaterialIcons name="inventory-2" size={30} color={Colors.primary} />
         )}
@@ -123,7 +124,9 @@ function CartRow({ item }: { item: CartItem }) {
         </View>
         
         <View style={styles.priceRow}>
-          <Text style={styles.itemPrice}>{formatPHP(item.price)}</Text>
+          <Text style={styles.itemPrice} numberOfLines={1}>
+            {formatPHP(item.price)}
+          </Text>
           <View style={styles.quantityControl}>
             <Pressable 
               style={styles.qtyBtn}
@@ -218,10 +221,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     padding: Spacing.sm,
     gap: Spacing.sm,
-    alignItems: 'center',
+    alignItems: 'flex-start',
   },
   checkboxArea: {
     padding: Spacing.xs,
+    paddingTop: 26,
   },
   itemDivider: {
     height: 1,
@@ -229,8 +233,8 @@ const styles = StyleSheet.create({
     marginLeft: 16,
   },
   thumb: {
-    width: 82,
-    height: 82,
+    width: 74,
+    height: 74,
     borderRadius: Radii.DEFAULT,
     backgroundColor: Colors.surfaceContainerHighest,
     alignItems: 'center',
@@ -238,7 +242,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   thumbImage: { width: '100%', height: '100%' },
-  cartCopy: { flex: 1, minHeight: 82, justifyContent: 'space-between' },
+  cartCopy: { flex: 1, minWidth: 0, minHeight: 82, justifyContent: 'space-between' },
   titleRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -255,20 +259,26 @@ const styles = StyleSheet.create({
   priceRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-end',
+    alignItems: 'center',
+    gap: Spacing.xs,
     marginTop: Spacing.sm,
   },
   itemPrice: {
+    flex: 1,
+    minWidth: 0,
     fontFamily: Fonts.epilogueSemiBold,
-    fontSize: 18,
+    fontSize: 17,
     color: Colors.primary,
   },
   quantityControl: {
+    width: 108,
+    flexShrink: 0,
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
     borderColor: Colors.outlineVariant,
     borderRadius: Radii.DEFAULT,
+    overflow: 'hidden',
   },
   qtyBtn: {
     width: 34,
@@ -281,11 +291,15 @@ const styles = StyleSheet.create({
     borderLeftColor: Colors.outlineVariant,
   },
   quantityText: {
-    width: 32,
+    width: 38,
+    height: 34,
+    lineHeight: 34,
     textAlign: 'center',
     fontFamily: Fonts.manropeRegular,
     fontSize: 14,
     color: Colors.onSurface,
+    borderLeftWidth: 1,
+    borderLeftColor: Colors.outlineVariant,
   },
   bottomBar: {
     position: 'absolute',

@@ -1,6 +1,7 @@
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { BuyerProduct, formatPHP } from '@/lib/buyerData';
+import { resolveImageSource } from '@/constants/productImages';
 import { Colors, Shadow } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
 import { Spacing } from '@/constants/spacing';
@@ -25,7 +26,7 @@ export function ProductCard({ product, onPress }: Props) {
     >
       <View style={styles.imageBlock}>
         {product.imageUrl ? (
-          <Image source={{ uri: product.imageUrl }} style={styles.productImage} resizeMode="cover" />
+          <Image source={resolveImageSource(product.imageUrl)} style={styles.productImage} resizeMode="cover" />
         ) : (
           <MaterialIcons name="inventory-2" size={40} color={Colors.primary} />
         )}

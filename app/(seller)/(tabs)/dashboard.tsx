@@ -9,7 +9,7 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Button } from '@/components/ui/Button';
@@ -121,6 +121,7 @@ function normalizeOrder(row: Record<string, any>): OrderItemData {
 
 export default function SellerDashboard() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const storeUserId = useAuthStore((s) => s.userId);
   const localProducts = useSellerStore((s) => s.products);
@@ -223,8 +224,8 @@ export default function SellerDashboard() {
   const goToOrders = () => router.push('/(seller)/(tabs)/orders');
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.appBar}>
+    <View style={styles.container}>
+      <View style={[styles.appBar, { paddingTop: insets.top }]}>
         <View style={styles.brandRow}>
           <View style={styles.logoBubble}>
             <Logo size={30} />
@@ -395,7 +396,7 @@ export default function SellerDashboard() {
           </Pressable>
         </Pressable>
       </Modal>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -421,8 +422,9 @@ function StatCard({
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },
   appBar: {
-    height: 64,
+    minHeight: 64,
     paddingHorizontal: Spacing.containerMargin,
+    paddingBottom: Spacing.sm,
     backgroundColor: Colors.primaryContainer,
     flexDirection: 'row',
     alignItems: 'center',

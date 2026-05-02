@@ -8,6 +8,7 @@ import { StepIndicator } from '@/components/ui/StepIndicator';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/authStore';
 import { useSellerStore } from '@/store/sellerStore';
+import { resolveImageSource } from '@/constants/productImages';
 import { Colors, Shadow } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
 import { Spacing } from '@/constants/spacing';
@@ -78,7 +79,7 @@ export default function AddProductStep3() {
         >
           <View style={styles.photoRow}>
             {draft.photos.slice(0, 3).map((photo) => (
-              <Image key={photo} source={{ uri: photo }} style={styles.photoThumb} />
+              <Image key={String(photo)} source={resolveImageSource(photo)} style={styles.photoThumb} />
             ))}
             {draft.photos.length === 0 && <EmptyThumb label="Photo" />}
           </View>
@@ -110,7 +111,7 @@ export default function AddProductStep3() {
               return (
                 <View key={label} style={styles.evidenceThumb}>
                   {uri ? (
-                    <Image source={{ uri }} style={styles.evidenceImage} />
+                    <Image source={resolveImageSource(uri)} style={styles.evidenceImage} />
                   ) : (
                     <MaterialIcons
                       name="image"

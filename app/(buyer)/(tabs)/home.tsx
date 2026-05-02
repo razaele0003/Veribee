@@ -1,6 +1,15 @@
 import { useState } from 'react';
-import { Image, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import {
+  Image,
+  Modal,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
+} from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { BUYER_PRODUCTS, BuyerProduct } from '@/lib/buyerData';
@@ -11,11 +20,12 @@ import { Colors, Shadow } from '@/constants/colors';
 import { Fonts } from '@/constants/typography';
 import { Spacing } from '@/constants/spacing';
 import { Radii } from '@/constants/radii';
+import { CategoryImages, ProductImages, ProductImageSource, resolveImageSource } from '@/constants/productImages';
 
 type CategoryTile = {
   label: string;
   category: string;
-  imageUrl: string;
+  imageUrl: ProductImageSource;
 };
 
 type StitchProduct = {
@@ -25,33 +35,29 @@ type StitchProduct = {
   price: string;
   msrp?: string;
   discount?: string;
-  imageUrl: string;
+  imageUrl: ProductImageSource;
 };
 
 const categories: CategoryTile[] = [
   {
     label: 'Electronics',
     category: 'Electronics',
-    imageUrl:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuDgVMNfaVr34ZA7sN9P9olih1Qgwk1e1pO3GaHqSTyXbEFx5DFgb_uA-vVFKeIclEXYdH_JPDwnXCUcODIdWQclbOn5gW510yBl9Q-ndbCj6x5iZiwSrEOeXE_roTgEN33rxvvznPMZA9dvEsQ-Gt6N5SCZ3zII-MwiytIMKaydATT6qStX3uRjkKQeybuGMGRXx976bbYMfCPdQSoOrGyYb9YgRxShAIQiZb781zMq6KT2djhfpNsSxymhQwng56YiSATIwtX2H9yF',
+    imageUrl: CategoryImages.electronics,
   },
   {
     label: 'Bags',
     category: 'Bags',
-    imageUrl:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuDXRagxhCE2MAtbOn7LWGDO4eWhZB-Y2Juf6-2I4Sf_TB2JaeGo_xiZF72MNcJFLFumKS0q-joYQLQBthaeMt3phBALLxD55cfQw32iNyr5ydNnjLe4tnM7JqXd0vsLEvTnjhbwq5HS4VwPUT4HYdV-wX_Ktic3cIZPGF3XPx6kQbAi3ZZdvLSfofIvxf6du__2J7CacbkaP9-5rYXQjgZiAJbN0hGj7gD6gEvd7Gl1j_Wy8Y3ytyodotMHK9O1r3oyO1U35PjxTn2C',
+    imageUrl: CategoryImages.bags,
   },
   {
     label: 'Shoes',
     category: 'Shoes',
-    imageUrl:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuAzJNhyKgSOS79hXd8bbnkeLcUahmwFe52I_HD5YvzUvQn_1-Q_UJOUy9tvU8tMO5lyKwlArUihH9-Whu4U8QVTX6SU-szSZjhWzzf0XhO4XX4jWIEMXOApVCUXXQUPXTnYBhro1n2GAGsrq6djRai9fFQv8NqjSN94jvuAznfgRRAY7OH1voBOSusgBBovUqcMVs_mrYn7tYIDaRj4P9Y7h9tGNiQ4X1HBqEU_xqdkj7dA20g-cW0Rk2cMYeTzGjLqllxHV4vSmsz-',
+    imageUrl: CategoryImages.shoes,
   },
   {
     label: 'Jewelry',
     category: 'Jewelry',
-    imageUrl:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuAPpQHwep4g-27fSJoqW8KTEoAoGAjywbMPOXZSTs6JJyN0VOLS79SzxwKRtmOHmrzw93JfiPR4b4gH3oa1jFB4OjTBVrreo1p4uY6CDazb0KKKS0pTaKXMNFiBnA0gzU3jz3tgoC8EusKM7PIMlMXYk9pXfUt8t5PU5Q4pdErsaqRzlEKHE-fk6XuB60F7fVFItVzZj0TEVut-wX6cUUtNQwFV1UzNGdlCyDv2T5T57RqGUrJRbfEXuzdHzM4SkTwKVsnrAhs0bLal',
+    imageUrl: CategoryImages.jewelry,
   },
 ];
 
@@ -63,16 +69,14 @@ const stitchProducts: StitchProduct[] = [
     price: '$249.00',
     msrp: '$295.00',
     discount: '15% OFF',
-    imageUrl:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuDO1JUBgPew03Bp6VXv2-YZCS3KrMzSkdYf6YJamtYGuNXsLsP-hPNPcjJTBot-AoHaQPNO45C2ZT-01v8QTx4FC2khCefShs0Phklu22fo_CPWsc2Rt6ntWt_qp0bxov9-HlYpThfyBsNAti85dMMHoJs2ltzjrTxCud2a--AAEEg7yJ3H8cxxczJ2IKSto_poKm7zstkLMODsL7iGdSPNW5y18BmC3Zd1hV3s2WjvAH3Vf74vXVdNJirglj6-7zILvRUcRt2oa0qq',
+    imageUrl: ProductImages.watch,
   },
   {
     product: BUYER_PRODUCTS[0],
     title: 'Studio Pro Headphones',
     seller: 'AudioPhile',
     price: '$349.00',
-    imageUrl:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuDcnBkJQ6AqwCyatIIvhhHjMwBD-OcDVWC42v6b1FaHEAtlQz6GCupMBRyxB-Y2OE6o69agI-IJHi7-JItd8wAvEMd3D_J-rbFcwdwhmUK0ELpOeve7rduH6nQLnDJpouRZNUz7SPbPwiDpZ_41rfGomRgIj-eQ64yqp2TN5PfLI58ZWRTyJNq2tzThYZ3x5p6cFZJZi6iragyYbiARj4jDQZVg8wAbJLhJpmuXCRKjycJE3bVyk3wvx-W7C1MtQ2xb7f514Ar-dA-2',
+    imageUrl: ProductImages.headphones,
   },
   {
     product: BUYER_PRODUCTS[3],
@@ -80,16 +84,20 @@ const stitchProducts: StitchProduct[] = [
     seller: 'TimePiece Co.',
     price: '$590.00',
     discount: 'NEW',
-    imageUrl:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuCxRAOKoKjDUT4l9KpLmnvLOKiHz9wGJrDpfb-3BEMVf5rBrRrV4eOXf6CrkX0lCEbHbC9nu00Y9l-z8WoXdkI-694HrcOeg2IGsLtI9JuANEVWw070eWZ1I-7A8DukUmcd1iQpV4W_mWyY1IOsWVB2tfl4p_ViwDzpPTy7dVUc9lI1s31Lta6vP95WmD3Q3S0Ux2j8r0nQpPK9VV8J_55GeEuKo6A4DdlzyQ6jsb9p4Iol-Lu7ObrolHXfLGwIsNar3_mnZwZAWi9g',
+    imageUrl: ProductImages.watch,
   },
 ];
 
 export default function BuyerHome() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
+  const { width } = useWindowDimensions();
   const [locationOpen, setLocationOpen] = useState(false);
   const location = useBuyerPrefsStore((s) => s.location);
   const setLocation = useBuyerPrefsStore((s) => s.setLocation);
+  const categoryTileWidth = Math.floor(
+    (width - Spacing.md * 2 - Spacing.md) / 2,
+  );
 
   const chooseLocation = (next: BuyerLocation) => {
     setLocation(next);
@@ -97,8 +105,8 @@ export default function BuyerHome() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.appBar}>
+    <View style={styles.container}>
+      <View style={[styles.appBar, { paddingTop: insets.top }]}>
         <Pressable
           onPress={() => router.push('/(buyer)/(tabs)/search')}
           style={({ pressed }) => [styles.searchInput, pressed && styles.pressed]}
@@ -135,11 +143,15 @@ export default function BuyerHome() {
             <Pressable
               key={category.label}
               onPress={() => router.push('/(buyer)/(tabs)/search')}
-              style={({ pressed }) => [styles.categoryCard, pressed && styles.pressed]}
+              style={({ pressed }) => [
+                styles.categoryCard,
+                { width: categoryTileWidth },
+                pressed && styles.pressed,
+              ]}
               accessibilityRole="button"
               accessibilityLabel={`Browse ${category.label}`}
             >
-              <Image source={{ uri: category.imageUrl }} style={styles.categoryImage} resizeMode="cover" />
+              <Image source={resolveImageSource(category.imageUrl)} style={styles.categoryImage} resizeMode="cover" />
               <View style={styles.categoryOverlay} />
               <Text style={styles.categoryLabel}>{category.label}</Text>
             </Pressable>
@@ -213,7 +225,7 @@ export default function BuyerHome() {
           </Pressable>
         </Pressable>
       </Modal>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -245,7 +257,7 @@ function StitchProductCard({ item }: { item: StitchProduct }) {
       accessibilityLabel={`Open ${item.title}`}
     >
       <View style={styles.productImageWrap}>
-        <Image source={{ uri: item.imageUrl }} style={styles.productImage} resizeMode="cover" />
+        <Image source={resolveImageSource(item.imageUrl)} style={styles.productImage} resizeMode="cover" />
         <View style={styles.verifiedBadge}>
           <MaterialIcons name="verified" size={12} color={Colors.onSecondaryContainer} />
           <Text style={styles.verifiedText}>VERIFIED</Text>
@@ -298,6 +310,7 @@ const styles = StyleSheet.create({
   appBar: {
     minHeight: 64,
     paddingHorizontal: Spacing.md,
+    paddingBottom: Spacing.sm,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: '#eae7e7',
     backgroundColor: '#fcf9f8',
@@ -339,7 +352,6 @@ const styles = StyleSheet.create({
     gap: Spacing.md,
   },
   categoryCard: {
-    width: '47.7%',
     aspectRatio: 4 / 3,
     borderRadius: Radii.lg,
     overflow: 'hidden',

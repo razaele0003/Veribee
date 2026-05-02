@@ -1,8 +1,12 @@
 import * as Linking from 'expo-linking';
 import { Platform } from 'react-native';
-import { supabase } from '@/lib/supabase';
+import { isSupabaseConfigured, supabase } from '@/lib/supabase';
 
 export async function signInWithGoogle() {
+  if (!isSupabaseConfigured) {
+    throw new Error('Supabase is not configured for this build.');
+  }
+
   const redirectTo = Linking.createURL('/callback');
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',

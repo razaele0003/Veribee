@@ -3,6 +3,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { formatRiderMoney, useRiderStore } from '@/store/riderStore';
+import { resolveImageSource } from '@/constants/productImages';
 import { Colors, Shadow } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
 import { Spacing } from '@/constants/spacing';
@@ -90,7 +91,7 @@ export default function JobDetailsScreen() {
           </View>
           <View style={styles.orderRow}>
             <View style={styles.orderImageContainer}>
-              <Image source={{ uri: job.productImage }} style={styles.orderImage} />
+              <Image source={resolveImageSource(job.productImage)} style={styles.orderImage} />
             </View>
             <View style={styles.orderInfo}>
               <Text style={styles.orderTitle} numberOfLines={1}>{job.productName}</Text>

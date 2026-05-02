@@ -3,6 +3,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { formatRiderMoney, useRiderStore } from '@/store/riderStore';
+import { resolveImageSource } from '@/constants/productImages';
 import { Colors, Shadow } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
 import { Spacing } from '@/constants/spacing';
@@ -30,7 +31,7 @@ export default function RiderJobHistory() {
             style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
             onPress={() => router.push(`/(rider)/job/${job.id}`)}
           >
-            <Image source={{ uri: job.productImage }} style={styles.image} />
+            <Image source={resolveImageSource(job.productImage)} style={styles.image} />
             <View style={styles.copy}>
               <Text style={styles.title} numberOfLines={1}>
                 {job.productName}

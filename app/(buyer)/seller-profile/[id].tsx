@@ -3,6 +3,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { BUYER_PRODUCTS, formatPHP } from '@/lib/buyerData';
+import { resolveImageSource } from '@/constants/productImages';
 import { Colors, Shadow } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
 import { Spacing } from '@/constants/spacing';
@@ -64,7 +65,7 @@ export default function SellerProfilePreview() {
             accessibilityLabel={`Open ${product.title}`}
           >
             {product.imageUrl ? (
-              <Image source={{ uri: product.imageUrl }} style={styles.productImage} />
+              <Image source={resolveImageSource(product.imageUrl)} style={styles.productImage} />
             ) : (
               <View style={styles.productImage}>
                 <MaterialIcons name="inventory-2" size={24} color={Colors.primary} />

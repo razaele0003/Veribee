@@ -20,6 +20,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { StepIndicator } from '@/components/ui/StepIndicator';
 import { useSellerStore } from '@/store/sellerStore';
+import { resolveImageSource } from '@/constants/productImages';
 import { Colors } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
 import { Spacing } from '@/constants/spacing';
@@ -200,7 +201,7 @@ export default function AddProductStep2() {
                 >
                   {draft.evidencePhotos[index] ? (
                     <Image
-                      source={{ uri: draft.evidencePhotos[index] }}
+                      source={resolveImageSource(draft.evidencePhotos[index])}
                       style={styles.evidenceImage}
                     />
                   ) : (

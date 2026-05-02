@@ -1,5 +1,6 @@
 import { Image, StyleSheet, Text, View } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+import { ProductImageSource, resolveImageSource } from '@/constants/productImages';
 import { Colors, Shadow } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
 import { Spacing } from '@/constants/spacing';
@@ -11,7 +12,7 @@ export type OrderItemData = {
   productTitle: string;
   price: number;
   status: string;
-  thumbnailUrl?: string;
+  thumbnailUrl?: ProductImageSource;
 };
 
 type Props = {
@@ -68,7 +69,7 @@ export function OrderItem({ order }: Props) {
       <View style={styles.right}>
         <View style={styles.thumb}>
           {order.thumbnailUrl ? (
-            <Image source={{ uri: order.thumbnailUrl }} style={styles.image} />
+            <Image source={resolveImageSource(order.thumbnailUrl)} style={styles.image} />
           ) : (
             <MaterialIcons
               name="inventory-2"

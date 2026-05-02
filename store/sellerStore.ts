@@ -1,10 +1,10 @@
 import { create } from 'zustand';
-import { ProductImages } from '@/constants/productImages';
+import { ProductImageSource, ProductImages } from '@/constants/productImages';
 import { DEMO_ROUTE } from '@/lib/demoProfiles';
 import { runLocalAiScanner } from '@/lib/veribeeScoring';
 
 export type ProductDraft = {
-  photos: string[];
+  photos: ProductImageSource[];
   title: string;
   category: string;
   price: string;
@@ -12,7 +12,7 @@ export type ProductDraft = {
   serialNumber: string;
   brand: string;
   model: string;
-  evidencePhotos: string[];
+  evidencePhotos: ProductImageSource[];
 };
 
 export type LocalProduct = ProductDraft & {

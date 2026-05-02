@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { ProductImages } from '@/constants/productImages';
+import { ProductImageSource, ProductImages } from '@/constants/productImages';
 import { DEMO_ACCOUNTS, DEMO_ROUTE } from '@/lib/demoProfiles';
 
 export type RiderJobStatus =
@@ -15,7 +15,7 @@ export type RiderJob = {
   id: string;
   orderId: string;
   productName: string;
-  productImage: string;
+  productImage: ProductImageSource;
   category: string;
   pickupAddress: string;
   deliveryAddress: string;

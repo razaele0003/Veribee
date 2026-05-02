@@ -8,6 +8,7 @@ import { sellerProductToBuyerProduct } from '@/lib/marketplaceProducts';
 import { useCartStore } from '@/store/cartStore';
 import { useBuyerPrefsStore } from '@/store/buyerPrefsStore';
 import { useSellerStore } from '@/store/sellerStore';
+import { resolveImageSource } from '@/constants/productImages';
 import { Colors, Shadow } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
 import { Spacing } from '@/constants/spacing';
@@ -88,7 +89,7 @@ export default function ProductDetail() {
         <View style={styles.heroImage}>
           {product.imageUrl ? (
             <Image
-              source={{ uri: product.imageUrl }}
+              source={resolveImageSource(product.imageUrl)}
               style={styles.productImage}
               resizeMode="cover"
             />

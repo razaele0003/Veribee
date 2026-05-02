@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import * as Linking from 'expo-linking';
 import { Platform } from 'react-native';
-import { supabase } from '@/lib/supabase';
+import { isSupabaseConfigured, supabase } from '@/lib/supabase';
 import { useAuthStore, type Role } from '@/store/authStore';
 import { Colors } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
@@ -18,6 +18,11 @@ export default function AuthCallback() {
 
   useEffect(() => {
     let cancelled = false;
+
+    if (!isSupabaseConfigured) {
+      router.replace('/(auth)/login');
+      return;
+    }
 
     async function resolveOAuthSessionFromUrl() {
       const currentUrl =

@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { formatRiderMoney, useRiderStore } from '@/store/riderStore';
+import { ProductImageSource, resolveImageSource } from '@/constants/productImages';
 import { Colors, Shadow } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
 import { Spacing } from '@/constants/spacing';
@@ -138,7 +139,7 @@ function EarningRow({
   isLast,
   onPress,
 }: {
-  job: { id?: string; productImage: string; productName: string; orderId: string; jobFee: number };
+  job: { id?: string; productImage: ProductImageSource; productName: string; orderId: string; jobFee: number };
   muted?: boolean;
   isLast?: boolean;
   onPress?: () => void;
@@ -153,7 +154,7 @@ function EarningRow({
         pressed && styles.jobRowPressed,
       ]}
     >
-      <Image source={{ uri: job.productImage }} style={styles.jobImage} />
+      <Image source={resolveImageSource(job.productImage)} style={styles.jobImage} />
       <View style={styles.jobCopy}>
         <Text style={styles.jobName} numberOfLines={1}>
           {job.productName}

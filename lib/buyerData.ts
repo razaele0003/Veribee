@@ -1,4 +1,4 @@
-import { ProductImages } from '@/constants/productImages';
+import { ProductImageSource, ProductImages } from '@/constants/productImages';
 import { DEMO_ACCOUNTS, DEMO_ROUTE } from '@/lib/demoProfiles';
 
 export type BuyerProduct = {
@@ -9,7 +9,7 @@ export type BuyerProduct = {
   sellerId: string;
   sellerName: string;
   sellerVsi: number;
-  imageUrl?: string;
+  imageUrl?: ProductImageSource;
   authStatus: 'verified' | 'pending';
   description: string;
   brand: string;

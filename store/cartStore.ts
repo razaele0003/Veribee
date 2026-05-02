@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createJSONStorage, persist } from 'zustand/middleware';
+import type { ProductImageSource } from '@/constants/productImages';
 
 export type CartItem = {
   productId: string;
@@ -8,7 +9,7 @@ export type CartItem = {
   price: number;
   sellerId: string;
   sellerName: string;
-  imageUrl?: string;
+  imageUrl?: ProductImageSource;
   quantity: number;
   authStatus: 'verified' | 'pending';
   selected?: boolean;

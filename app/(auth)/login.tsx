@@ -24,7 +24,7 @@ import { Type, Fonts } from '@/constants/typography';
 import { Spacing } from '@/constants/spacing';
 import { Radii } from '@/constants/radii';
 import { Logo } from '@/components/ui/Logo';
-import { supabase } from '@/lib/supabase';
+import { isSupabaseConfigured, supabase } from '@/lib/supabase';
 import { signInWithGoogle } from '@/lib/authOAuth';
 import type { Role } from '@/store/authStore';
 
@@ -99,6 +99,12 @@ export default function Login() {
         return;
       }
       setPhoneError('Incorrect password');
+      setLoading(false);
+      return;
+    }
+
+    if (!isSupabaseConfigured) {
+      setPhoneError('Supabase is not configured for this build. Use the test account buttons for local QA.');
       setLoading(false);
       return;
     }

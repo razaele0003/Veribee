@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { ActiveDeliveryCard } from '@/components/rider/ActiveDeliveryCard';
 import { MapCard } from '@/components/rider/MapCard';
 import { useRiderStore } from '@/store/riderStore';
+import { resolveImageSource } from '@/constants/productImages';
 import { Colors, Shadow } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
 import { Spacing } from '@/constants/spacing';
@@ -136,6 +137,7 @@ export default function RiderActive() {
         </Pressable>
       </View>
       <View style={styles.mapContainer}>
+        <View style={styles.routePreview}>
         <Image 
           source={{ uri: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAxZTad_jHpx1uRF4cMn7_Ydjq6ZxRxlIWFDs04G-MuLUQbkynMbgwJtmiEB4PGGujfIdaR4fGmSYDZ-C8N4AaJ8uWMBzgBa5JRxdlCblk0dOg4YHT0pdiV4UyfQz1_djL_lbyB0Zc67cFR54vzIR8BHyqXH9A1tdl6gEk4YIga2tYSohOhpcLVVzA9gclByx-MEI1fkhVsdCFSOhnt7g8T6cOruW957RiAjCFlVxw87K5WwhqGMDlxK5IXK4zUYBVaB6COkFjUejQ' }} 
           style={StyleSheet.absoluteFillObject} 
@@ -146,10 +148,10 @@ export default function RiderActive() {
           <MaterialIcons name="navigation" size={20} color={Colors.primary} />
           <Text style={styles.etaBadgeText}>{activeDelivery.etaMinutes} mins away</Text>
         </View>
+        </View>
 
-        {/* Floating Card */}
+        {/* Delivery Details */}
         <View style={styles.floatingCard}>
-          <View style={styles.handle} />
           <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.cardScroll}>
             
             {/* Header */}
@@ -198,7 +200,7 @@ export default function RiderActive() {
 
                {/* Item Card */}
                <View style={styles.itemCard}>
-                 <Image source={{ uri: activeDelivery.productImage }} style={styles.itemImage} />
+                 <Image source={resolveImageSource(activeDelivery.productImage)} style={styles.itemImage} />
                  <View style={styles.itemCopy}>
                    <Text style={styles.itemCategory}>{activeDelivery.category}</Text>
                    <Text style={styles.itemName} numberOfLines={1}>{activeDelivery.productName}</Text>
@@ -405,8 +407,13 @@ const styles = StyleSheet.create({
   },
   mapContainer: {
     flex: 1,
+    backgroundColor: Colors.surfaceContainer,
+  },
+  routePreview: {
+    height: 190,
     position: 'relative',
     backgroundColor: Colors.surfaceContainer,
+    overflow: 'hidden',
   },
   etaBadge: {
     position: 'absolute',
@@ -427,28 +434,10 @@ const styles = StyleSheet.create({
     color: Colors.onSurface,
   },
   floatingCard: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
+    flex: 1,
     backgroundColor: Colors.surface,
-    borderTopLeftRadius: Radii.xl,
-    borderTopRightRadius: Radii.xl,
-    maxHeight: '75%',
-    shadowColor: Colors.onSurface,
-    shadowOffset: { width: 0, height: -8 },
-    shadowOpacity: 0.08,
-    shadowRadius: 24,
-    elevation: 16,
-  },
-  handle: {
-    width: 48,
-    height: 6,
-    backgroundColor: Colors.surfaceContainerHighest,
-    borderRadius: Radii.full,
-    alignSelf: 'center',
-    marginTop: Spacing.sm,
-    marginBottom: Spacing.sm,
+    borderTopWidth: 1,
+    borderTopColor: Colors.surfaceContainerHigh,
   },
   cardScroll: {
     padding: Spacing.lg,

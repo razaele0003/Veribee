@@ -1,6 +1,7 @@
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { LocalProduct } from '@/store/sellerStore';
+import { resolveImageSource } from '@/constants/productImages';
 import { Colors, Shadow } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
 import { Spacing } from '@/constants/spacing';
@@ -47,7 +48,7 @@ export function ProductListItem({ product, onMenu, onPress }: Props) {
       <View style={styles.topRow}>
         <View style={styles.thumb}>
           {product.photos[0] ? (
-            <Image source={{ uri: product.photos[0] }} style={[styles.image, product.authStatus === 'failed' && styles.imageDisabled]} />
+            <Image source={resolveImageSource(product.photos[0])} style={[styles.image, product.authStatus === 'failed' && styles.imageDisabled]} />
           ) : (
             <MaterialIcons name="inventory-2" size={30} color={Colors.primary} />
           )}

@@ -9,6 +9,7 @@ import { supabase } from '@/lib/supabase';
 import { useBuyerPrefsStore } from '@/store/buyerPrefsStore';
 import { useCartStore } from '@/store/cartStore';
 import { useSellerStore } from '@/store/sellerStore';
+import { resolveImageSource } from '@/constants/productImages';
 import { Colors, Shadow } from '@/constants/colors';
 import { Fonts } from '@/constants/typography';
 import { Spacing } from '@/constants/spacing';
@@ -175,7 +176,7 @@ function SearchResultCard({ product }: { product: BuyerProduct }) {
     >
       <View style={styles.productImageWrap}>
         {product.imageUrl ? (
-          <Image source={{ uri: product.imageUrl }} style={styles.productImage} resizeMode="cover" />
+          <Image source={resolveImageSource(product.imageUrl)} style={styles.productImage} resizeMode="cover" />
         ) : (
           <MaterialIcons name="inventory-2" size={42} color={Colors.primary} />
         )}

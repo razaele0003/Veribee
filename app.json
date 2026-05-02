@@ -6,8 +6,8 @@
     "orientation": "portrait",
     "scheme": "veribee",
     "userInterfaceStyle": "light",
-    "newArchEnabled": true,
-    "icon": "./assets/images/veribee-logo.png",
+    "newArchEnabled": false,
+    "icon": "./assets/images/veribee-app-icon.png",
     "splash": {
       "image": "./assets/images/veribee-logo.png",
       "resizeMode": "contain",
@@ -23,20 +23,20 @@
     },
     "android": {
       "package": "com.veribee.delivery",
-      "versionCode": 1,
+      "versionCode": 3,
       "permissions": [
         "ACCESS_COARSE_LOCATION",
         "ACCESS_FINE_LOCATION"
       ],
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/veribee-logo.png",
+        "foregroundImage": "./assets/images/veribee-app-icon.png",
         "backgroundColor": "#fcf9f8"
       }
     },
     "web": {
       "bundler": "metro",
       "output": "single",
-      "favicon": "./assets/images/veribee-logo.png"
+      "favicon": "./assets/images/veribee-app-icon.png"
     },
     "plugins": [
       "expo-router",
@@ -47,10 +47,20 @@
         {
           "locationWhenInUsePermission": "Veribee uses your location during active deliveries so buyers can see secure rider progress."
         }
-      ]
+      ],
+      "@maplibre/maplibre-react-native"
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "8bc866e6-c5f8-4cda-a78e-a656cc64436d"
+      }
+    },
+    "owner": "razaele0003"
   }
 }

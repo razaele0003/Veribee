@@ -7,6 +7,7 @@ import { supabase } from '@/lib/supabase';
 import { isLocalUserId } from '@/lib/localAuth';
 import { useRiderStore } from '@/store/riderStore';
 import { useAuthStore } from '@/store/authStore';
+import { resolveImageSource } from '@/constants/productImages';
 import { Colors, Shadow } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
 import { Spacing } from '@/constants/spacing';
@@ -56,7 +57,7 @@ export default function PickupConfirm() {
         </View>
 
         <View style={styles.productCard}>
-          <Image source={{ uri: activeDelivery.productImage }} style={styles.productImage} />
+          <Image source={resolveImageSource(activeDelivery.productImage)} style={styles.productImage} />
           <View style={styles.productCopy}>
             <Text style={styles.productName}>{activeDelivery.productName}</Text>
             <Text style={styles.meta}>Order {activeDelivery.orderId}</Text>

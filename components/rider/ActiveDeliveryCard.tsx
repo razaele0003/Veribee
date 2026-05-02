@@ -1,6 +1,7 @@
 import { Image, Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { ActiveDelivery, formatRiderMoney } from '@/store/riderStore';
+import { resolveImageSource } from '@/constants/productImages';
 import { Colors, Shadow } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
 import { Radii } from '@/constants/radii';
@@ -28,7 +29,6 @@ export function ActiveDeliveryCard({
 
   return (
     <View style={styles.sheet}>
-      <View style={styles.handle} />
       <View style={styles.topRow}>
         <View style={styles.statusCopy}>
           <Text style={styles.label}>{subtitle}</Text>
@@ -42,7 +42,7 @@ export function ActiveDeliveryCard({
       </View>
 
       <View style={styles.packageCard}>
-        <Image source={{ uri: delivery.productImage }} style={styles.productImage} />
+        <Image source={resolveImageSource(delivery.productImage)} style={styles.productImage} />
         <View style={styles.packageCopy}>
           <Text style={styles.productName} numberOfLines={2}>
             {delivery.productName}
@@ -100,14 +100,6 @@ const styles = StyleSheet.create({
     padding: Spacing.containerMargin,
     gap: Spacing.md,
     ...Shadow.card,
-  },
-  handle: {
-    width: 48,
-    height: 5,
-    borderRadius: Radii.full,
-    backgroundColor: Colors.surfaceVariant,
-    alignSelf: 'center',
-    marginBottom: Spacing.xs,
   },
   topRow: {
     flexDirection: 'row',

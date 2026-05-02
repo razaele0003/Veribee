@@ -1,12 +1,13 @@
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+import { ProductImageSource, resolveImageSource } from '@/constants/productImages';
 import { Colors } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
 import { Spacing } from '@/constants/spacing';
 import { Radii } from '@/constants/radii';
 
 type Props = {
-  photos: string[];
+  photos: ProductImageSource[];
   onAdd?: () => void;
 };
 
@@ -32,11 +33,11 @@ export function EvidenceUploader({ photos, onAdd }: Props) {
           <View style={styles.grid}>
             {photos.slice(0, 8).map((photo, index) => (
               <View
-                key={photo}
+                key={String(photo)}
                 style={styles.slot}
                 accessibilityLabel={`Product photo ${index + 1}`}
               >
-                <Image source={{ uri: photo }} style={styles.image} />
+                <Image source={resolveImageSource(photo)} style={styles.image} />
                 <View style={styles.numberPill}>
                   <Text style={styles.numberText}>{index + 1}</Text>
                 </View>

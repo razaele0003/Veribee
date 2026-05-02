@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -19,6 +19,7 @@ type PendingAction = 'accept' | 'decline';
 
 export default function RiderJobFeed() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const jobs = useRiderStore((s) => s.jobs);
   const userId = useAuthStore((s) => s.userId);
   const isOnline = useRiderStore((s) => s.isOnline);
@@ -76,12 +77,12 @@ export default function RiderJobFeed() {
   const isAcceptDialog = pendingAction === 'accept';
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <View style={styles.container}>
       <LinearGradient
         colors={[Colors.primaryContainer, Colors.primary, '#d22517']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
-        style={styles.hero}
+        style={[styles.hero, { paddingTop: insets.top + Spacing.md }]}
       >
         <View style={styles.heroRow}>
           <View style={styles.heroTitleRow}>
@@ -243,7 +244,7 @@ export default function RiderJobFeed() {
           </View>
         </View>
       )}
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -251,7 +252,6 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },
   hero: {
     paddingHorizontal: Spacing.containerMargin,
-    paddingTop: Spacing.md,
     paddingBottom: Spacing.md,
     borderBottomLeftRadius: Radii.xl,
     borderBottomRightRadius: Radii.xl,

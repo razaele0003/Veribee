@@ -5,6 +5,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { Button } from '@/components/ui/Button';
 import { AuthScoreCircle } from '@/components/ui/AuthScoreCircle';
 import { LocalProduct, useSellerStore } from '@/store/sellerStore';
+import { resolveImageSource } from '@/constants/productImages';
 import { Colors, Shadow } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
 import { Spacing } from '@/constants/spacing';
@@ -130,7 +131,7 @@ export default function AuthStatus() {
         <View style={styles.summaryCard}>
           <View style={styles.thumbnail}>
             {product.photos[0] ? (
-              <Image source={{ uri: product.photos[0] }} style={styles.image} />
+              <Image source={resolveImageSource(product.photos[0])} style={styles.image} />
             ) : (
               <MaterialIcons name="inventory-2" size={28} color={Colors.primary} />
             )}

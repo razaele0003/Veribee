@@ -28,3 +28,4 @@ button-test-report/
 playwright-report/
 test-results/
 .playwright/
+artifacts/
