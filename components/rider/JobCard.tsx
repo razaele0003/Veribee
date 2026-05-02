@@ -1,6 +1,7 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { RiderJob, formatRiderMoney } from '@/store/riderStore';
+import { resolveImageSource } from '@/constants/productImages';
 import { Colors, Shadow } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
 import { Spacing } from '@/constants/spacing';
@@ -18,7 +19,7 @@ export function JobCard({ job, onAccept, onDecline }: Props) {
       <View style={styles.cardHeader}>
         <View style={styles.headerLeft}>
           <View style={styles.iconBox}>
-            <MaterialIcons name="inventory-2" size={24} color={Colors.primary} />
+            <Image source={resolveImageSource(job.productImage)} style={styles.productImage} />
           </View>
           <View style={styles.headerCopy}>
             <Text style={styles.categoryText} numberOfLines={1}>{job.category} Verified</Text>
@@ -120,6 +121,11 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surfaceContainerHigh,
     alignItems: 'center',
     justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  productImage: {
+    width: '100%',
+    height: '100%',
   },
   headerCopy: {
     flex: 1,

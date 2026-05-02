@@ -21,6 +21,7 @@ import { useAuthStore } from '@/store/authStore';
 import { useSellerStore } from '@/store/sellerStore';
 import { calculateSellerVsiFromProducts } from '@/lib/veribeeScoring';
 import { DEMO_ACCOUNTS } from '@/lib/demoProfiles';
+import { ProductImages } from '@/constants/productImages';
 import { Colors, Shadow } from '@/constants/colors';
 import { Fonts, Type } from '@/constants/typography';
 import { Spacing } from '@/constants/spacing';
@@ -50,6 +51,7 @@ const fallbackOrders: OrderItemData[] = [
     productTitle: 'Artisan Honey x2',
     price: 1200,
     status: 'processing',
+    thumbnailUrl: ProductImages.tote,
   },
   {
     id: 'preview-2',
@@ -57,6 +59,7 @@ const fallbackOrders: OrderItemData[] = [
     productTitle: 'Beeswax Candles',
     price: 850,
     status: 'pending auth',
+    thumbnailUrl: ProductImages.pendant,
   },
 ];
 
